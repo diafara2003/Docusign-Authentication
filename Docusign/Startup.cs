@@ -33,6 +33,7 @@ namespace Docusign
         }
 
         public IConfiguration Configuration { get; }
+        const string origins = "CorsPolicy";
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -44,6 +45,15 @@ namespace Docusign
             Configuration.Bind("DocuSign", config);
 
             services.AddSingleton(config);
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy(origins,
+                    //builder => builder.WithOrigins("http://10.1.10.31")
+                    builder => builder.WithOrigins("*")
+                    .AllowAnyMethod()
+                    .AllowAnyHeader());
+            });
 
             //  services.AddMemoryCache();
             //services.AddSession();
@@ -112,6 +122,9 @@ namespace Docusign
 
             services.AddControllers();
 
+
+            services.AddAuthorization();
+
         }
 
 #nullable enable
@@ -151,7 +164,7 @@ namespace Docusign
 
             app.UseRouting();
 
-
+            app.UseCors(origins);
             app.UseAuthentication();
             app.UseAuthorization();
 
