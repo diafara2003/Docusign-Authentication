@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Model\Model\Model.csproj" />
+    <ProjectReference Include="..\Services\DocuSignBL\DocuSignBL.csproj" />
   </ItemGroup>
 
 </Project>
