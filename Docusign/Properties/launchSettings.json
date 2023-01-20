@@ -23,6 +23,7 @@
     },
     "Docusign": {
       "commandName": "IIS",
+      "launchBrowser": true,
       "launchUrl": "http://localhost/Sinco/V3/ADPRO/Docusign/"
     }
   }
