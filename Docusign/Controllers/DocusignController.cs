@@ -7,6 +7,7 @@ using System;
 using DocuSignBL.Peticion;
 using Model.DTO;
 using Model.DTO.Users;
+using System.Threading.Tasks;
 
 namespace Docusign.Controllers
 {
@@ -21,20 +22,29 @@ namespace Docusign.Controllers
         }
 
         [HttpGet("userInfo")]
-        public IActionResult GetUserInfo()
+        public async Task<IActionResult> GetUserInfo()
         {
             //if (!User.Identity.IsAuthenticated) return Challenge(new AuthenticationProperties() { RedirectUri = "/Docusign/userInfo" });
 
-            var auth = new PeticionDocusign().validationAuthentication();
-            if (!auth.isAuthenticated)
+            //var auth = new PeticionDocusign().validationAuthentication();
+            //if (!auth.isAuthenticated)
+            //{
+            //    Tuple<AuthenticationDTO, string> responseAuth = new Tuple<AuthenticationDTO, string>(auth, string.Empty);
+            //    return Ok(responseAuth);
+            //}
+            try
             {
-                Tuple<AuthenticationDTO, string> responseAuth = new Tuple<AuthenticationDTO, string>(auth, string.Empty);
-                return Ok(responseAuth);
+                var x = await new PeticionDocusign().peticion<userDTO>("users", HttpMethod.Get);
+
+                return Ok(x);
+
+            }
+            catch (Exception e)
+            {
+
+                return Ok(e.Message);
             }
 
-
-            return Ok(new PeticionDocusign().peticion<userDTO>("users", HttpMethod.Get));
-           
         }
     }
 }

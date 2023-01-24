@@ -4,7 +4,7 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iis": {
-      "applicationUrl": "http://localhost/Sinco/V3/ADPRO/Docusign/",
+      "applicationUrl": "https://localhost/Sinco/V3/ADPRO/Docusign/",
       "sslPort": 0
     },
     "iisExpress": {
@@ -24,7 +24,7 @@
     "Docusign": {
       "commandName": "IIS",
       "launchBrowser": true,
-      "launchUrl": "http://localhost/Sinco/V3/ADPRO/Docusign/"
+      "launchUrl": "https://localhost/Sinco/V3/ADPRO/Docusign/"
     }
   }
 }
