@@ -11,7 +11,7 @@
     "Docusign": {
       "commandName": "IIS",
       "launchBrowser": true,
-      "launchUrl": "http://localhost/Sinco/V3/ADPRO/Docusign/"
+      "launchUrl": "https://localhost/Sinco/V3/ADPRO/Docusign/"
     }
   },
   "$schema": "http://json.schemastore.org/launchsettings.json",

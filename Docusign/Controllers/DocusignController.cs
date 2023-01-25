@@ -7,6 +7,8 @@ using System;
 using DocuSignBL.Peticion;
 using Model.DTO;
 using Model.DTO.Users;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace Docusign.Controllers
 {
@@ -21,20 +23,57 @@ namespace Docusign.Controllers
         }
 
         [HttpGet("userInfo")]
-        public IActionResult GetUserInfo()
+        public async Task<IActionResult> GetUserInfo()
         {
             //if (!User.Identity.IsAuthenticated) return Challenge(new AuthenticationProperties() { RedirectUri = "/Docusign/userInfo" });
 
-            var auth = new PeticionDocusign().validationAuthentication();
-            if (!auth.isAuthenticated)
+            //var auth = new PeticionDocusign().validationAuthentication();
+            //if (!auth.isAuthenticated)
+            //{
+            //    Tuple<AuthenticationDTO, string> responseAuth = new Tuple<AuthenticationDTO, string>(auth, string.Empty);
+            //    return Ok(responseAuth);
+            //}
+            try
             {
-                Tuple<AuthenticationDTO, string> responseAuth = new Tuple<AuthenticationDTO, string>(auth, string.Empty);
-                return Ok(responseAuth);
+                var x = await new PeticionDocusign().peticion<userDTO>("users", HttpMethod.Get);
+
+                return Ok(x);
+
+            }
+            catch (Exception e)
+            {
+
+                return Ok(e.Message);
+            }
+
+        }
+
+        [HttpGet("Templates")]
+        public async Task<IActionResult> GetTemplates()
+        {
+            try
+            {
+                templatesDTO TemplatesArray = await new PeticionDocusign().peticion<templatesDTO>("templates?order_by=name", HttpMethod.Get);
+
+                //var TemplatesLista = new List<envelopeTemplatesDTO>();
+
+                //foreach (var item in TemplatesArray.envelopeTemplates)
+                //{
+                //    var Templates = await new PeticionDocusign().peticion<envelopeTemplatesDTO>(item.uri, HttpMethod.Get);
+                //    TemplatesLista.Add(Templates);
+                //}
+
+                return Ok(TemplatesArray.envelopeTemplates);
+
+            }
+            catch (Exception e)
+            {
+
+                return Ok(e.Message);
+
             }
 
 
-            return Ok(new PeticionDocusign().peticion<userDTO>("users", HttpMethod.Get));
-           
         }
     }
 }
