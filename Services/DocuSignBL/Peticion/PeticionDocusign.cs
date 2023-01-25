@@ -45,7 +45,7 @@ namespace DocuSignBL.Peticion
         public AuthenticationDTO validationAuthentication()
         {
             AuthenticationDTO auth = new AuthenticationDTO();
-            auth.isAuthenticated = false;
+            auth.isAuthenticated = true;
             auth.URL = "https://account.docusign.com/oauth/auth?client_id=4907d311-b734-4d16-be6c-acab89356eaa&scope=signature&response_type=code&redirect_uri=https%3A%2F%2Flocalhost%2FSinco%2FV3%2FADPRO%2FDocusign%2Fapi%2Fds%2Fcallback";
             return auth;
         }

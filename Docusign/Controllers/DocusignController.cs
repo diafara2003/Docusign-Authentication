@@ -47,33 +47,27 @@ namespace Docusign.Controllers
             }
 
         }
-
+        
         [HttpGet("Templates")]
         public async Task<IActionResult> GetTemplates()
         {
             try
             {
                 templatesDTO TemplatesArray = await new PeticionDocusign().peticion<templatesDTO>("templates?order_by=name", HttpMethod.Get);
+                var auth = new PeticionDocusign().validationAuthentication();
+                Tuple<AuthenticationDTO, IList<envelopeTemplatesDTO>> responseAuth = new Tuple<AuthenticationDTO, IList<envelopeTemplatesDTO>>(auth, TemplatesArray.envelopeTemplates);
+                if (!auth.isAuthenticated)
+                {                   
+                    return Ok(responseAuth);
+                }
 
-                //var TemplatesLista = new List<envelopeTemplatesDTO>();
-
-                //foreach (var item in TemplatesArray.envelopeTemplates)
-                //{
-                //    var Templates = await new PeticionDocusign().peticion<envelopeTemplatesDTO>(item.uri, HttpMethod.Get);
-                //    TemplatesLista.Add(Templates);
-                //}
-
-                return Ok(TemplatesArray.envelopeTemplates);
-
+                return Ok(responseAuth);
             }
             catch (Exception e)
             {
-
                 return Ok(e.Message);
 
             }
-
-
         }
     }
 }
