@@ -54,7 +54,7 @@ namespace Docusign.Controllers
             try
             {
                 templatesDTO TemplatesArray = await new PeticionDocusign().peticion<templatesDTO>("templates?order_by=name", HttpMethod.Get);
-                var auth = new PeticionDocusign().validationAuthentication();
+                var auth = new PeticionDocusign().validationAuthentication();   
                 Tuple<AuthenticationDTO, IList<envelopeTemplatesDTO>> responseAuth = new Tuple<AuthenticationDTO, IList<envelopeTemplatesDTO>>(auth, TemplatesArray.envelopeTemplates);
                 if (!auth.isAuthenticated)
                 {                   
