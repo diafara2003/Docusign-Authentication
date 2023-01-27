@@ -55,25 +55,45 @@ namespace Docusign.Controllers
             {
                 templatesDTO TemplatesArray = await new PeticionDocusign().peticion<templatesDTO>("templates?order_by=name", HttpMethod.Get);
 
-                //var TemplatesLista = new List<envelopeTemplatesDTO>();
+                var TemplatesFilter = new List<envelopeTemplatesDTO>();
 
-                //foreach (var item in TemplatesArray.envelopeTemplates)
-                //{
-                //    var Templates = await new PeticionDocusign().peticion<envelopeTemplatesDTO>(item.uri, HttpMethod.Get);
-                //    TemplatesLista.Add(Templates);
-                //}
+                foreach (var item in TemplatesArray.envelopeTemplates)
+                {
+                    if (item.name != "")
+                    {
+                        TemplatesFilter.Add(item);
+                    }
+                }
 
-                return Ok(TemplatesArray.envelopeTemplates);
+                var auth = new PeticionDocusign().validationAuthentication();
+                Tuple<AuthenticationDTO, IList<envelopeTemplatesDTO>> responseAuth = new Tuple<AuthenticationDTO, IList<envelopeTemplatesDTO>>(auth, TemplatesFilter);
+
+                return Ok(responseAuth);
 
             }
             catch (Exception e)
             {
-
                 return Ok(e.Message);
-
             }
+        }
 
+        [HttpGet("TemplatesSigners")]
+        public async Task<IActionResult> GetTemplatesSigners()
+        {
+            try
+            {
+                templatesDTO TemplatesArray = await new PeticionDocusign().peticion<templatesDTO>("templates?order_by=name&include=recipients,documents", HttpMethod.Get);
+                var signers = TemplatesArray.envelopeTemplates;
 
+                var auth = new PeticionDocusign().validationAuthentication();
+                Tuple<AuthenticationDTO, IList<envelopeTemplatesDTO>> responseAuth = new Tuple<AuthenticationDTO, IList<envelopeTemplatesDTO>>(auth, signers);
+
+                return Ok(responseAuth);
+            }
+            catch (Exception e)
+            {
+                return Ok(e.Message);
+            }
         }
     }
 }
