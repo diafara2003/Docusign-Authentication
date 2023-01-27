@@ -47,7 +47,7 @@ namespace Docusign.Controllers
             }
 
         }
-        
+
         [HttpGet("Templates")]
         public async Task<IActionResult> GetTemplates()
         {
@@ -77,9 +77,26 @@ namespace Docusign.Controllers
             }
         }
 
+
+        [HttpGet("TemplatesSigners")]
+        public async Task<IActionResult> GetTemplatesSigners()
+        {
+            try
+            {
+                templatesDTO TemplatesArray = await new PeticionDocusign().peticion<templatesDTO>("templates?order_by=name&include=recipients,documents", HttpMethod.Get);
+                var signers = TemplatesArray.envelopeTemplates;
+
+                var auth = new PeticionDocusign().validationAuthentication();
+                Tuple<AuthenticationDTO, IList<envelopeTemplatesDTO>> responseAuth = new Tuple<AuthenticationDTO, IList<envelopeTemplatesDTO>>(auth, signers);
+
+                return Ok(responseAuth);
             }
-
-
+            catch (Exception e)
+            {
+                return Ok(e.Message);
+            }
         }
+
     }
 }
+
