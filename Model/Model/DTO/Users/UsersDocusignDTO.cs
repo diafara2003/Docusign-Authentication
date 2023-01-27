@@ -34,5 +34,32 @@ namespace Model.DTO.Users
         public string templateId { get; set; }
         public string uri { get; set; }
         public string name { get; set; }
+        public string emailSubject { get; set; }
+        public string emailBlurb { get; set; }
+        public IList<documentsDTO> documents { get; set; }
+        public recipientsDTO recipients { get; set; }
+
     }
+
+    public class documentsDTO
+    {
+        public string documentId { get; set; }
+        public string uri { get; set; }
+        public string name { get; set; }
+    }
+
+    public class recipientsDTO
+    {
+        public IList<signersDTO> signers { get; set; }
+    }
+
+    public class signersDTO
+    {
+        public string name { get; set; }
+        public string email { get; set; }
+        public string recipientId { get; set; }
+        public string roleName { get; set; }
+    }
+
+
 }
