@@ -60,6 +60,4 @@ namespace Model.DTO.Users
         public string recipientId { get; set; }
         public string roleName { get; set; }
     }
-
-
 }
