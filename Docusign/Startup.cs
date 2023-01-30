@@ -160,7 +160,7 @@ namespace Docusign
             else app.UseHsts();
 
 
-            app.UseHttpsRedirection();
+          //  app.UseHttpsRedirection();
 
             app.UseRouting();
 
