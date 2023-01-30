@@ -9,6 +9,7 @@ using Model.DTO;
 using Model.DTO.Users;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using DocuSignBL.Opetations;
 
 namespace Docusign.Controllers
 {
@@ -95,6 +96,12 @@ namespace Docusign.Controllers
             {
                 return Ok(e.Message);
             }
+        }
+
+        [HttpGet("envelopes/recipents")]
+        public async Task<IActionResult> GetRecipentsEnvelope(string envelope)
+        {
+            return Ok(await new DocuSignBL.Opetations.DocuSignBL().GetRecipentsEnvelope(envelope));
         }
 
     }

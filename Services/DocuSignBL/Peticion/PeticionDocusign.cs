@@ -1,11 +1,8 @@
 ﻿using Model.DTO;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DocuSignBL.Peticion
@@ -23,7 +20,7 @@ namespace DocuSignBL.Peticion
                 Timeout = new TimeSpan(0, 2, 0)
             };
 
-            var token = "eyJ0eXAiOiJNVCIsImFsZyI6IlJTMjU2Iiwia2lkIjoiOGFlYzFjZjQtYmE4NS00MDM5LWE1MmItYzVhODAxMjA3N2EyIn0.AQsAAAABAAUABwCAh9NKaQDbSAgAgMf2WKwA20gCALv6cVlKS7RPn5vjUswLIFIVAAMAAAAYAAEAAAAFAAAADQAkAAAANDkwN2QzMTEtYjczNC00ZDE2LWJlNmMtYWNhYjg5MzU2ZWFhIgAkAAAANDkwN2QzMTEtYjczNC00ZDE2LWJlNmMtYWNhYjg5MzU2ZWFhEgABAAAACwAAAGludGVyYWN0aXZlMAAA8TpKaQDbSDcATFPDbC0aE02P4LYnQ8rjeA.Ootz9QBi2h3vNJgIf9ufEd3FMLJPIpbWwVgX74Zg2c1f2dMkCdT0ZCPiNSKlDtqOrSFtPcbGt_KSluBfz-UFhx8Kn9Z3DVHsxgQ4tnNrcqknoaGUJwXW2PTuJ1dIYvAElGapAEAo6qQzIfCFPigVNzgg5Sr2Oxi1GL7YFGiQnOS60Qxt9gDER6QqiR6E5KRZD2SgldakY9MoZicYR2Ih6r2ZRz983XtdONNYiMuCkX4CPUsnntVf-wCVLjMfSTYp-me-3z1YxhzxI-hzN-juIyDQd2bqVL0NVdoIKZKU64B-HcTK7L3yIBSjY76U9nT-c_YOAh6dpZljXJuYIhOSWQ";
+            var token = "eyJ0eXAiOiJNVCIsImFsZyI6IlJTMjU2Iiwia2lkIjoiOGFlYzFjZjQtYmE4NS00MDM5LWE1MmItYzVhODAxMjA3N2EyIn0.AQsAAAABAAUABwCAoEBF-gLbSAgAgOBjUz0D20gCALv6cVlKS7RPn5vjUswLIFIVAAMAAAAYAAEAAAAFAAAADQAkAAAANDkwN2QzMTEtYjczNC00ZDE2LWJlNmMtYWNhYjg5MzU2ZWFhIgAkAAAANDkwN2QzMTEtYjczNC00ZDE2LWJlNmMtYWNhYjg5MzU2ZWFhEgABAAAACwAAAGludGVyYWN0aXZlMAAACqhE-gLbSDcATFPDbC0aE02P4LYnQ8rjeA.dRA36MECJ9bEk_sIj_qYz8J_n-EggMr93SmhLb7BKHnrxxSTWyJrd6JvnTtVAtLwhHQjUT1LplmXgL6MiL9E-wgsH3DHqODfDW8Cr4iXe6vKIjej-DN7rYTnlLqE9hA1Sh-VGdIS8xzesuNTgR4uMNbZPpE4KKc1oW5nKcj_uroRIr92t4zf3z6LwdBmRkwWly5ENN67j7re8TdQf1X9eyWN-PGCzDG_nb_zi7UsjULk1AqGK7XjOPQ_O6HZeX_UYL21jUsR_jkFeOoEYP86xsK0fRhxAdtxyJKiuR2YH6BDW52hiie9h165azMXE7HnG-vO7PrkB2DbLKjiEqk2VA";
 
             httpClient.DefaultRequestHeaders.Add("ContentType", "application/json");
             httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
