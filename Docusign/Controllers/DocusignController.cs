@@ -106,6 +106,28 @@ namespace Docusign.Controllers
             return Ok(await new DocuSignBL.Opetations.DocuSignBL().GetRecipentsEnvelope(envelope));
         }
 
+        /// <summary>
+        /// Metodo encargado de consultar los firmantes segun un template especifico
+        /// </summary>
+        /// <param name="idTemplate"></param>
+        /// <returns></returns>
+        [HttpGet("SignersByTemplete")]
+        public async Task<IActionResult> GetSignersByTemplete(string idTemplate)
+        {
+            try
+            {
+                envelopeTemplatesDTO SignersDocuemnts = await new PeticionDocusign().peticion<envelopeTemplatesDTO>($"templates/{idTemplate}/signers?order_by=name", HttpMethod.Get);              
+                //var auth = new PeticionDocusign().validationAuthentication();
+                //Tuple<AuthenticationDTO, envelopeTemplatesDTO> responseAuth = new Tuple<AuthenticationDTO,envelopeTemplatesDTO>(auth, SignersDocuemnts);
+
+                return Ok(SignersDocuemnts);
+            }
+            catch (Exception e)
+            {
+                return Ok(e.Message);
+            }
+        }
+
         [HttpPost("envelopes/send")]
         public async Task<IActionResult> SendEnvelope(EnvelopeSendDTO envelope)
         {
