@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace DocuSignBL.Peticion
@@ -20,12 +21,25 @@ namespace DocuSignBL.Peticion
                 Timeout = new TimeSpan(0, 2, 0)
             };
 
-            var token = "eyJ0eXAiOiJNVCIsImFsZyI6IlJTMjU2Iiwia2lkIjoiOGFlYzFjZjQtYmE4NS00MDM5LWE1MmItYzVhODAxMjA3N2EyIn0.AQsAAAABAAUABwCAoEBF-gLbSAgAgOBjUz0D20gCALv6cVlKS7RPn5vjUswLIFIVAAMAAAAYAAEAAAAFAAAADQAkAAAANDkwN2QzMTEtYjczNC00ZDE2LWJlNmMtYWNhYjg5MzU2ZWFhIgAkAAAANDkwN2QzMTEtYjczNC00ZDE2LWJlNmMtYWNhYjg5MzU2ZWFhEgABAAAACwAAAGludGVyYWN0aXZlMAAACqhE-gLbSDcATFPDbC0aE02P4LYnQ8rjeA.dRA36MECJ9bEk_sIj_qYz8J_n-EggMr93SmhLb7BKHnrxxSTWyJrd6JvnTtVAtLwhHQjUT1LplmXgL6MiL9E-wgsH3DHqODfDW8Cr4iXe6vKIjej-DN7rYTnlLqE9hA1Sh-VGdIS8xzesuNTgR4uMNbZPpE4KKc1oW5nKcj_uroRIr92t4zf3z6LwdBmRkwWly5ENN67j7re8TdQf1X9eyWN-PGCzDG_nb_zi7UsjULk1AqGK7XjOPQ_O6HZeX_UYL21jUsR_jkFeOoEYP86xsK0fRhxAdtxyJKiuR2YH6BDW52hiie9h165azMXE7HnG-vO7PrkB2DbLKjiEqk2VA";
+            var token = "eyJ0eXAiOiJNVCIsImFsZyI6IlJTMjU2Iiwia2lkIjoiOGFlYzFjZjQtYmE4NS00MDM5LWE1MmItYzVhODAxMjA3N2EyIn0.AQsAAAABAAUABwCA9WxWJAXbSAgAgDWQZGcF20gCALv6cVlKS7RPn5vjUswLIFIVAAMAAAAYAAEAAAAFAAAADQAkAAAANDkwN2QzMTEtYjczNC00ZDE2LWJlNmMtYWNhYjg5MzU2ZWFhIgAkAAAANDkwN2QzMTEtYjczNC00ZDE2LWJlNmMtYWNhYjg5MzU2ZWFhEgABAAAACwAAAGludGVyYWN0aXZlMAAAX9RVJAXbSDcATFPDbC0aE02P4LYnQ8rjeA.tMtxBHJDhBwktpO47nhfm7bkyYpr6uSMiCwgmYQuFe-9v8jZc-PYNZuuxToJJqfb0p_9X0GD51cHlr1S9iFyQub_r20h7B3_4kl3otTwexo44X1MKAxEk_mZRdJdiABSJldy-Up-iy3TNMftFNp0OeZRUpsYTzOVU2HVEdDuPKm5RJLpVAJEpp9uHWLenZumey5Z8ydpqrsNN-O09psY3A7FBhSuPlcGSZuKrA9zl_i75SYRKkVnejPtkktVXn99wEYfvJ-THBnXE5g6Gi3M_i1xaEe_tHi4oO9c87eQAyi8OcErSd7gLIeoatpyxbHPWd5MlGeNn3eR9oyNxljTTA";
 
             httpClient.DefaultRequestHeaders.Add("ContentType", "application/json");
             httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
 
-            HttpResponseMessage response = await httpClient.GetAsync($"https://na3.docusign.net/restapi/v2.1/accounts/56483961/{method}");
+            HttpResponseMessage response = new HttpResponseMessage();
+
+            if (type.Method == "GET")
+            {
+                response = await httpClient.GetAsync($"https://na3.docusign.net/restapi/v2.1/accounts/56483961/{method}");
+            }
+            else if (type.Method == "POST")
+            {
+                var json = JsonConvert.SerializeObject(data);
+                var dataEnvio = new StringContent(json, Encoding.UTF8, "application/json");
+                response = await httpClient.PostAsync($"https://na3.docusign.net/restapi/v2.1/accounts/56483961/{method}", dataEnvio);
+            }
+
+
             string content = string.Empty;
 
             using (StreamReader stream = new StreamReader(await response.Content.ReadAsStreamAsync()))
