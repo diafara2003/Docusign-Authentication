@@ -116,7 +116,7 @@ namespace Docusign.Controllers
         {
             try
             {
-                envelopeTemplatesDTO SignersDocuemnts = await new PeticionDocusign().peticion<envelopeTemplatesDTO>($"templates/{idTemplate}/signers?order_by=name", HttpMethod.Get);              
+                envelopeTemplatesDTO SignersDocuemnts = await new PeticionDocusign().peticion<envelopeTemplatesDTO>($"templates/{idTemplate}/signers?order_by=name", HttpMethod.Get);
                 //var auth = new PeticionDocusign().validationAuthentication();
                 //Tuple<AuthenticationDTO, envelopeTemplatesDTO> responseAuth = new Tuple<AuthenticationDTO,envelopeTemplatesDTO>(auth, SignersDocuemnts);
 
@@ -131,11 +131,24 @@ namespace Docusign.Controllers
         [HttpPost("envelopes/send")]
         public async Task<IActionResult> SendEnvelope(EnvelopeSendDTO envelope)
         {
+            EnvelopeResponse envelopeResponse2 = new EnvelopeResponse();
+
+            envelopeResponse2.envelopeId = "467489b2-fddc-4264-977c-fe4944806c71";
+            envelopeResponse2.uri = "/envelopes/467489b2-fddc-4264-977c-fe4944806c71";
+            envelopeResponse2.statusDateTime = "2023-05-05T16:33:16.2970000Z";
+            envelopeResponse2.status = "sent";
+
+
+
+            var auth2 = new PeticionDocusign().validationAuthentication();
+            Tuple<AuthenticationDTO, EnvelopeResponse> responseAuth2 = new Tuple<AuthenticationDTO, EnvelopeResponse>(auth2, envelopeResponse2);
+            return Ok(responseAuth2);
+
             try
             {
                 templateDTO template = await new PeticionDocusign().peticion<templateDTO>("templates/" + envelope.IdTemplate, HttpMethod.Get);
 
-                
+
                 EnvelopeResponse envelopeResponse = new EnvelopeResponse();
                 envelopeTemplatesDTO envelopeToSend = new envelopeTemplatesDTO();
 
