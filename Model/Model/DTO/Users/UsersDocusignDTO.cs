@@ -100,4 +100,68 @@ namespace Model.DTO.Users
         public IList<fullNameDTO> fullNameTabs { get; set; }
         public IList<signHereDTO> signHereTabs { get; set; }
     }
+
+
+    public class dateSignedTabsDTO
+    {
+        public string anchorString { get; set; }
+        public string anchorYOffset { get; set; }
+        public string fontSize { get; set; }
+        public string name { get; set; }
+        public string recipientId { get; set; }
+        public string tabLabel { get; set; }
+    }
+
+    public class fullNameDTO
+    {
+        public string anchorString { get; set; }
+        public string anchorYOffset { get; set; }
+        public string fontSize { get; set; }
+        public string name { get; set; }
+        public string recipientId { get; set; }
+        public string tabLabel { get; set; }
+    }
+
+    public class signHereDTO
+    {
+        public string anchorString { get; set; }
+        public string anchorYOffset { get; set; }
+        public string fontSize { get; set; }
+        public string name { get; set; }
+        public string optional { get; set; }
+        public string recipientId { get; set; }
+        public string scaleValue { get; set; }
+        public string tabLabel { get; set; }
+    }
+
+    public class carbonCopiesDtO
+    {
+        public string email { get; set; }
+        public string name { get; set; }
+        public string recipientId { get; set; }
+        public string routingOrder { get; set; }
+    }
+
+    public class EnvelopeSendDTO
+    {
+        public string documentoBase64 { get; set; }
+        public string documentId { get; set; }
+        public string fileExtension { get; set; }
+        public string name { get; set; }
+        public string IdTemplate { get; set; }
+        public string nameTer { get; set; }
+        public string emailTer { get; set; }
+    }
+
+    public class EnvelopeResponse
+    {
+        public string envelopeId { get; set; }
+
+        public string uri { get; set; }
+
+        public string statusDateTime { get; set; }
+
+        public string status { get; set; }
+
+    }
 }
