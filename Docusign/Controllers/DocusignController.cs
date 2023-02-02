@@ -10,6 +10,8 @@ using Model.DTO.Users;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using DocuSignBL.Opetations;
+using System.Linq;
+using System.Xml.Linq;
 
 namespace Docusign.Controllers
 {
@@ -114,11 +116,121 @@ namespace Docusign.Controllers
         {
             try
             {
-                envelopeTemplatesDTO SignersDocuemnts = await new PeticionDocusign().peticion<envelopeTemplatesDTO>($"templates/{idTemplate}/signers?order_by=name", HttpMethod.Get);              
+                envelopeTemplatesDTO SignersDocuemnts = await new PeticionDocusign().peticion<envelopeTemplatesDTO>($"templates/{idTemplate}/signers?order_by=name", HttpMethod.Get);
                 //var auth = new PeticionDocusign().validationAuthentication();
                 //Tuple<AuthenticationDTO, envelopeTemplatesDTO> responseAuth = new Tuple<AuthenticationDTO,envelopeTemplatesDTO>(auth, SignersDocuemnts);
 
                 return Ok(SignersDocuemnts);
+            }
+            catch (Exception e)
+            {
+                return Ok(e.Message);
+            }
+        }
+
+        [HttpPost("envelopes/send")]
+        public async Task<IActionResult> SendEnvelope(EnvelopeSendDTO envelope)
+        {
+            EnvelopeResponse envelopeResponse2 = new EnvelopeResponse();
+
+            envelopeResponse2.envelopeId = "467489b2-fddc-4264-977c-fe4944806c71";
+            envelopeResponse2.uri = "/envelopes/467489b2-fddc-4264-977c-fe4944806c71";
+            envelopeResponse2.statusDateTime = "2023-05-05T16:33:16.2970000Z";
+            envelopeResponse2.status = "sent";
+
+
+
+            var auth2 = new PeticionDocusign().validationAuthentication();
+            Tuple<AuthenticationDTO, EnvelopeResponse> responseAuth2 = new Tuple<AuthenticationDTO, EnvelopeResponse>(auth2, envelopeResponse2);
+            return Ok(responseAuth2);
+
+            try
+            {
+                templateDTO template = await new PeticionDocusign().peticion<templateDTO>("templates/" + envelope.IdTemplate, HttpMethod.Get);
+
+
+                EnvelopeResponse envelopeResponse = new EnvelopeResponse();
+                envelopeTemplatesDTO envelopeToSend = new envelopeTemplatesDTO();
+
+
+
+
+                envelopeToSend.emailSubject = template.emailSubject;
+
+                /*Se obtienen los documentos*/
+
+                documentsDTO docu = new documentsDTO();
+                List<documentsDTO> documents = new List<documentsDTO>();
+
+                docu.documentBase64 = envelope.documentoBase64;
+                docu.documentId = envelope.documentId;
+                docu.fileExtension = envelope.fileExtension;
+                docu.name = envelope.name;
+
+                foreach (var doc in template.documents)
+                {
+                    string documentsBase64 = await new PeticionDocusign().peticion<string>(doc.uri, HttpMethod.Get);
+                    doc.documentBase64 = documentsBase64;
+                    documents.Add(doc);
+                }
+
+                documents.Add(docu);
+
+                envelopeToSend.documents = documents;
+
+                /*Se obtienen los firmantes*/
+
+                /*Se obtienen contratista*/
+
+                List<signersDTO> signers = new List<signersDTO>();
+
+                signers.AddRange((from item in template.recipients.signers
+                                  where item.email != "" && item.name != ""
+                                  select new signersDTO
+                                  {
+                                      email = item.email,
+                                      name = item.name,
+                                      recipientId = item.recipientId,
+                                      routingOrder = item.routingOrder,
+                                      tabs = new tabsDTO
+                                      {
+                                          signHereTabs = new List<signHereDTO>() {new signHereDTO(){
+                                                                                       anchorString = string.Concat("/" + item.roleName.Replace(' ', '_')),
+                                                                                       anchorYOffset = "-6",
+                                                                                       name = item.name,
+                                                                                       optional = "false",
+                                                                                       recipientId = item.recipientId,
+                                                                                       scaleValue = "1"
+                                                                                    }
+                                                                                  }
+
+
+                                      }
+
+                                  }).ToList());
+
+
+                envelopeToSend.recipients.signers = signers;
+
+                /*Se obtienen los usuarios para copias*/
+
+                foreach (var carbonCopies in template.recipients.carbonCopies)
+                {
+                    if (carbonCopies.email != "" && carbonCopies.name != "")
+                    {
+                        envelopeToSend.recipients.carbonCopies.Add(carbonCopies);
+                    }
+                }
+
+                envelopeToSend.status = "sent";
+
+
+                envelopeResponse = await new PeticionDocusign().peticion<EnvelopeResponse>("envelopes", HttpMethod.Post, envelopeToSend);
+
+                var auth = new PeticionDocusign().validationAuthentication();
+                Tuple<AuthenticationDTO, EnvelopeResponse> responseAuth = new Tuple<AuthenticationDTO, EnvelopeResponse>(auth, envelopeResponse);
+
+                return Ok(responseAuth);
             }
             catch (Exception e)
             {
