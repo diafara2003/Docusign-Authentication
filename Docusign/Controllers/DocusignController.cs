@@ -148,19 +148,6 @@ namespace Docusign.Controllers
         [HttpPost("envelopes/send")]
         public async Task<IActionResult> SendEnvelope(EnvelopeSendDTO envelope)
         {
-            //EnvelopeResponse envelopeResponse2 = new EnvelopeResponse();
-
-            //envelopeResponse2.envelopeId = "467489b2-fddc-4264-977c-fe4944806c71";
-            //envelopeResponse2.uri = "/envelopes/467489b2-fddc-4264-977c-fe4944806c71";
-            //envelopeResponse2.statusDateTime = "2023-05-05T16:33:16.2970000Z";
-            //envelopeResponse2.status = "sent";
-
-
-
-            //var auth2 = new PeticionDocusign().validationAuthentication();
-            //Tuple<AuthenticationDTO, EnvelopeResponse> responseAuth2 = new Tuple<AuthenticationDTO, EnvelopeResponse>(auth2, envelopeResponse2);
-            //return Ok(responseAuth2);
-
             try
             {
                 templateDTO template = await new PeticionDocusign().peticion<templateDTO>("templates/" + envelope.IdTemplate, HttpMethod.Get);
@@ -199,18 +186,18 @@ namespace Docusign.Controllers
 
                 envelopeToSend.documents = documents;
 
-                EnvelopeResponse envelopeResponse2 = new EnvelopeResponse();
+                //EnvelopeResponse envelopeResponse2 = new EnvelopeResponse();
 
-                envelopeResponse2.envelopeId = "467489b2-fddc-4264-977c-fe4944806c71";
-                envelopeResponse2.uri = "/envelopes/467489b2-fddc-4264-977c-fe4944806c71";
-                envelopeResponse2.statusDateTime = "2023-05-05T16:33:16.2970000Z";
-                envelopeResponse2.status = "sent";
+                //envelopeResponse2.envelopeId = "467489b2-fddc-4264-977c-fe4944806c71";
+                //envelopeResponse2.uri = "/envelopes/467489b2-fddc-4264-977c-fe4944806c71";
+                //envelopeResponse2.statusDateTime = "2023-05-05T16:33:16.2970000Z";
+                //envelopeResponse2.status = "sent";
 
 
 
-                var auth2 = new PeticionDocusign().validationAuthentication();
-                Tuple<AuthenticationDTO, EnvelopeResponse> responseAuth2 = new Tuple<AuthenticationDTO, EnvelopeResponse>(auth2, envelopeResponse2);
-                return Ok(responseAuth2);
+                //var auth2 = new PeticionDocusign().validationAuthentication();
+                //Tuple<AuthenticationDTO, EnvelopeResponse> responseAuth2 = new Tuple<AuthenticationDTO, EnvelopeResponse>(auth2, envelopeResponse2);
+                //return Ok(responseAuth2);
 
                 /*Se obtienen los firmantes*/
 
