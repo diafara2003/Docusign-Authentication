@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Net.Http;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -21,7 +22,7 @@ namespace DocuSignBL.Peticion
                 Timeout = new TimeSpan(0, 2, 0)
             };
 
-            var token = "eyJ0eXAiOiJNVCIsImFsZyI6IlJTMjU2Iiwia2lkIjoiOGFlYzFjZjQtYmE4NS00MDM5LWE1MmItYzVhODAxMjA3N2EyIn0.AQsAAAABAAUABwCA9WxWJAXbSAgAgDWQZGcF20gCALv6cVlKS7RPn5vjUswLIFIVAAMAAAAYAAEAAAAFAAAADQAkAAAANDkwN2QzMTEtYjczNC00ZDE2LWJlNmMtYWNhYjg5MzU2ZWFhIgAkAAAANDkwN2QzMTEtYjczNC00ZDE2LWJlNmMtYWNhYjg5MzU2ZWFhEgABAAAACwAAAGludGVyYWN0aXZlMAAAX9RVJAXbSDcATFPDbC0aE02P4LYnQ8rjeA.tMtxBHJDhBwktpO47nhfm7bkyYpr6uSMiCwgmYQuFe-9v8jZc-PYNZuuxToJJqfb0p_9X0GD51cHlr1S9iFyQub_r20h7B3_4kl3otTwexo44X1MKAxEk_mZRdJdiABSJldy-Up-iy3TNMftFNp0OeZRUpsYTzOVU2HVEdDuPKm5RJLpVAJEpp9uHWLenZumey5Z8ydpqrsNN-O09psY3A7FBhSuPlcGSZuKrA9zl_i75SYRKkVnejPtkktVXn99wEYfvJ-THBnXE5g6Gi3M_i1xaEe_tHi4oO9c87eQAyi8OcErSd7gLIeoatpyxbHPWd5MlGeNn3eR9oyNxljTTA";
+            var token = "eyJ0eXAiOiJNVCIsImFsZyI6IlJTMjU2Iiwia2lkIjoiOGFlYzFjZjQtYmE4NS00MDM5LWE1MmItYzVhODAxMjA3N2EyIn0.AQsAAAABAAUABwCAyrze-AXbSAgAgArg7DsG20gCALv6cVlKS7RPn5vjUswLIFIVAAMAAAAYAAEAAAAFAAAADQAkAAAANDkwN2QzMTEtYjczNC00ZDE2LWJlNmMtYWNhYjg5MzU2ZWFhIgAkAAAANDkwN2QzMTEtYjczNC00ZDE2LWJlNmMtYWNhYjg5MzU2ZWFhEgABAAAACwAAAGludGVyYWN0aXZlMAAANCTe-AXbSDcATFPDbC0aE02P4LYnQ8rjeA.mZnWqN333cyOB9V9H2AcwNfo4WjSmhd2YeLbnE6RSXYx0TxhJ5kDhVPRW-5mZJKDfzp5u1MSMBiyxKhzdfXKJKGfvQzuS163lJxTCepd64d3XOpqTgCQf1mkYzYa1ptbPNfNgawBhuZgLg8F_VdiL51bDg7-HJkhOiKtbjIMr9o_aSAI7kP2cFGoGwd6ge14jh2v-u_6okcUm681DAyjhkTya1ivyhMYaLVouQ6xf-E43HDHLHG-WQPJLEZM_QMERkS1jACGQPL2stse_KKKY1Fxo00aiBpClHL5aF2Jco-qKxJsFkVok1JlosZr1RyiD2lxITHbEg4yZJyk1egowQ";
 
             httpClient.DefaultRequestHeaders.Add("ContentType", "application/json");
             httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
@@ -52,6 +53,36 @@ namespace DocuSignBL.Peticion
             return x;
         }
 
+        public async Task<T> peticionFile<T>(string method, HttpMethod type, object data = null) where T : class
+        {
+
+            HttpMessageHandler handler = new HttpClientHandler();
+
+            var httpClient = new HttpClient(handler)
+            {
+                BaseAddress = new Uri($"https://na3.docusign.net/restapi/v2.1/accounts/56483961/{method}"),
+                Timeout = new TimeSpan(0, 2, 0)
+            };
+
+            var token = "eyJ0eXAiOiJNVCIsImFsZyI6IlJTMjU2Iiwia2lkIjoiOGFlYzFjZjQtYmE4NS00MDM5LWE1MmItYzVhODAxMjA3N2EyIn0.AQsAAAABAAUABwCAyrze-AXbSAgAgArg7DsG20gCALv6cVlKS7RPn5vjUswLIFIVAAMAAAAYAAEAAAAFAAAADQAkAAAANDkwN2QzMTEtYjczNC00ZDE2LWJlNmMtYWNhYjg5MzU2ZWFhIgAkAAAANDkwN2QzMTEtYjczNC00ZDE2LWJlNmMtYWNhYjg5MzU2ZWFhEgABAAAACwAAAGludGVyYWN0aXZlMAAANCTe-AXbSDcATFPDbC0aE02P4LYnQ8rjeA.mZnWqN333cyOB9V9H2AcwNfo4WjSmhd2YeLbnE6RSXYx0TxhJ5kDhVPRW-5mZJKDfzp5u1MSMBiyxKhzdfXKJKGfvQzuS163lJxTCepd64d3XOpqTgCQf1mkYzYa1ptbPNfNgawBhuZgLg8F_VdiL51bDg7-HJkhOiKtbjIMr9o_aSAI7kP2cFGoGwd6ge14jh2v-u_6okcUm681DAyjhkTya1ivyhMYaLVouQ6xf-E43HDHLHG-WQPJLEZM_QMERkS1jACGQPL2stse_KKKY1Fxo00aiBpClHL5aF2Jco-qKxJsFkVok1JlosZr1RyiD2lxITHbEg4yZJyk1egowQ";
+
+            httpClient.DefaultRequestHeaders.Add("ContentType", "application/json");
+            httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
+
+            HttpResponseMessage response = new HttpResponseMessage();
+
+            response = await httpClient.GetAsync($"https://na3.docusign.net/restapi/v2.1/accounts/56483961/{method}");
+
+            byte[] content = await response.Content.ReadAsByteArrayAsync();
+
+            string fileBase64 = Convert.ToBase64String(content);
+
+            fileBase64 = "{\"documentBase64\" :\"" + fileBase64 + "\"}";
+
+            var x = JsonConvert.DeserializeObject<T>(fileBase64);
+
+            return x;
+        }
 
         public AuthenticationDTO validationAuthentication()
         {

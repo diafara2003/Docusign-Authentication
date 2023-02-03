@@ -151,6 +151,7 @@ namespace Model.DTO.Users
         public string IdTemplate { get; set; }
         public string nameTer { get; set; }
         public string emailTer { get; set; }
+        public string IdTer { get; set; }
     }
 
     public class EnvelopeResponse

@@ -131,18 +131,18 @@ namespace Docusign.Controllers
         [HttpPost("envelopes/send")]
         public async Task<IActionResult> SendEnvelope(EnvelopeSendDTO envelope)
         {
-            EnvelopeResponse envelopeResponse2 = new EnvelopeResponse();
+            //EnvelopeResponse envelopeResponse2 = new EnvelopeResponse();
 
-            envelopeResponse2.envelopeId = "467489b2-fddc-4264-977c-fe4944806c71";
-            envelopeResponse2.uri = "/envelopes/467489b2-fddc-4264-977c-fe4944806c71";
-            envelopeResponse2.statusDateTime = "2023-05-05T16:33:16.2970000Z";
-            envelopeResponse2.status = "sent";
+            //envelopeResponse2.envelopeId = "467489b2-fddc-4264-977c-fe4944806c71";
+            //envelopeResponse2.uri = "/envelopes/467489b2-fddc-4264-977c-fe4944806c71";
+            //envelopeResponse2.statusDateTime = "2023-05-05T16:33:16.2970000Z";
+            //envelopeResponse2.status = "sent";
 
 
 
-            var auth2 = new PeticionDocusign().validationAuthentication();
-            Tuple<AuthenticationDTO, EnvelopeResponse> responseAuth2 = new Tuple<AuthenticationDTO, EnvelopeResponse>(auth2, envelopeResponse2);
-            return Ok(responseAuth2);
+            //var auth2 = new PeticionDocusign().validationAuthentication();
+            //Tuple<AuthenticationDTO, EnvelopeResponse> responseAuth2 = new Tuple<AuthenticationDTO, EnvelopeResponse>(auth2, envelopeResponse2);
+            //return Ok(responseAuth2);
 
             try
             {
@@ -169,23 +169,40 @@ namespace Docusign.Controllers
 
                 foreach (var doc in template.documents)
                 {
-                    string documentsBase64 = await new PeticionDocusign().peticion<string>(doc.uri, HttpMethod.Get);
-                    doc.documentBase64 = documentsBase64;
-                    documents.Add(doc);
+                    if (doc.documentId != envelope.documentId)
+                    {
+                        documentsDTO fileBase64 = await new PeticionDocusign().peticionFile<documentsDTO>("templates/" + envelope.IdTemplate + "/documents/" + doc.documentId, HttpMethod.Get);
+                        doc.documentBase64 = fileBase64.documentBase64;
+                        doc.fileExtension = "pdf";
+                        documents.Add(doc);
+                    }                   
                 }
 
                 documents.Add(docu);
 
                 envelopeToSend.documents = documents;
 
+                EnvelopeResponse envelopeResponse2 = new EnvelopeResponse();
+
+                envelopeResponse2.envelopeId = "467489b2-fddc-4264-977c-fe4944806c71";
+                envelopeResponse2.uri = "/envelopes/467489b2-fddc-4264-977c-fe4944806c71";
+                envelopeResponse2.statusDateTime = "2023-05-05T16:33:16.2970000Z";
+                envelopeResponse2.status = "sent";
+
+
+
+                var auth2 = new PeticionDocusign().validationAuthentication();
+                Tuple<AuthenticationDTO, EnvelopeResponse> responseAuth2 = new Tuple<AuthenticationDTO, EnvelopeResponse>(auth2, envelopeResponse2);
+                return Ok(responseAuth2);
+
                 /*Se obtienen los firmantes*/
 
-                /*Se obtienen contratista*/
+                /*Se obtienen firmantes docising*/
 
                 List<signersDTO> signers = new List<signersDTO>();
 
                 signers.AddRange((from item in template.recipients.signers
-                                  where item.email != "" && item.name != ""
+                                  where item.email != "" && item.name != "" && item.roleName != "" && !item.roleName.ToLower().Contains("contratista")
                                   select new signersDTO
                                   {
                                       email = item.email,
@@ -202,14 +219,30 @@ namespace Docusign.Controllers
                                                                                        recipientId = item.recipientId,
                                                                                        scaleValue = "1"
                                                                                     }
-                                                                                  }
-
-
+                                          },
                                       }
 
                                   }).ToList());
 
+                /*Se obtienen contratista*/
 
+                signersDTO contratista = new signersDTO();
+
+                contratista = template.recipients.signers.Where(c => c.roleName.ToLower().Contains("contratista")).FirstOrDefault();
+
+                contratista.email = envelope.emailTer;
+                contratista.name = envelope.nameTer;
+                contratista.tabs.signHereTabs = new List<signHereDTO>(){new signHereDTO(){
+                                                                                       anchorString = string.Concat("/contratista"),
+                                                                                       anchorYOffset = "-6",
+                                                                                       name = envelope.nameTer,
+                                                                                       optional = "false",
+                                                                                       recipientId = contratista.recipientId,
+                                                                                       scaleValue = "1"
+                                                                                    }
+                };
+
+                signers.Add(contratista);
                 envelopeToSend.recipients.signers = signers;
 
                 /*Se obtienen los usuarios para copias*/
