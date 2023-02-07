@@ -1,4 +1,6 @@
-﻿using Model.DTO;
+﻿using DocuSignBL.DataBase.Conexion;
+using Microsoft.AspNetCore.Http;
+using Model.DTO;
 using Newtonsoft.Json;
 using System;
 using System.IO;
@@ -6,38 +8,49 @@ using System.Net.Http;
 using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace DocuSignBL.Peticion
 {
     public class PeticionDocusign
     {
+
+        private IHttpContextAccessor _httpContextAccessor { get; }
+
+
+        public PeticionDocusign(IHttpContextAccessor httpContextAccessor)
+        {
+            _httpContextAccessor = httpContextAccessor;
+        }
         public async Task<T> peticion<T>(string method, HttpMethod type, object data = null) where T : class
         {
 
             HttpMessageHandler handler = new HttpClientHandler();
+            DB_ADPRO db = new DB_ADPRO(_httpContextAccessor);
+            var token = db.tokenDocusign.Take(1).First();
+            string account = db.adpconfig.FirstOrDefault(c => c.CnfCodigo == "CuentaDocuSign").CnfValor;
 
             var httpClient = new HttpClient(handler)
             {
-                BaseAddress = new Uri($"https://na3.docusign.net/restapi/v2.1/accounts/56483961/{method}"),
+                BaseAddress = new Uri($"https://na3.docusign.net/restapi/v2.1/accounts/{account}/{method}"),
                 Timeout = new TimeSpan(0, 2, 0)
             };
 
-        
-            var token = "eyJ0eXAiOiJNVCIsImFsZyI6IlJTMjU2Iiwia2lkIjoiOGFlYzFjZjQtYmE4NS00MDM5LWE1MmItYzVhODAxMjA3N2EyIn0.AQsAAAABAAUABwAAaGggLwbbSAgAAKiLLnIG20gCALv6cVlKS7RPn5vjUswLIFIVAAMAAAAYAAEAAAAFAAAADQAkAAAANDkwN2QzMTEtYjczNC00ZDE2LWJlNmMtYWNhYjg5MzU2ZWFhIgAkAAAANDkwN2QzMTEtYjczNC00ZDE2LWJlNmMtYWNhYjg5MzU2ZWFhEgABAAAACwAAAGludGVyYWN0aXZlMAAAOzcfLwbbSDcATFPDbC0aE02P4LYnQ8rjeA.MxhTSN2JeECoGImTyXknyvfidved2HIVVl2vzWcjk4_gIBVrdY2-KIc4JlxJq7_NSXzPbt119Qp9MInGuRUxGoT00eJ74pnDUODkJM-tEj_QwXql1IQRJsGHEKRWCV9DpxCajz2KEXwhm4-LdgKqrPC49d72m0uF8JvYyBv58dHCzNA_6iam-JpIBmBTzjPCMrh7Z7TBq5Hwx0cHN5MSYiSlW9cjOBGLdj64ubziKr6s5FRxes4Obih-jATQwH8TSdy7hwZQNOBwVopuw7zpLMskExtnCcvUP-wg1fXg7r3vJeQ0ko9YPal2XfEwUG9C8yxX_oHEtIrJkyU7okAmHA";
+
             httpClient.DefaultRequestHeaders.Add("ContentType", "application/json");
-            httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
+            httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + token.Token);
 
             HttpResponseMessage response = new HttpResponseMessage();
 
             if (type.Method == "GET")
             {
-                response = await httpClient.GetAsync($"https://na3.docusign.net/restapi/v2.1/accounts/56483961/{method}");
+                response = await httpClient.GetAsync($"https://na3.docusign.net/restapi/v2.1/accounts/{account}/{method}");
             }
             else if (type.Method == "POST")
             {
                 var json = JsonConvert.SerializeObject(data);
                 var dataEnvio = new StringContent(json, Encoding.UTF8, "application/json");
-                response = await httpClient.PostAsync($"https://na3.docusign.net/restapi/v2.1/accounts/56483961/{method}", dataEnvio);
+                response = await httpClient.PostAsync($"https://na3.docusign.net/restapi/v2.1/accounts/{account}/{method}", dataEnvio);
             }
 
 
@@ -55,23 +68,26 @@ namespace DocuSignBL.Peticion
 
         public async Task<T> peticionFile<T>(string method, HttpMethod type, object data = null) where T : class
         {
-
+            DB_ADPRO db = new DB_ADPRO(_httpContextAccessor);
+            string account = db.adpconfig.FirstOrDefault(c => c.CnfCodigo == "CuentaDocuSign").CnfValor;
             HttpMessageHandler handler = new HttpClientHandler();
 
             var httpClient = new HttpClient(handler)
             {
-                BaseAddress = new Uri($"https://na3.docusign.net/restapi/v2.1/accounts/56483961/{method}"),
+                BaseAddress = new Uri($"https://na3.docusign.net/restapi/v2.1/accounts/{account}/{method}"),
                 Timeout = new TimeSpan(0, 2, 0)
             };
 
-            var token = "eyJ0eXAiOiJNVCIsImFsZyI6IlJTMjU2Iiwia2lkIjoiOGFlYzFjZjQtYmE4NS00MDM5LWE1MmItYzVhODAxMjA3N2EyIn0.AQsAAAABAAUABwCAyrze-AXbSAgAgArg7DsG20gCALv6cVlKS7RPn5vjUswLIFIVAAMAAAAYAAEAAAAFAAAADQAkAAAANDkwN2QzMTEtYjczNC00ZDE2LWJlNmMtYWNhYjg5MzU2ZWFhIgAkAAAANDkwN2QzMTEtYjczNC00ZDE2LWJlNmMtYWNhYjg5MzU2ZWFhEgABAAAACwAAAGludGVyYWN0aXZlMAAANCTe-AXbSDcATFPDbC0aE02P4LYnQ8rjeA.mZnWqN333cyOB9V9H2AcwNfo4WjSmhd2YeLbnE6RSXYx0TxhJ5kDhVPRW-5mZJKDfzp5u1MSMBiyxKhzdfXKJKGfvQzuS163lJxTCepd64d3XOpqTgCQf1mkYzYa1ptbPNfNgawBhuZgLg8F_VdiL51bDg7-HJkhOiKtbjIMr9o_aSAI7kP2cFGoGwd6ge14jh2v-u_6okcUm681DAyjhkTya1ivyhMYaLVouQ6xf-E43HDHLHG-WQPJLEZM_QMERkS1jACGQPL2stse_KKKY1Fxo00aiBpClHL5aF2Jco-qKxJsFkVok1JlosZr1RyiD2lxITHbEg4yZJyk1egowQ";
+            var token = db.tokenDocusign.Take(1).First();
+
+
 
             httpClient.DefaultRequestHeaders.Add("ContentType", "application/json");
-            httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
+            httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + token.Token);
 
             HttpResponseMessage response = new HttpResponseMessage();
 
-            response = await httpClient.GetAsync($"https://na3.docusign.net/restapi/v2.1/accounts/56483961/{method}");
+            response = await httpClient.GetAsync($"https://na3.docusign.net/restapi/v2.1/accounts/{account}/{method}");
 
             byte[] content = await response.Content.ReadAsByteArrayAsync();
 
@@ -87,10 +103,73 @@ namespace DocuSignBL.Peticion
         public AuthenticationDTO validationAuthentication()
         {
             AuthenticationDTO auth = new AuthenticationDTO();
-            auth.isAuthenticated = true;
-            auth.URL = "https://account.docusign.com/oauth/auth?client_id=4907d311-b734-4d16-be6c-acab89356eaa&scope=signature&response_type=code&redirect_uri=https%3A%2F%2Flocalhost%2FSinco%2FV3%2FADPRO%2FDocusign%2Fapi%2Fds%2Fcallback";
-            return auth;
+            DB_ADPRO db = new DB_ADPRO(_httpContextAccessor);
+
+            var host = _httpContextAccessor.HttpContext.Request.Host.Value;
+            var path = _httpContextAccessor.HttpContext.Request.PathBase.Value;
+
+            string callback = $"https://{host}{path}/api/ds/callback".Replace("/", "%2F").Replace(":", "%3A");
+
+            string client_id = db.adpconfig.FirstOrDefault(c => c.CnfCodigo == "Client_id_docusign").CnfValor;
+            var token = db.tokenDocusign.ToList();
+            string url = $"https://account.docusign.com/oauth/auth?client_id={client_id}&scope=signature&response_type=code&redirect_uri={callback}";
+
+
+            if (token.Count == 0)
+            {
+                auth.isAuthenticated = false;
+                auth.URL = url;
+
+
+                db.SaveChanges();
+
+                return auth;
+            }
+
+
+
+            if (token.FirstOrDefault().Fecha <= DateTime.Now.AddHours(8))
+            {
+                auth.isAuthenticated = true;
+                auth.URL = url;
+                return auth;
+            }
+            else
+            {
+                auth.isAuthenticated = false;
+                auth.URL = url;
+
+
+
+                db.SaveChanges();
+
+                return auth;
+            }
+
         }
 
+
+        public void AgregarToken(string token, int usuario, string RefreshToken)
+        {
+
+            DB_ADPRO db = new DB_ADPRO(_httpContextAccessor);
+
+            db.tokenDocusign.ToList().ForEach(c => db.Entry(c).State = Microsoft.EntityFrameworkCore.EntityState.Deleted);
+
+            db.tokenDocusign.Add(new Model.Entity.ADP_API.TokenDocusign()
+            {
+                TokenDocuId = 0,
+                EnProceso = false,
+                Token = token,
+                Fecha = DateTime.Now,
+                IdUsuario = usuario,
+                RefreshToken = RefreshToken
+
+
+            });
+
+            db.SaveChanges();
+
+        }
     }
 }

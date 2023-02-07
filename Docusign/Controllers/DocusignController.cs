@@ -13,6 +13,7 @@ using DocuSignBL.Opetations;
 using System.Linq;
 using System.Xml.Linq;
 using Model.DTO.Docusign;
+using SincoSoft.Context.Core;
 
 namespace Docusign.Controllers
 {
@@ -20,6 +21,32 @@ namespace Docusign.Controllers
     [ApiController]
     public class DocusignController : ControllerBase
     {
+        private IHttpContextAccessor _httpContextAccessor { get; }
+
+        public DocusignController(IHttpContextAccessor httpContextAccessor)
+        {
+            _httpContextAccessor = httpContextAccessor;
+        }
+
+        [HttpGet("sesion")]
+        public IActionResult GetSession()
+        {
+            //Se crea el objeto pasando el IHttpContextAccessor
+            var currentContext = new CurrentContext(_httpContextAccessor);
+
+
+            return Ok(new
+            {
+                currentContext.IdOrigen,
+                currentContext.IdEmpresa,
+                currentContext.IdSucursal,
+                currentContext.IdUsuario,
+                currentContext.NomUsuario,
+                currentContext.IdProyecto,
+                currentContext.CadenaConexion
+            });
+        }
+
         [HttpGet("docusign")]
         public IActionResult GetDocuSign()
         {
@@ -39,7 +66,7 @@ namespace Docusign.Controllers
             //}
             try
             {
-                var x = await new PeticionDocusign().peticion<userDTO>("users", HttpMethod.Get);
+                var x = await new PeticionDocusign(_httpContextAccessor).peticion<userDTO>("users", HttpMethod.Get);
 
                 return Ok(x);
 
@@ -57,7 +84,7 @@ namespace Docusign.Controllers
         {
             try
             {
-                var auth = new PeticionDocusign().validationAuthentication();
+                var auth = new PeticionDocusign(_httpContextAccessor).validationAuthentication();
 
                 if (!auth.isAuthenticated)
                 {
@@ -65,7 +92,7 @@ namespace Docusign.Controllers
                 }
 
 
-                templatesDTO TemplatesArray = await new PeticionDocusign().peticion<templatesDTO>("templates?order_by=name", HttpMethod.Get);
+                templatesDTO TemplatesArray = await new PeticionDocusign(_httpContextAccessor).peticion<templatesDTO>("templates?order_by=name", HttpMethod.Get);
 
                 var TemplatesFilter = new List<envelopeTemplatesDTO>();
 
@@ -96,14 +123,14 @@ namespace Docusign.Controllers
         {
             try
             {
-                var auth = new PeticionDocusign().validationAuthentication();
+                var auth = new PeticionDocusign(_httpContextAccessor).validationAuthentication();
 
                 if (!auth.isAuthenticated)
                 {
                     return Ok(new Tuple<AuthenticationDTO, IList<envelopeTemplatesDTO>>(auth, new List<envelopeTemplatesDTO>()));
                 }
 
-                templatesDTO TemplatesArray = await new PeticionDocusign().peticion<templatesDTO>("templates?order_by=name&include=recipients,documents", HttpMethod.Get);
+                templatesDTO TemplatesArray = await new PeticionDocusign(_httpContextAccessor).peticion<templatesDTO>("templates?order_by=name&include=recipients,documents", HttpMethod.Get);
                 var signers = TemplatesArray.envelopeTemplates;
 
 
@@ -120,7 +147,7 @@ namespace Docusign.Controllers
         [HttpGet("envelopes/recipents")]
         public async Task<IActionResult> GetRecipentsEnvelope(string envelope)
         {
-            return Ok(await new DocuSignBL.Opetations.DocuSignBL().GetRecipentsEnvelope(envelope));
+            return Ok(await new DocuSignBL.Opetations.DocuSignBL(_httpContextAccessor).GetRecipentsEnvelope(envelope));
         }
 
         /// <summary>
@@ -133,7 +160,7 @@ namespace Docusign.Controllers
         {
             try
             {
-                envelopeTemplatesDTO SignersDocuemnts = await new PeticionDocusign().peticion<envelopeTemplatesDTO>($"templates/{idTemplate}/signers?order_by=name", HttpMethod.Get);
+                envelopeTemplatesDTO SignersDocuemnts = await new PeticionDocusign(_httpContextAccessor).peticion<envelopeTemplatesDTO>($"templates/{idTemplate}/signers?order_by=name", HttpMethod.Get);
                 //var auth = new PeticionDocusign().validationAuthentication();
                 //Tuple<AuthenticationDTO, envelopeTemplatesDTO> responseAuth = new Tuple<AuthenticationDTO,envelopeTemplatesDTO>(auth, SignersDocuemnts);
 
@@ -150,7 +177,7 @@ namespace Docusign.Controllers
         {
             try
             {
-                templateDTO template = await new PeticionDocusign().peticion<templateDTO>("templates/" + envelope.IdTemplate, HttpMethod.Get);
+                templateDTO template = await new PeticionDocusign(_httpContextAccessor).peticion<templateDTO>("templates/" + envelope.IdTemplate, HttpMethod.Get);
 
 
                 EnvelopeResponse envelopeResponse = new EnvelopeResponse();
@@ -175,7 +202,7 @@ namespace Docusign.Controllers
                 {
                     if (doc.documentId != envelope.documentId)
                     {
-                        documentsDTO fileBase64 = await new PeticionDocusign().peticionFile<documentsDTO>("templates/" + envelope.IdTemplate + "/documents/" + doc.documentId, HttpMethod.Get);
+                        documentsDTO fileBase64 = await new PeticionDocusign(_httpContextAccessor).peticionFile<documentsDTO>("templates/" + envelope.IdTemplate + "/documents/" + doc.documentId, HttpMethod.Get);
                         doc.documentBase64 = fileBase64.documentBase64;
                         doc.fileExtension = "pdf";
                         documents.Add(doc);
@@ -262,9 +289,9 @@ namespace Docusign.Controllers
                 envelopeToSend.status = "sent";
 
 
-                envelopeResponse = await new PeticionDocusign().peticion<EnvelopeResponse>("envelopes", HttpMethod.Post, envelopeToSend);
+                envelopeResponse = await new PeticionDocusign(_httpContextAccessor).peticion<EnvelopeResponse>("envelopes", HttpMethod.Post, envelopeToSend);
 
-                var auth = new PeticionDocusign().validationAuthentication();
+                var auth = new PeticionDocusign(_httpContextAccessor).validationAuthentication();
                 Tuple<AuthenticationDTO, EnvelopeResponse> responseAuth = new Tuple<AuthenticationDTO, EnvelopeResponse>(auth, envelopeResponse);
 
                 return Ok(responseAuth);
@@ -287,17 +314,17 @@ namespace Docusign.Controllers
         {
             try
             {
-                var auth = new PeticionDocusign().validationAuthentication();
+                var auth = new PeticionDocusign(_httpContextAccessor).validationAuthentication();
                 if (!auth.isAuthenticated)
                 {
                     return Ok(new Tuple<AuthenticationDTO, ResponseDocusignAuditoriaDTO>(auth, new ResponseDocusignAuditoriaDTO()));
                 }
 
-                DocusignAuditoriaDTO SignersDocuemnts = await new PeticionDocusign().peticion<DocusignAuditoriaDTO>($"envelopes/{idenvelope}?include=documents,recipients", HttpMethod.Get);
+                DocusignAuditoriaDTO SignersDocuemnts = await new PeticionDocusign(_httpContextAccessor).peticion<DocusignAuditoriaDTO>($"envelopes/{idenvelope}?include=documents,recipients", HttpMethod.Get);
 
 
 
-                EnvelopeDocusignAudit EnvelopeAudit = await new PeticionDocusign().peticion<EnvelopeDocusignAudit>($"envelopes/{idenvelope}/audit_events", HttpMethod.Get);
+                EnvelopeDocusignAudit EnvelopeAudit = await new PeticionDocusign(_httpContextAccessor).peticion<EnvelopeDocusignAudit>($"envelopes/{idenvelope}/audit_events", HttpMethod.Get);
 
 
                 Tuple<AuthenticationDTO, ResponseDocusignAuditoriaDTO> responseAuth = new Tuple<AuthenticationDTO, ResponseDocusignAuditoriaDTO>(auth, new ResponseDocusignAuditoriaDTO()
