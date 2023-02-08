@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Linq;
 using Docusign.Repository.DataBase.Conexion;
+using Microsoft.AspNetCore.Http;
 
 namespace Docusign.Repository.Peticion
 {
@@ -23,7 +24,7 @@ namespace Docusign.Repository.Peticion
     {
         Task<T> peticion<T>(string method, MethodRequest type, object data = null);
 
-        Task<T> peticionFile<T>(string method,  object data = null);
+        Task<T> peticionFile<T>(string method, object data = null);
 
         AuthenticationDTO validationAuthentication();
 
@@ -33,9 +34,11 @@ namespace Docusign.Repository.Peticion
     public class PeticionDocusignRepository : IPeticionDocusignRepository
     {
         private DB_ADPRO contexto;
-        public PeticionDocusignRepository(DB_ADPRO _contexto)
+        private IHttpContextAccessor httpContextAccessor;
+        public PeticionDocusignRepository(DB_ADPRO _contexto, IHttpContextAccessor _httpContextAccessor)
         {
             this.contexto = _contexto;
+            this.httpContextAccessor = _httpContextAccessor;
         }
 
         //public PeticionDocusignRepository(IConstruirSession construirSession, IHttpContextAccessor httpContextAccessor)
@@ -87,7 +90,7 @@ namespace Docusign.Repository.Peticion
             return x;
         }
 
-        public async Task<T> peticionFile<T>(string method,  object data = null)
+        public async Task<T> peticionFile<T>(string method, object data = null)
         {
 
             string account = contexto.adpconfig.FirstOrDefault(c => c.CnfCodigo == "CuentaDocuSign").CnfValor;
@@ -126,8 +129,8 @@ namespace Docusign.Repository.Peticion
             AuthenticationDTO auth = new AuthenticationDTO();
 
 
-            var host = "";// .HttpContext.Request.Host.Value;
-            var path = "";// _httpContextAccessor.HttpContext.Request.PathBase.Value;
+            var host = httpContextAccessor.HttpContext.Request.Host.Value;
+            var path = httpContextAccessor.HttpContext.Request.PathBase.Value;
 
             string callback = $"https://{host}{path}/api/ds/callback".Replace("/", "%2F").Replace(":", "%3A");
 

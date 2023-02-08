@@ -9,21 +9,33 @@ namespace Docusign.Controllers
     [ApiController]
     public class dsController : ControllerBase
     {
+        private IHttpContextAccessor httpContextAccessor;
 
-        private IHttpContextAccessor _httpContextAccessor { get; }
-
-        public dsController(IHttpContextAccessor httpContextAccessor)
+        public dsController(IHttpContextAccessor _httpContextAccessor)
         {
-            _httpContextAccessor = httpContextAccessor;
+            this.httpContextAccessor = _httpContextAccessor;
         }
 
         [HttpGet("callback")]
-        public IActionResult GetDocuSign(string code)
+        public IActionResult GetDocuSign(string code) => Ok(code);
+
+
+        [HttpGet("callback/test")]
+        public IActionResult GetTest()
         {
-           
-            return Ok(code);
+            var host = httpContextAccessor.HttpContext.Request.Host.Value;
+            var path = httpContextAccessor.HttpContext.Request.PathBase.Value;
+
+            string callback = $"https://{host}{path}/api/ds/callback";
+            string callbackREplace = $"https://{host}{path}/api/ds/callback".Replace("/", "%2F").Replace(":", "%3A");
+
+            return Ok(new
+            {
+                Url = callback,
+                callbackReplace = callbackREplace,
+            });
         }
 
-       
+
     }
 }

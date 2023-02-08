@@ -33,15 +33,12 @@ namespace Docusign.Middleware
         public async Task Invoke(HttpContext context)
         {
             string urlPeticion = context.Request.GetDisplayUrl().ToLower();
-            //if (urlPeticion.Contains("/api/"))
-            //{
+            if (!urlPeticion.Contains("callback"))
+            {
+                ObtenerSesion(context);
 
-            ObtenerSesion(context);
-
-
-            
-            new DB_ADPRO(construirSession, httpContextAccessor);
-            
+                new DB_ADPRO(construirSession, httpContextAccessor);
+            }
             await next(context);
         }
         private void ObtenerSesion(HttpContext context)
