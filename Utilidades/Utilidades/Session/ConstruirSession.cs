@@ -24,11 +24,17 @@ namespace Docusign.Utilidades.Session
         }
         public DbContextOptions ObtenerConextOptions(DbContextOptionsBuilder builder)
         {
-            builder.UseSqlServer(ObtenerSession().CadenaConexion, x =>
+            var sesion = ObtenerSession();
+            if (string.IsNullOrEmpty(sesion.CadenaConexion)) return builder.Options;
+
+
+            builder.UseSqlServer(sesion.CadenaConexion, x =>
             {
                 x.MigrationsHistoryTable("_MigrationHistory", "ADP_SRM");
                 x.CommandTimeout((int)TimeSpan.FromMinutes(5).TotalSeconds);
-            }); return builder.Options;
+            });
+
+            return builder.Options;
         }
         public SessionDTO ObtenerSession()
         {
@@ -39,10 +45,13 @@ namespace Docusign.Utilidades.Session
             //}
             //else
             //{
+
             sesion.CadenaConexion = HttpContextAccessor.HttpContext.Items["_cadenaConexion"].ToString();
             sesion.IdEmpresa = Convert.ToInt32(HttpContextAccessor.HttpContext.Items["_idEmpresa"].ToString());
             sesion.IdSucursal = Convert.ToInt32(HttpContextAccessor.HttpContext.Items["_idSucursal"].ToString());
             sesion.IdUsuario = Convert.ToInt32(HttpContextAccessor.HttpContext.Items["_idUsuario"].ToString());
+
+
             //}
             return sesion;
         }

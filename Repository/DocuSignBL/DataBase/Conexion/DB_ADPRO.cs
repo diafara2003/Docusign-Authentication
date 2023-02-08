@@ -39,6 +39,7 @@ namespace Docusign.Repository.DataBase.Conexion
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)
         {
+
             CurrentContext contextoActual = new CurrentContext(this._httpContextAccessor);
             // connect to sql server with connection string from app settings
             options.UseSqlServer(contextoActual.CadenaConexion);

@@ -1,8 +1,8 @@
 ﻿
 using Docusign.Services;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
-
+using Model.DTO;
 
 namespace Docusign.Controllers
 {
@@ -10,32 +10,25 @@ namespace Docusign.Controllers
     [ApiController]
     public class dsController : ControllerBase
     {
-        private IHttpContextAccessor httpContextAccessor;
-        private IDocusignService docusignService;
 
-        public dsController(IHttpContextAccessor _httpContextAccessor, IDocusignService _docusignService)
+        private IDocusignCallbackService docusignService;
+        IWebHostEnvironment webHostEnvironment;
+
+        public dsController(IDocusignCallbackService _docusignService, IWebHostEnvironment _webHostEnvironment)
         {
-            this.httpContextAccessor = _httpContextAccessor;
+
             this.docusignService = _docusignService;
+            this.webHostEnvironment = _webHostEnvironment;
         }
 
         [HttpGet("callback")]
-        public IActionResult GetDocuSign(string code) => Ok(code);
-
-
-        [HttpGet("callback/test")]
-        public IActionResult GetTest()
+        public IActionResult GetDocuSign(string code)
         {
-            var host = httpContextAccessor.HttpContext.Request.Host.Value;
-            var path = httpContextAccessor.HttpContext.Request.PathBase.Value;
+            docusignService.SaveTokenFile(code, webHostEnvironment.ContentRootPath);
 
-            string callback = $"https://{host}{path}/api/ds/callback";
-            string callbackREplace = $"https://{host}{path}/api/ds/callback".Replace("/", "%2F").Replace(":", "%3A");
-
-            return Ok(new
+            return Ok(new ResponseAPIDTO()
             {
-                Url = callback,
-                callbackReplace = callbackREplace,
+                success = true
             });
         }
 
@@ -43,7 +36,7 @@ namespace Docusign.Controllers
         [HttpGet("callback/verificacion")]
         public IActionResult GetTokenVerificacion()
         {
-           
+
             return Ok("");
         }
 
