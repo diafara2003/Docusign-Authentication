@@ -28,7 +28,7 @@ namespace Docusign.Repository.Peticion
 
         AuthenticationDTO validationAuthentication();
 
-        
+
     }
 
     public class PeticionDocusignRepository : IPeticionDocusignRepository
@@ -163,7 +163,7 @@ namespace Docusign.Repository.Peticion
                 auth.isAuthenticated = false;
                 auth.URL = url;
 
-
+                contexto.Entry(token.FirstOrDefault()).State = Microsoft.EntityFrameworkCore.EntityState.Deleted;
 
                 contexto.SaveChanges();
 
