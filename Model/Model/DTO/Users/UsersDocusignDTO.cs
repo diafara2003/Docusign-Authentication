@@ -35,7 +35,6 @@ namespace Model.DTO.Users
         public envelopeTemplatesDTO()
         {
             recipients = new recipientsDTO();
-            recipients.carbonCopies = new List<carbonCopiesDtO>();
             recipients.signers = new List<signersDTO>();
         }
         public string templateId { get; set; }
@@ -51,6 +50,10 @@ namespace Model.DTO.Users
 
     public class templateDTO
     {
+        public templateDTO()
+        {
+            recipients.carbonCopies = new List<carbonCopiesDtO>();
+        }
         public string templateId { get; set; }
         public string uri { get; set; }
         public string name { get; set; }
@@ -67,7 +70,7 @@ namespace Model.DTO.Users
         public string uri { get; set; }
         public string name { get; set; }
         public string documentBase64 { get; set; }
-        public string fileExtension { get; set; }       
+        public string fileExtension { get; set; }
     }
 
     public class recipientsDTO
@@ -80,7 +83,7 @@ namespace Model.DTO.Users
     {
         public signersDTO()
         {
-            tabs= new tabsDTO();
+            tabs = new tabsDTO();
             tabs.dateSignedTabs = new List<dateSignedTabsDTO>();
             tabs.fullNameTabs = new List<fullNameDTO>();
             tabs.signHereTabs = new List<signHereDTO>();
@@ -88,7 +91,7 @@ namespace Model.DTO.Users
         public string name { get; set; }
         public string email { get; set; }
         public string recipientId { get; set; }
-        public string roleName { get; set; } 
+        public string roleName { get; set; }
         public string routingOrder { get; set; }
         public tabsDTO tabs { get; set; }
 
