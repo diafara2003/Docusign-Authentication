@@ -28,7 +28,7 @@ namespace Docusign.Repository.Peticion
 
         AuthenticationDTO validationAuthentication();
 
-        void AgregarToken(string token, int usuario, string RefreshToken);
+        
     }
 
     public class PeticionDocusignRepository : IPeticionDocusignRepository
@@ -171,28 +171,5 @@ namespace Docusign.Repository.Peticion
             }
 
         }
-
-
-        public void AgregarToken(string token, int usuario, string RefreshToken)
-        {
-
-            contexto.tokenDocusign.ToList().ForEach(c => contexto.Entry(c).State = Microsoft.EntityFrameworkCore.EntityState.Deleted);
-
-            contexto.tokenDocusign.Add(new Model.Entity.ADP_API.TokenDocusign()
-            {
-                TokenDocuId = 0,
-                EnProceso = false,
-                Token = token,
-                Fecha = DateTime.Now,
-                IdUsuario = usuario,
-                RefreshToken = RefreshToken
-
-            });
-
-            contexto.SaveChanges();
-
-        }
-
-
     }
 }

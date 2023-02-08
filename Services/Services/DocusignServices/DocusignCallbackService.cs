@@ -11,6 +11,8 @@ namespace Docusign.Services
         string GetNameFile();
 
         string ReadTokenFile(string folder);
+
+        void DeleteTokenFile(string root);
     }
 
     public class DocusignCallbackService : IDocusignCallbackService
@@ -36,9 +38,8 @@ namespace Docusign.Services
 
 
             ruta += $@"\{GetNameFile()}.txt";
-
-            if (File.Exists(ruta)) File.Delete(ruta);
-
+            //Delete file token
+            DeleteTokenFile(root);
 
             var archivo = File.Create(ruta);
 
@@ -73,6 +74,12 @@ namespace Docusign.Services
             }
 
             return texto;
+        }
+
+        public void DeleteTokenFile (string root)
+        {
+            string ruta = $"{root}\\token\\{GetNameFile()}.txt";
+            if (File.Exists(ruta)) File.Delete(ruta);
         }
     }
 }

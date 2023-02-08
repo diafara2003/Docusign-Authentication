@@ -6,7 +6,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
 using Docusign.Repository.Peticion;
-using System.IO;
+using Docusign.Repository.DataBase.Conexion;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 
 namespace Docusign.Services
 {
@@ -20,6 +21,7 @@ namespace Docusign.Services
 
         void AgregarToken(string token, int usuario, string RefreshToken);
 
+
         Task<Tuple<AuthenticationDTO, IList<envelopeTemplatesDTO>>> GetTemplates();
 
         Task<EnvelopeSignerDTO> GetRecipentsEnvelope(string envelopes);
@@ -27,19 +29,21 @@ namespace Docusign.Services
         Task<Tuple<AuthenticationDTO, IList<envelopeTemplatesDTO>>> GetTemplatesSigners();
 
         Task<Tuple<AuthenticationDTO, ResponseDocusignAuditoriaDTO>> GetEnvelopeHistory(string idenvelope);
-
         Task<Tuple<AuthenticationDTO, EnvelopeResponse>> SendEnvelope(EnvelopeSendDTO envelope);
-      
+        ResposeStateTokenDTO StateToken(string rootWeb);
     }
 
     public class DocusignService : IDocusignService
     {
 
         private IPeticionDocusignRepository _peticionDOcusign;
-
-        public DocusignService(IPeticionDocusignRepository peticionDocusign)
+        private IDocusignCallbackService _peticionDocuCallBackService;
+        private DB_ADPRO _contexto;
+        public DocusignService(IPeticionDocusignRepository peticionDocusign, IDocusignCallbackService docuCallBackService, DB_ADPRO contexto)
         {
             this._peticionDOcusign = peticionDocusign;
+            this._peticionDocuCallBackService = docuCallBackService;
+            this._contexto = contexto;
         }
 
         public async Task<Tuple<AuthenticationDTO, ResponseDocusignAuditoriaDTO>> GetEnvelopeHistory(string idenvelope)
@@ -138,7 +142,23 @@ namespace Docusign.Services
 
         public void AgregarToken(string token, int usuario, string RefreshToken)
         {
-            _peticionDOcusign.AgregarToken(token, usuario, RefreshToken);
+
+            _contexto.tokenDocusign.ToList().ForEach(c => _contexto.Entry(c).State = Microsoft.EntityFrameworkCore.EntityState.Deleted);
+
+            _contexto.tokenDocusign.Add(new Model.Entity.ADP_API.TokenDocusign()
+            {
+                TokenDocuId = 0,
+                EnProceso = false,
+                Token = token,
+                Fecha = DateTime.Now,
+                IdUsuario = usuario,
+                RefreshToken = RefreshToken
+
+            });
+
+            _contexto.SaveChanges();
+            //_peticionDOcusign.AgregarToken(token, usuario, RefreshToken);
+            //_peticionDocuCallBackService.ReadTokenFile(token);
         }
 
         public async Task<EnvelopeSignerDTO> GetRecipentsEnvelope(string envelopes)
@@ -188,7 +208,6 @@ namespace Docusign.Services
         {
             return _peticionDOcusign.validationAuthentication();
         }
-
         public async Task<Tuple<AuthenticationDTO, EnvelopeResponse>> SendEnvelope(EnvelopeSendDTO envelope)
         {
             templateDTO template = await peticion<templateDTO>("templates/" + envelope.IdTemplate, MethodRequest.GET);
@@ -310,6 +329,28 @@ namespace Docusign.Services
             }, envelopeResponse);
         }
 
-     
+        public ResposeStateTokenDTO StateToken(string rootWeb)
+        {
+            ResposeStateTokenDTO response = new ResposeStateTokenDTO();
+            //Valida si existe un token guardado en tabla
+            if (_contexto.tokenDocusign.Count() > 0)
+                return response;
+            //Valida si existe un archivo guardado
+            else
+            {
+                var _token = _peticionDocuCallBackService.ReadTokenFile(rootWeb);
+                if (_token == string.Empty)                
+                    return response;                
+                else
+                {
+                    AgregarToken(_token, 1, "");
+                    _peticionDocuCallBackService.DeleteTokenFile(rootWeb);
+             
+                    response.Exist = true;
+                    response.Cod = 1;
+                    return response;
+                }
+            }           
+        }        
     }
 }
