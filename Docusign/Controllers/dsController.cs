@@ -27,10 +27,7 @@ namespace Docusign.Controllers
         {
             docusignService.SaveTokenFile(code, webHostEnvironment.ContentRootPath);
 
-            return Ok(new ResponseAPIDTO()
-            {
-                success = true
-            });
+            return Ok("Se autentico en DocuSign correctamente, puede cerrar esta ventana.");
         }
 
 

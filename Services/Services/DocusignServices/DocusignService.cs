@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using Docusign.Repository.Peticion;
 using Docusign.Repository.DataBase.Conexion;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
+
 
 namespace Docusign.Services
 {
@@ -19,7 +19,7 @@ namespace Docusign.Services
 
         AuthenticationDTO validationAuthentication();
 
-        void AgregarToken(string token, int usuario, string RefreshToken);
+        void AgregarToken(DocusignAuthDTO token, int usuario);
 
 
         Task<Tuple<AuthenticationDTO, IList<envelopeTemplatesDTO>>> GetTemplates();
@@ -140,7 +140,7 @@ namespace Docusign.Services
 
         }
 
-        public void AgregarToken(string token, int usuario, string RefreshToken)
+        public void AgregarToken(DocusignAuthDTO token, int usuario)
         {
 
             _contexto.tokenDocusign.ToList().ForEach(c => _contexto.Entry(c).State = Microsoft.EntityFrameworkCore.EntityState.Deleted);
@@ -149,10 +149,10 @@ namespace Docusign.Services
             {
                 TokenDocuId = 0,
                 EnProceso = false,
-                Token = token,
+                Token = token.access_token,
                 Fecha = DateTime.Now,
                 IdUsuario = usuario,
-                RefreshToken = RefreshToken
+                RefreshToken = token.refresh_token
 
             });
 
@@ -333,24 +333,24 @@ namespace Docusign.Services
         {
             ResposeStateTokenDTO response = new ResposeStateTokenDTO();
             //Valida si existe un token guardado en tabla
-            if (_contexto.tokenDocusign.Count() > 0)
-                return response;
+            //if (_contexto.tokenDocusign.Count() == 0)
+            //    return response;
             //Valida si existe un archivo guardado
+            //else
+            //{
+            var _token = _peticionDocuCallBackService.ReadTokenFile(rootWeb);
+            if (_token == null)
+                return response;
             else
             {
-                var _token = _peticionDocuCallBackService.ReadTokenFile(rootWeb);
-                if (_token == string.Empty)                
-                    return response;                
-                else
-                {
-                    AgregarToken(_token, 1, "");
-                    _peticionDocuCallBackService.DeleteTokenFile(rootWeb);
-             
-                    response.Exist = true;
-                    response.Cod = 1;
-                    return response;
-                }
-            }           
-        }        
+                AgregarToken(_token, 1);
+              //  _peticionDocuCallBackService.DeleteTokenFile(rootWeb);
+
+                response.Exist = true;
+                response.Cod = 1;
+                return response;
+            }
+            //}           
+        }
     }
 }

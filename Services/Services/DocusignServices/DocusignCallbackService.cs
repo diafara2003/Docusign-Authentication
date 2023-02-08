@@ -1,6 +1,10 @@
 ﻿
+using Docusign.Repository.Peticion;
 using Microsoft.AspNetCore.Http;
+using Model.DTO.Docusign;
+using Newtonsoft.Json;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace Docusign.Services
 {
@@ -10,7 +14,7 @@ namespace Docusign.Services
 
         string GetNameFile();
 
-        string ReadTokenFile(string folder);
+        DocusignAuthDTO ReadTokenFile(string folder);
 
         void DeleteTokenFile(string root);
     }
@@ -18,9 +22,13 @@ namespace Docusign.Services
     public class DocusignCallbackService : IDocusignCallbackService
     {
         private IHttpContextAccessor httpContextAccessor;
-        public DocusignCallbackService(IHttpContextAccessor _httpContextAccessor)
+        IPeticionDocusignAuth _peticionDocusignAuth;
+        public DocusignCallbackService(IHttpContextAccessor _httpContextAccessor
+            , IPeticionDocusignAuth _peticionDocusignAuth
+            )
         {
             this.httpContextAccessor = _httpContextAccessor;
+            this._peticionDocusignAuth = _peticionDocusignAuth;
         }
         public string GetNameFile()
         {
@@ -29,17 +37,20 @@ namespace Docusign.Services
             return rutaRequest.ToLower();
         }
 
-        public void SaveTokenFile(string code, string root)
+        public async void SaveTokenFile(string code, string root)
         {
+            string name = GetNameFile();
+            var access = await _peticionDocusignAuth.GetAccesToken(code);
             string ruta = $"{root}\\token\\";
 
 
             if (!Directory.Exists(ruta)) Directory.CreateDirectory(ruta);
 
 
-            ruta += $@"\{GetNameFile()}.txt";
+            ruta += $@"\{name}.txt";
             //Delete file token
-            DeleteTokenFile(root);
+            string rutaDelete = $"{root}\\token\\{name}.txt";
+            if (File.Exists(rutaDelete)) File.Delete(rutaDelete);
 
             var archivo = File.Create(ruta);
 
@@ -48,14 +59,14 @@ namespace Docusign.Services
 
             using (StreamWriter file = new StreamWriter(ruta, true))
             {
-                file.WriteLine(code);
+                file.WriteLine(JsonConvert.SerializeObject(access));
                 file.Close();
             }
 
         }
 
 
-        public string ReadTokenFile(string folder)
+        public DocusignAuthDTO ReadTokenFile(string folder)
         {
             string texto = string.Empty;
             try
@@ -73,10 +84,12 @@ namespace Docusign.Services
                 texto = string.Empty;
             }
 
-            return texto;
+            if (string.IsNullOrEmpty(texto)) return null;
+            else
+                return JsonConvert.DeserializeObject<DocusignAuthDTO>(texto);
         }
 
-        public void DeleteTokenFile (string root)
+        public void DeleteTokenFile(string root)
         {
             string ruta = $"{root}\\token\\{GetNameFile()}.txt";
             if (File.Exists(ruta)) File.Delete(ruta);

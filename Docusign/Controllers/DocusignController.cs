@@ -176,6 +176,13 @@ namespace Docusign.Controllers
             }
         }
 
+        [HttpGet("validarsesion")]
+        public IActionResult GetValdiadSesion()
+        {
+
+            return Ok(new Tuple<AuthenticationDTO, string>(_docusignService.validationAuthentication(), string.Empty));
+        }
+
     }
 }
 
