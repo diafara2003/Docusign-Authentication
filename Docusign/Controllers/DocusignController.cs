@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
 using Model.DTO.Docusign;
-using Services.DocusignServices;
+using Docusign.Services;
 using Docusign.Middleware;
-using Repository.Repositories.Peticion;
+using Docusign.Repository.Peticion;
 
 namespace Docusign.Controllers
 {
@@ -19,11 +19,14 @@ namespace Docusign.Controllers
     public class DocusignController : ControllerBase
     {
         private readonly IDocusignService _docusignService;
-        private readonly IEjemplo ejemplo;
-        public DocusignController(IDocusignService peticionDocusign)
+        private readonly IEjemplo _ejemplo;
+        public DocusignController
+           (IDocusignService peticionDocusign)
+        //(IEjemplo ejemplo)
         {
-             this._docusignService = peticionDocusign;
-            
+            this._docusignService = peticionDocusign;
+            //  this._ejemplo = ejemplo;
+
         }
 
 

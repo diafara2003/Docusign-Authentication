@@ -1,13 +1,13 @@
 ﻿using Model.DTO;
 using Model.DTO.Docusign;
 using Model.DTO.Users;
-using Repository.Repositories.Peticion;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
+using Docusign.Repository.Peticion;
 
-namespace Services.DocusignServices
+namespace Docusign.Services
 {
     public interface IDocusignService
     {
@@ -34,10 +34,10 @@ namespace Services.DocusignServices
     {
 
         private IPeticionDocusignRepository _peticionDOcusign;
-        //public DocusignService(IPeticionDocusignRepository peticionDocusign)
-        //{
-        //    this._peticionDOcusign = peticionDocusign;
-        //}
+        public DocusignService(IPeticionDocusignRepository peticionDocusign)
+        {
+            this._peticionDOcusign = peticionDocusign;
+        }
 
         public async Task<Tuple<AuthenticationDTO, ResponseDocusignAuditoriaDTO>> GetEnvelopeHistory(string idenvelope)
         {

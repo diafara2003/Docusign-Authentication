@@ -2,6 +2,7 @@
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using Docusign.Utilidades.Session;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -10,9 +11,8 @@ using Model.Entity.ADP_API;
 using Model.Entity.DBO;
 using Repository.DataBase.Model;
 using SincoSoft.Context.Core;
-using Utilidades.Session;
 
-namespace Repository.DataBase.Conexion
+namespace Docusign.Repository.DataBase.Conexion
 {
     public class DB_ADPRO : DbContext
     {

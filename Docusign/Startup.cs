@@ -8,12 +8,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Model.DTO;
-using Repository.DataBase.Conexion;
-using Repository.Repositories.Peticion;
-using Services.DocusignServices;
+
+using Docusign.Services;
 using System;
 using System.Reflection;
-using Utilidades.Session;
+using Docusign.Repository.Peticion;
+using Docusign.Utilidades.Session;
+using Docusign.Repository.DataBase.Conexion;
 
 namespace Docusign
 {
@@ -41,13 +42,13 @@ namespace Docusign
 
             services.AddControllers();
 
-            //services.AddScoped<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddScoped<IHttpContextAccessor, HttpContextAccessor>();
             //services.AddScoped<IConstruirSession, ConstruirSession>();
             //services.AddScoped<IPeticionDocusignRepository, PeticionDocusignRepository>();
-            services.AddScoped<IDocusignService, DocusignService>();
-           
-            
+            //services.AddScoped<IDocusignService, DocusignService>();           
             services.AddScoped<IEjemplo, Ejemplo>();
+
+            services.AddDbContext<DB_ADPRO>();
 
             services.AddCors(options =>
             {
@@ -77,7 +78,7 @@ namespace Docusign
             app.UseAuthentication();
             app.UseAuthorization();
 
-            //app.UseMiddleware(typeof(AuthenticationMiddleware));
+            app.UseMiddleware(typeof(AuthenticationMiddleware));
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
@@ -87,16 +88,16 @@ namespace Docusign
 
         public void ConfigureContainer(ContainerBuilder builder)
         {
-            builder.RegisterAssemblyTypes(AppDomain.CurrentDomain.GetAssemblies())
-            .Where(x => x?.Namespace != null
-            && (x.Namespace.EndsWith("Peticion") || x.Namespace.EndsWith("Conexion") || x.Namespace.EndsWith("DocusignServices")))
-             .AsImplementedInterfaces()
-       .InstancePerRequest();
+            builder.RegisterAssemblyTypes(Assembly.Load("Utilidades"))
+ .AsImplementedInterfaces();
 
-            // builder.RegisterAssemblyTypes(Assembly.Load("Services"))
-            //.Where(x => x?.Namespace != null && x.Namespace.EndsWith("DocusignServices"))
-            //.AsImplementedInterfaces();
+            builder.RegisterAssemblyTypes(Assembly.Load("Repository"))
+.AsImplementedInterfaces();
 
+            builder.RegisterAssemblyTypes(Assembly.Load("Services"))
+ .AsImplementedInterfaces();
+
+         
         }
     }
 }

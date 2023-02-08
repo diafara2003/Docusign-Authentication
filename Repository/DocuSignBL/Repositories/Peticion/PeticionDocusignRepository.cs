@@ -1,4 +1,4 @@
-﻿using Repository.DataBase.Conexion;
+﻿
 
 using Model.DTO;
 using Newtonsoft.Json;
@@ -9,8 +9,9 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Linq;
+using Docusign.Repository.DataBase.Conexion;
 
-namespace Repository.Repositories.Peticion
+namespace Docusign.Repository.Peticion
 {
     public enum MethodRequest
     {
@@ -32,9 +33,14 @@ namespace Repository.Repositories.Peticion
     public class PeticionDocusignRepository : IPeticionDocusignRepository
     {
         private DB_ADPRO contexto;
-        //public PeticionDocusignRepository(DB_ADPRO _contexto)
+        public PeticionDocusignRepository(DB_ADPRO _contexto)
+        {
+            this.contexto = _contexto;
+        }
+
+        //public PeticionDocusignRepository(IConstruirSession construirSession, IHttpContextAccessor httpContextAccessor)
         //{
-        //    this.contexto = _contexto;
+        //    // this.contexto = _contexto;
         //}
 
         public async Task<T> peticion<T>(string method, MethodRequest type, object data = null)
@@ -125,7 +131,7 @@ namespace Repository.Repositories.Peticion
 
             string callback = $"https://{host}{path}/api/ds/callback".Replace("/", "%2F").Replace(":", "%3A");
 
-            string client_id = contexto.adpconfig.FirstOrDefault(c => c.CnfCodigo == "Client_id_docusign").CnfValor;
+            string client_id = contexto.adpconfig.Where(c => c.CnfCodigo == "Client_id_docusign").FirstOrDefault().CnfValor;
             var token = contexto.tokenDocusign.ToList();
             string url = $"https://account.docusign.com/oauth/auth?client_id={client_id}&scope=signature&response_type=code&redirect_uri={callback}";
 

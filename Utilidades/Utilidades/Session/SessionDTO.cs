@@ -1,7 +1,7 @@
 ﻿
-namespace Utilidades.Session
+namespace Docusign.Utilidades.Session
 {
-    public class Session
+    public class SessionDTO
     {
         public string CadenaConexion { get; set; }
         public int IdUsuario { get; set; }

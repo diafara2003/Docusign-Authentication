@@ -1,11 +1,13 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Docusign.Repository.DataBase.Conexion;
+using Docusign.Utilidades.Session;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Configuration;
-using Repository.DataBase.Conexion;
+
 using SincoSoft.Context.Core;
 using System;
 using System.Threading.Tasks;
-using Utilidades.Session;
+
 
 namespace Docusign.Middleware
 {
@@ -34,11 +36,11 @@ namespace Docusign.Middleware
             //if (urlPeticion.Contains("/api/"))
             //{
 
-            //ObtenerSesion(context);
+            ObtenerSesion(context);
 
 
             
-            //new DB_ADPRO(construirSession, httpContextAccessor);
+            new DB_ADPRO(construirSession, httpContextAccessor);
             
             await next(context);
         }
