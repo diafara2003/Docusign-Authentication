@@ -1,4 +1,5 @@
 ﻿
+using Docusign.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,10 +11,12 @@ namespace Docusign.Controllers
     public class dsController : ControllerBase
     {
         private IHttpContextAccessor httpContextAccessor;
+        private IDocusignService docusignService;
 
-        public dsController(IHttpContextAccessor _httpContextAccessor)
+        public dsController(IHttpContextAccessor _httpContextAccessor, IDocusignService _docusignService)
         {
             this.httpContextAccessor = _httpContextAccessor;
+            this.docusignService = _docusignService;
         }
 
         [HttpGet("callback")]
@@ -36,6 +39,13 @@ namespace Docusign.Controllers
             });
         }
 
+
+        [HttpGet("callback/verificacion")]
+        public IActionResult GetTokenVerificacion()
+        {
+           
+            return Ok("");
+        }
 
     }
 }

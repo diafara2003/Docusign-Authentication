@@ -89,12 +89,15 @@ namespace Docusign
         public void ConfigureContainer(ContainerBuilder builder)
         {
             builder.RegisterAssemblyTypes(Assembly.Load("Utilidades"))
+                 .Where(x => x?.Namespace != null && x.Namespace.Contains("Docusign.Utilidades.Session"))
  .AsImplementedInterfaces();
 
             builder.RegisterAssemblyTypes(Assembly.Load("Repository"))
+                 .Where(x => x?.Namespace != null && x.Namespace.Contains("Docusign.Repository"))
 .AsImplementedInterfaces();
 
             builder.RegisterAssemblyTypes(Assembly.Load("Services"))
+                 .Where(x => x?.Namespace != null && x.Namespace.Contains("Docusign.Services"))
  .AsImplementedInterfaces();
 
          
