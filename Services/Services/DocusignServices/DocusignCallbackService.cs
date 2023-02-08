@@ -57,13 +57,21 @@ namespace Docusign.Services
         public string ReadTokenFile(string folder)
         {
             string texto = string.Empty;
-            using (var sr = new StreamReader($@"{folder}\token\\{GetNameFile()}.txt"))
+            try
             {
-                // Read the stream as a string, and write the string to the console.
-                texto = sr.ReadLine();
+                using (var sr = new StreamReader($@"{folder}\token\\{GetNameFile()}.txt"))
+                {
+                    // Read the stream as a string, and write the string to the console.
+                    texto = sr.ReadLine();
 
-                sr.Close();
+                    sr.Close();
+                }
             }
+            catch (System.Exception)
+            {
+                texto = string.Empty;
+            }
+
             return texto;
         }
     }
