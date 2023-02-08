@@ -1,34 +1,49 @@
-﻿using DocuSignBL.DataBase.Conexion;
-using Microsoft.AspNetCore.Http;
+﻿using Repository.DataBase.Conexion;
+
 using Model.DTO;
 using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Net.Http;
-using System.Reflection.Metadata;
+
 using System.Text;
 using System.Threading.Tasks;
 using System.Linq;
 
-namespace DocuSignBL.Peticion
+namespace Repository.Repositories.Peticion
 {
-    public class PeticionDocusign
+    public enum MethodRequest
     {
+        GET,
+        POST
+    }
 
-        private IHttpContextAccessor _httpContextAccessor { get; }
+    public interface IPeticionDocusignRepository
+    {
+        Task<T> peticion<T>(string method, MethodRequest type, object data = null);
 
+        Task<T> peticionFile<T>(string method,  object data = null);
 
-        public PeticionDocusign(IHttpContextAccessor httpContextAccessor)
-        {
-            _httpContextAccessor = httpContextAccessor;
-        }
-        public async Task<T> peticion<T>(string method, HttpMethod type, object data = null) where T : class
+        AuthenticationDTO validationAuthentication();
+
+        void AgregarToken(string token, int usuario, string RefreshToken);
+    }
+
+    public class PeticionDocusignRepository : IPeticionDocusignRepository
+    {
+        private DB_ADPRO contexto;
+        //public PeticionDocusignRepository(DB_ADPRO _contexto)
+        //{
+        //    this.contexto = _contexto;
+        //}
+
+        public async Task<T> peticion<T>(string method, MethodRequest type, object data = null)
         {
 
             HttpMessageHandler handler = new HttpClientHandler();
-            DB_ADPRO db = new DB_ADPRO(_httpContextAccessor);
-            var token = db.tokenDocusign.Take(1).First();
-            string account = db.adpconfig.FirstOrDefault(c => c.CnfCodigo == "CuentaDocuSign").CnfValor;
+
+            var token = contexto.tokenDocusign.Take(1).First();
+            string account = contexto.adpconfig.FirstOrDefault(c => c.CnfCodigo == "CuentaDocuSign").CnfValor;
 
             var httpClient = new HttpClient(handler)
             {
@@ -42,11 +57,11 @@ namespace DocuSignBL.Peticion
 
             HttpResponseMessage response = new HttpResponseMessage();
 
-            if (type.Method == "GET")
+            if (type == MethodRequest.GET)
             {
                 response = await httpClient.GetAsync($"https://na3.docusign.net/restapi/v2.1/accounts/{account}/{method}");
             }
-            else if (type.Method == "POST")
+            else if (type == MethodRequest.POST)
             {
                 var json = JsonConvert.SerializeObject(data);
                 var dataEnvio = new StringContent(json, Encoding.UTF8, "application/json");
@@ -66,10 +81,10 @@ namespace DocuSignBL.Peticion
             return x;
         }
 
-        public async Task<T> peticionFile<T>(string method, HttpMethod type, object data = null) where T : class
+        public async Task<T> peticionFile<T>(string method,  object data = null)
         {
-            DB_ADPRO db = new DB_ADPRO(_httpContextAccessor);
-            string account = db.adpconfig.FirstOrDefault(c => c.CnfCodigo == "CuentaDocuSign").CnfValor;
+
+            string account = contexto.adpconfig.FirstOrDefault(c => c.CnfCodigo == "CuentaDocuSign").CnfValor;
             HttpMessageHandler handler = new HttpClientHandler();
 
             var httpClient = new HttpClient(handler)
@@ -78,7 +93,7 @@ namespace DocuSignBL.Peticion
                 Timeout = new TimeSpan(0, 2, 0)
             };
 
-            var token = db.tokenDocusign.Take(1).First();
+            var token = contexto.tokenDocusign.Take(1).First();
 
 
 
@@ -103,15 +118,15 @@ namespace DocuSignBL.Peticion
         public AuthenticationDTO validationAuthentication()
         {
             AuthenticationDTO auth = new AuthenticationDTO();
-            DB_ADPRO db = new DB_ADPRO(_httpContextAccessor);
 
-            var host = _httpContextAccessor.HttpContext.Request.Host.Value;
-            var path = _httpContextAccessor.HttpContext.Request.PathBase.Value;
+
+            var host = "";// .HttpContext.Request.Host.Value;
+            var path = "";// _httpContextAccessor.HttpContext.Request.PathBase.Value;
 
             string callback = $"https://{host}{path}/api/ds/callback".Replace("/", "%2F").Replace(":", "%3A");
 
-            string client_id = db.adpconfig.FirstOrDefault(c => c.CnfCodigo == "Client_id_docusign").CnfValor;
-            var token = db.tokenDocusign.ToList();
+            string client_id = contexto.adpconfig.FirstOrDefault(c => c.CnfCodigo == "Client_id_docusign").CnfValor;
+            var token = contexto.tokenDocusign.ToList();
             string url = $"https://account.docusign.com/oauth/auth?client_id={client_id}&scope=signature&response_type=code&redirect_uri={callback}";
 
 
@@ -121,7 +136,7 @@ namespace DocuSignBL.Peticion
                 auth.URL = url;
 
 
-                db.SaveChanges();
+                contexto.SaveChanges();
 
                 return auth;
             }
@@ -141,7 +156,7 @@ namespace DocuSignBL.Peticion
 
 
 
-                db.SaveChanges();
+                contexto.SaveChanges();
 
                 return auth;
             }
@@ -152,11 +167,9 @@ namespace DocuSignBL.Peticion
         public void AgregarToken(string token, int usuario, string RefreshToken)
         {
 
-            DB_ADPRO db = new DB_ADPRO(_httpContextAccessor);
+            contexto.tokenDocusign.ToList().ForEach(c => contexto.Entry(c).State = Microsoft.EntityFrameworkCore.EntityState.Deleted);
 
-            db.tokenDocusign.ToList().ForEach(c => db.Entry(c).State = Microsoft.EntityFrameworkCore.EntityState.Deleted);
-
-            db.tokenDocusign.Add(new Model.Entity.ADP_API.TokenDocusign()
+            contexto.tokenDocusign.Add(new Model.Entity.ADP_API.TokenDocusign()
             {
                 TokenDocuId = 0,
                 EnProceso = false,
@@ -165,11 +178,12 @@ namespace DocuSignBL.Peticion
                 IdUsuario = usuario,
                 RefreshToken = RefreshToken
 
-
             });
 
-            db.SaveChanges();
+            contexto.SaveChanges();
 
         }
+
+
     }
 }

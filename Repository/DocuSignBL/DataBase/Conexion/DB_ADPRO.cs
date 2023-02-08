@@ -1,16 +1,18 @@
 ﻿using System;
 using System.Data;
 using System.Data.SqlClient;
-using DocuSignBL.DataBase.Model;
+using System.Linq;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Model.Entity.ADP_API;
 using Model.Entity.DBO;
+using Repository.DataBase.Model;
 using SincoSoft.Context.Core;
+using Utilidades.Session;
 
-namespace DocuSignBL.DataBase.Conexion
+namespace Repository.DataBase.Conexion
 {
     public class DB_ADPRO : DbContext
     {
@@ -19,15 +21,25 @@ namespace DocuSignBL.DataBase.Conexion
         public DbSet<TokenDocusign> tokenDocusign { get; set; }
         public DbSet<ADPConfig> adpconfig { get; set; }
 
-        public DB_ADPRO(IHttpContextAccessor httpContextAccessor)
+        public DB_ADPRO(IConstruirSession construirSession, IHttpContextAccessor httpContextAccessor) : base(construirSession.ObtenerConextOptions(new DbContextOptionsBuilder<DB_ADPRO>()))
         {
-            _httpContextAccessor = httpContextAccessor;
-          
+            this._httpContextAccessor = httpContextAccessor;
+            //  var cliente = new SqlConnectionStringBuilder(construirSession.ObtenerSession().CadenaConexion);
+            // if (!ConstantesEntornoEstaticas.MigracionesAplicadasBD.Any(bd => bd.Equals(cliente.InitialCatalog)))
+            //{
+            if (Database.CanConnect())
+            {
+                if (Database.GetPendingMigrations().Any()) Database.Migrate();
+            }
+            else
+                throw new Exception("No se encontro la BD");
+
+            //  ConstantesEntornoEstaticas.MigracionesAplicadasBD.Add(cliente.InitialCatalog);
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)
         {
-            CurrentContext contextoActual = new CurrentContext(_httpContextAccessor);
+            CurrentContext contextoActual = new CurrentContext(this._httpContextAccessor);
             // connect to sql server with connection string from app settings
             options.UseSqlServer(contextoActual.CadenaConexion);
         }
@@ -79,20 +91,4 @@ namespace DocuSignBL.DataBase.Conexion
 
     }
 
-
-    public class Inicializer
-    {
-
-        public void UpgradeDatabase(IApplicationBuilder app)
-        {
-            using (var serviceScope = app.ApplicationServices.CreateScope())
-            {
-                var context = serviceScope.ServiceProvider.GetService<DB_ADPRO>();
-                if (context != null && context.Database != null)
-                {
-                    context.Database.Migrate();
-                }
-            }
-        }
-    }
 }

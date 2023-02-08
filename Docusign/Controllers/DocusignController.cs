@@ -1,19 +1,16 @@
 ﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.IO;
 using System.Net.Http;
 using System;
-using DocuSignBL.Peticion;
 using Model.DTO;
 using Model.DTO.Users;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using DocuSignBL.Opetations;
 using System.Linq;
-using System.Xml.Linq;
 using Model.DTO.Docusign;
-using SincoSoft.Context.Core;
+using Services.DocusignServices;
+using Docusign.Middleware;
+using Repository.Repositories.Peticion;
 
 namespace Docusign.Controllers
 {
@@ -21,31 +18,14 @@ namespace Docusign.Controllers
     [ApiController]
     public class DocusignController : ControllerBase
     {
-        private IHttpContextAccessor _httpContextAccessor { get; }
-
-        public DocusignController(IHttpContextAccessor httpContextAccessor)
+        private readonly IDocusignService _docusignService;
+        private readonly IEjemplo ejemplo;
+        public DocusignController(IDocusignService peticionDocusign)
         {
-            _httpContextAccessor = httpContextAccessor;
+             this._docusignService = peticionDocusign;
+            
         }
 
-        [HttpGet("sesion")]
-        public IActionResult GetSession()
-        {
-            //Se crea el objeto pasando el IHttpContextAccessor
-            var currentContext = new CurrentContext(_httpContextAccessor);
-
-
-            return Ok(new
-            {
-                currentContext.IdOrigen,
-                currentContext.IdEmpresa,
-                currentContext.IdSucursal,
-                currentContext.IdUsuario,
-                currentContext.NomUsuario,
-                currentContext.IdProyecto,
-                currentContext.CadenaConexion
-            });
-        }
 
         [HttpGet("docusign")]
         public IActionResult GetDocuSign()
@@ -66,7 +46,7 @@ namespace Docusign.Controllers
             //}
             try
             {
-                var x = await new PeticionDocusign(_httpContextAccessor).peticion<userDTO>("users", HttpMethod.Get);
+                var x = await _docusignService.peticion<userDTO>("users", MethodRequest.GET);
 
                 return Ok(x);
 
@@ -79,37 +59,16 @@ namespace Docusign.Controllers
 
         }
 
+        /// <summary>
+        /// obtiene todos los templates de docusign
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("Templates")]
         public async Task<IActionResult> GetTemplates()
         {
             try
             {
-                var auth = new PeticionDocusign(_httpContextAccessor).validationAuthentication();
-
-                if (!auth.isAuthenticated)
-                {
-                    return Ok(new Tuple<AuthenticationDTO, IList<envelopeTemplatesDTO>>(auth, new List<envelopeTemplatesDTO>()));
-                }
-
-
-                templatesDTO TemplatesArray = await new PeticionDocusign(_httpContextAccessor).peticion<templatesDTO>("templates?order_by=name", HttpMethod.Get);
-
-                var TemplatesFilter = new List<envelopeTemplatesDTO>();
-
-                if (TemplatesArray.envelopeTemplates != null)
-                    foreach (var item in TemplatesArray.envelopeTemplates)
-                    {
-                        if (item.name != "")
-                        {
-                            TemplatesFilter.Add(item);
-                        }
-                    }
-
-
-                Tuple<AuthenticationDTO, IList<envelopeTemplatesDTO>> responseAuth = new Tuple<AuthenticationDTO, IList<envelopeTemplatesDTO>>(auth, TemplatesFilter);
-
-                return Ok(responseAuth);
-
+                return Ok(await _docusignService.GetTemplates());
             }
             catch (Exception e)
             {
@@ -117,26 +76,16 @@ namespace Docusign.Controllers
             }
         }
 
-
+        /// <summary>
+        /// obtiene todos los firmantes de un  templates de la cuenta DOcuSign
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("TemplatesSigners")]
         public async Task<IActionResult> GetTemplatesSigners()
         {
             try
             {
-                var auth = new PeticionDocusign(_httpContextAccessor).validationAuthentication();
-
-                if (!auth.isAuthenticated)
-                {
-                    return Ok(new Tuple<AuthenticationDTO, IList<envelopeTemplatesDTO>>(auth, new List<envelopeTemplatesDTO>()));
-                }
-
-                templatesDTO TemplatesArray = await new PeticionDocusign(_httpContextAccessor).peticion<templatesDTO>("templates?order_by=name&include=recipients,documents", HttpMethod.Get);
-                var signers = TemplatesArray.envelopeTemplates;
-
-
-                Tuple<AuthenticationDTO, IList<envelopeTemplatesDTO>> responseAuth = new Tuple<AuthenticationDTO, IList<envelopeTemplatesDTO>>(auth, signers);
-
-                return Ok(responseAuth);
+                return Ok(await _docusignService.GetTemplatesSigners());
             }
             catch (Exception e)
             {
@@ -144,10 +93,15 @@ namespace Docusign.Controllers
             }
         }
 
+        /// <summary>
+        /// obtiene todos los firmantes de un sobre
+        /// </summary>
+        /// <param name="envelope"></param>
+        /// <returns></returns>
         [HttpGet("envelopes/recipents")]
         public async Task<IActionResult> GetRecipentsEnvelope(string envelope)
         {
-            return Ok(await new DocuSignBL.Opetations.DocuSignBL(_httpContextAccessor).GetRecipentsEnvelope(envelope));
+            return Ok(await _docusignService.GetRecipentsEnvelope(envelope));
         }
 
         /// <summary>
@@ -160,11 +114,8 @@ namespace Docusign.Controllers
         {
             try
             {
-                envelopeTemplatesDTO SignersDocuemnts = await new PeticionDocusign(_httpContextAccessor).peticion<envelopeTemplatesDTO>($"templates/{idTemplate}/signers?order_by=name", HttpMethod.Get);
-                //var auth = new PeticionDocusign().validationAuthentication();
-                //Tuple<AuthenticationDTO, envelopeTemplatesDTO> responseAuth = new Tuple<AuthenticationDTO,envelopeTemplatesDTO>(auth, SignersDocuemnts);
 
-                return Ok(SignersDocuemnts);
+                return Ok(await _docusignService.peticion<envelopeTemplatesDTO>($"templates/{idTemplate}/signers?order_by=name", MethodRequest.GET));
             }
             catch (Exception e)
             {
@@ -177,7 +128,7 @@ namespace Docusign.Controllers
         {
             try
             {
-                templateDTO template = await new PeticionDocusign(_httpContextAccessor).peticion<templateDTO>("templates/" + envelope.IdTemplate, HttpMethod.Get);
+                templateDTO template = await _docusignService.peticion<templateDTO>("templates/" + envelope.IdTemplate, MethodRequest.GET);
 
 
                 EnvelopeResponse envelopeResponse = new EnvelopeResponse();
@@ -202,11 +153,11 @@ namespace Docusign.Controllers
                 {
                     if (doc.documentId != envelope.documentId)
                     {
-                        documentsDTO fileBase64 = await new PeticionDocusign(_httpContextAccessor).peticionFile<documentsDTO>("templates/" + envelope.IdTemplate + "/documents/" + doc.documentId, HttpMethod.Get);
+                        documentsDTO fileBase64 = await _docusignService.peticionFile<documentsDTO>("templates/" + envelope.IdTemplate + "/documents/" + doc.documentId, HttpMethod.Get);
                         doc.documentBase64 = fileBase64.documentBase64;
                         doc.fileExtension = "pdf";
                         documents.Add(doc);
-                    }                   
+                    }
                 }
 
                 documents.Add(docu);
@@ -289,9 +240,9 @@ namespace Docusign.Controllers
                 envelopeToSend.status = "sent";
 
 
-                envelopeResponse = await new PeticionDocusign(_httpContextAccessor).peticion<EnvelopeResponse>("envelopes", HttpMethod.Post, envelopeToSend);
+                envelopeResponse = await _docusignService.peticion<EnvelopeResponse>("envelopes", MethodRequest.POST, envelopeToSend);
 
-                var auth = new PeticionDocusign(_httpContextAccessor).validationAuthentication();
+                var auth = _docusignService.validationAuthentication();
                 Tuple<AuthenticationDTO, EnvelopeResponse> responseAuth = new Tuple<AuthenticationDTO, EnvelopeResponse>(auth, envelopeResponse);
 
                 return Ok(responseAuth);
@@ -314,39 +265,7 @@ namespace Docusign.Controllers
         {
             try
             {
-                var auth = new PeticionDocusign(_httpContextAccessor).validationAuthentication();
-                if (!auth.isAuthenticated)
-                {
-                    return Ok(new Tuple<AuthenticationDTO, ResponseDocusignAuditoriaDTO>(auth, new ResponseDocusignAuditoriaDTO()));
-                }
-
-                DocusignAuditoriaDTO SignersDocuemnts = await new PeticionDocusign(_httpContextAccessor).peticion<DocusignAuditoriaDTO>($"envelopes/{idenvelope}?include=documents,recipients", HttpMethod.Get);
-
-
-
-                EnvelopeDocusignAudit EnvelopeAudit = await new PeticionDocusign(_httpContextAccessor).peticion<EnvelopeDocusignAudit>($"envelopes/{idenvelope}/audit_events", HttpMethod.Get);
-
-
-                Tuple<AuthenticationDTO, ResponseDocusignAuditoriaDTO> responseAuth = new Tuple<AuthenticationDTO, ResponseDocusignAuditoriaDTO>(auth, new ResponseDocusignAuditoriaDTO()
-                {
-                    encabezado = new ResponseEncabezadoAuditDTO()
-                    {
-                        documentos = SignersDocuemnts.envelopeDocuments != null
-                            ? string.Join(", ", SignersDocuemnts.envelopeDocuments.Select(c => c.name))
-                            : "",
-                        asunto = SignersDocuemnts.emailSubject,
-                        destinatarios = SignersDocuemnts.recipients != null && SignersDocuemnts.recipients.signers != null
-                            ? string.Join(", ", SignersDocuemnts.recipients.signers.Where(c => c.recipientType == "signer").Select(c => c.name))
-                            : "",
-                        fechaCreacion = SignersDocuemnts.createdDateTime.ToString("MM/dd/yyyy h:mm tt"),
-                        fechaEnvio = SignersDocuemnts.sentDateTime.ToString("MM/dd/yyyy h:mm tt"),
-                        estado = StatusEnvelope(SignersDocuemnts.status)
-                    },
-                    detalles = GenerateDetail(EnvelopeAudit)
-
-                });
-
-                return Ok(responseAuth);
+                return Ok(await _docusignService.GetEnvelopeHistory(idenvelope));
             }
             catch (Exception e)
             {
@@ -354,47 +273,6 @@ namespace Docusign.Controllers
             }
         }
 
-        List<ResponseDetalleAuditDTO> GenerateDetail(EnvelopeDocusignAudit data)
-        {
-            List<ResponseDetalleAuditDTO> objLst = new List<ResponseDetalleAuditDTO>();
-
-
-            if (data.auditEvents == null) return objLst;
-
-
-            data.auditEvents.ForEach(c =>
-            {
-                var accion = c.eventFields.FirstOrDefault(e => e.name.ToLower().Equals("action")) ?? new EventFieldsDocuSignDTO() { };
-                var user = c.eventFields.FirstOrDefault(e => e.name.ToLower().Equals("username")) ?? new EventFieldsDocuSignDTO() { };
-                var status = c.eventFields.FirstOrDefault(e => e.name.ToLower().Equals("envelopestatus")) ?? new EventFieldsDocuSignDTO() { };
-                var date = c.eventFields.FirstOrDefault(e => e.name.ToLower().Equals("logtime")) ?? new EventFieldsDocuSignDTO() { };
-                var message = c.eventFields.FirstOrDefault(e => e.name.ToLower().Equals("message")) ?? new EventFieldsDocuSignDTO() { };
-
-
-                objLst.Add(new ResponseDetalleAuditDTO()
-                {
-                    accion = accion != null ? accion.value : string.Empty,
-                    actividad = message != null ? message.value : string.Empty,
-                    estado = status != null ? status.value : string.Empty,
-                    hora = status != null ? Convert.ToDateTime(date.value).ToString("MM/dd/yyyy h:mm tt") : string.Empty,
-                    usuario = user != null ? user.value : string.Empty,
-                });
-
-            });
-
-            return objLst;
-        }
-
-
-        string StatusEnvelope(string name)
-        {
-            string statrusName = string.Empty;
-
-            if (name == "sent") statrusName = "Enviado";
-            else statrusName = "Completado";
-
-            return statrusName;
-        }
     }
 }
 

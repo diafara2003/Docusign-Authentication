@@ -2,7 +2,7 @@
 
 using System.Collections.Generic;
 
-namespace DocuSignBL.DataBase.Model
+namespace Repository.DataBase.Model
 {
     public class ProcedureDTO
     {
