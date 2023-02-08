@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using SincoSoft.Context;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,7 +13,7 @@ using System.Threading.Tasks;
 namespace Docusign.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class WeatherForecastController : ControllerBase
     {
         private static readonly string[] Summaries = new[]
@@ -19,12 +21,20 @@ namespace Docusign.Controllers
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
         };
 
+        //private IHttpContextAccessor _httpContextAccessor { get; }
+
         private readonly ILogger<WeatherForecastController> _logger;
 
         public WeatherForecastController(ILogger<WeatherForecastController> logger)
         {
             _logger = logger;
         }
+
+
+        //public WeatherForecastController(IHttpContextAccessor httpContextAccessor)
+        //{
+        //    _httpContextAccessor = httpContextAccessor;
+        //}
 
         [HttpGet]
         public IEnumerable<WeatherForecast> Get()
@@ -40,7 +50,8 @@ namespace Docusign.Controllers
         }
 
         [HttpGet("docusign")]
-        public IActionResult GetDocuSign() {
+        public IActionResult GetDocuSign()
+        {
             return Challenge(new AuthenticationProperties() { RedirectUri = "/WeatherForecast/userinfo" });
         }
 
@@ -50,7 +61,7 @@ namespace Docusign.Controllers
         {
 
 
-            if(!User.Identity.IsAuthenticated) return Challenge(new AuthenticationProperties() { RedirectUri = "/WeatherForecast/userinfo" });
+            if (!User.Identity.IsAuthenticated) return Challenge(new AuthenticationProperties() { RedirectUri = "/WeatherForecast/userinfo" });
 
             HttpMessageHandler handler = new HttpClientHandler()
             {
@@ -78,5 +89,7 @@ namespace Docusign.Controllers
 
             return Ok(content);
         }
+
+     
     }
 }
