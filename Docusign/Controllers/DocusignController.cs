@@ -11,6 +11,7 @@ using Model.DTO.Docusign;
 using Docusign.Services;
 using Docusign.Middleware;
 using Docusign.Repository.Peticion;
+using Microsoft.AspNetCore.Hosting;
 
 namespace Docusign.Controllers
 {
@@ -20,11 +21,14 @@ namespace Docusign.Controllers
     {
         private readonly IDocusignService _docusignService;
         private readonly IEjemplo _ejemplo;
+        IWebHostEnvironment _webHostEnvironment;
+
         public DocusignController
-           (IDocusignService peticionDocusign)
+           (IDocusignService peticionDocusign, IWebHostEnvironment webHostEnvironment)
         //(IEjemplo ejemplo)
         {
             this._docusignService = peticionDocusign;
+            this._webHostEnvironment = webHostEnvironment;
             //  this._ejemplo = ejemplo;
 
         }
@@ -156,6 +160,19 @@ namespace Docusign.Controllers
             catch (Exception e)
             {
                 return Ok(new Tuple<AuthenticationDTO, ResponseDocusignAuditoriaDTO>(new AuthenticationDTO() { isAuthenticated = true }, new ResponseDocusignAuditoriaDTO()));
+            }
+        }
+
+        [HttpGet("state/token")]
+        public IActionResult GetStateToken()
+        {
+            try
+            {
+                return Ok(_docusignService.StateToken(_webHostEnvironment.ContentRootPath));
+            }
+            catch (Exception e)
+            {
+                return Ok(new ResposeStateTokenDTO());
             }
         }
 
