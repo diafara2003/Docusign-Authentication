@@ -9,6 +9,8 @@ namespace Docusign.Services
         void SaveTokenFile(string code, string root);
 
         string GetNameFile();
+
+        string ReadTokenFile(string folder);
     }
 
     public class DocusignCallbackService : IDocusignCallbackService
@@ -20,7 +22,7 @@ namespace Docusign.Services
         }
         public string GetNameFile()
         {
-            string rutaRequest = $"{httpContextAccessor.HttpContext.Request.PathBase.Value.Replace("/", "_").ToLower()}_{httpContextAccessor.HttpContext.Request.Path.Value.Replace("/", "_").ToLower()}";
+            string rutaRequest = $"{httpContextAccessor.HttpContext.Request.PathBase.Value.Replace("/", "_").ToLower()}";
 
             return rutaRequest.ToLower();
         }
@@ -39,7 +41,9 @@ namespace Docusign.Services
 
 
             var archivo = File.Create(ruta);
+
             archivo.Close();
+
 
             using (StreamWriter file = new StreamWriter(ruta, true))
             {
@@ -47,6 +51,20 @@ namespace Docusign.Services
                 file.Close();
             }
 
+        }
+
+
+        public string ReadTokenFile(string folder)
+        {
+            string texto = string.Empty;
+            using (var sr = new StreamReader($@"{folder}\token\\{GetNameFile()}.txt"))
+            {
+                // Read the stream as a string, and write the string to the console.
+                texto = sr.ReadLine();
+
+                sr.Close();
+            }
+            return texto;
         }
     }
 }

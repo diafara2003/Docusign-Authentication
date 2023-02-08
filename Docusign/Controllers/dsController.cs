@@ -1,6 +1,7 @@
 ﻿
 using Docusign.Services;
 using Microsoft.AspNetCore.Hosting;
+
 using Microsoft.AspNetCore.Mvc;
 using Model.DTO;
 
@@ -37,7 +38,7 @@ namespace Docusign.Controllers
         public IActionResult GetTokenVerificacion()
         {
 
-            return Ok("");
+            return Ok(docusignService.ReadTokenFile(webHostEnvironment.ContentRootPath));
         }
 
     }
