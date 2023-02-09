@@ -52,7 +52,11 @@ namespace Model.DTO.Users
     {
         public templateDTO()
         {
-            recipients.carbonCopies = new List<carbonCopiesDtO>();
+            //this.recipients.carbonCopies = new List<carbonCopiesDtO>();
+            this.recipients = new recipientsDTO{
+                carbonCopies = new List<carbonCopiesDtO>(),
+                signers = new List<signersDTO>()
+            };
         }
         public string templateId { get; set; }
         public string uri { get; set; }
@@ -139,6 +143,13 @@ namespace Model.DTO.Users
 
     public class carbonCopiesDtO
     {
+        public carbonCopiesDtO()
+        {
+            this.email = "";
+            this.routingOrder = "";
+            this.name = "";
+            this.recipientId = "-1";
+        }
         public string email { get; set; }
         public string name { get; set; }
         public string recipientId { get; set; }
