@@ -16,20 +16,29 @@ namespace Model.DTO.Docusign
     }
 
 
-    public class EnvelopeSignerDTO {
-       
+    public class EnvelopeSignerDTO
+    {
+
         public List<EnvelopesDTO> envelopes { get; set; }
     }
 
-    public class EnvelopesDTO {
+    public class EnvelopesDTO
+    {
         public string envelopeId { get; set; }
         public SignersDTO recipients { get; set; }
 
     }
 
-    public class SignersDTO {
+    public class SignersDTO
+    {
         public List<RecipientsDTO> signers { get; set; }
     }
- 
+
+
+    public class TemplateDocuSignDTO
+    {
+        public string name { get; set; }
+        public SignersDTO recipients { get; set; }
+    }
 }
 

@@ -143,7 +143,17 @@ namespace Docusign.Controllers
             }
         }
 
+        [HttpGet("envelopes/status")]
+        public async Task<IActionResult> GetEnvelopeStatusSigners(string idenvelope)
+        {
+            var response = await _docusignService.peticion<DocusignAuditoriaDTO>($"envelopes/{idenvelope}?include=recipients,documents", MethodRequest.GET);
 
+
+            return Ok(new Tuple<AuthenticationDTO, DocusignAuditoriaDTO>(new AuthenticationDTO()
+            {
+                isAuthenticated = true,
+            }, response));
+        }
 
         /// <summary>
         /// Metodo encargado de consultar los firmantes segun un template especifico

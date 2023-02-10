@@ -21,6 +21,7 @@ namespace Docusign.Services
 
         void AgregarToken(DocusignAuthDTO token, int usuario);
 
+        Task<TemplateDocuSignDTO> GetSignersTemplate(string template);
 
         Task<Tuple<AuthenticationDTO, IList<envelopeTemplatesDTO>>> GetTemplates();
 
@@ -351,6 +352,11 @@ namespace Docusign.Services
                 return response;
             }
             //}           
+        }
+
+        public async Task<TemplateDocuSignDTO> GetSignersTemplate(string template)
+        {
+            return await peticion<TemplateDocuSignDTO>($"templates/{template}/signers", MethodRequest.GET);
         }
     }
 }
