@@ -131,8 +131,14 @@ namespace Docusign.Repository.Peticion
 
             var host = httpContextAccessor.HttpContext.Request.Host.Value;
             var path = httpContextAccessor.HttpContext.Request.PathBase.Value;
-
-            string callback = $"https://{host}{path}/api/ds/callback".Replace("/", "%2F").Replace(":", "%3A");
+            string callback = "";
+            if (host.ToLower().Contains("localhost"))
+            {
+                callback = $"https://{host}{path}/api/ds/callback".Replace("/", "%2F").Replace(":", "%3A");
+            }
+            else {
+                callback = $"https://{host}{path}/ds/callback".Replace("/", "%2F").Replace(":", "%3A");
+            }
 
             string client_id = contexto.adpconfig.Where(c => c.CnfCodigo == "Client_id_docusign").FirstOrDefault().CnfValor;
             var token = contexto.tokenDocusign.ToList();

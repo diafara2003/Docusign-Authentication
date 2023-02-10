@@ -15,7 +15,7 @@ using Microsoft.AspNetCore.Hosting;
 
 namespace Docusign.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class DocusignController : ControllerBase
     {

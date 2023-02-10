@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace Docusign.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
     {
         private static readonly string[] Summaries = new[]
@@ -21,13 +21,14 @@ namespace Docusign.Controllers
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
         };
 
-        //private IHttpContextAccessor _httpContextAccessor { get; }
+        private IHttpContextAccessor _httpContextAccessor { get; }
 
         private readonly ILogger<WeatherForecastController> _logger;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        public WeatherForecastController(ILogger<WeatherForecastController> logger, IHttpContextAccessor httpContextAccessor)
         {
             _logger = logger;
+            _httpContextAccessor = httpContextAccessor;
         }
 
 
@@ -56,40 +57,28 @@ namespace Docusign.Controllers
         }
 
 
-        [HttpGet("userinfo")]
+        [HttpGet("url/ballback")]
         public IActionResult GetUserInfo()
         {
-
-
-            if (!User.Identity.IsAuthenticated) return Challenge(new AuthenticationProperties() { RedirectUri = "/WeatherForecast/userinfo" });
-
-            HttpMessageHandler handler = new HttpClientHandler()
+            var host = _httpContextAccessor.HttpContext.Request.Host.Value;
+            var path = _httpContextAccessor.HttpContext.Request.PathBase.Value;
+            string callback = "";
+            if (host.ToLower().Contains("localhost"))
             {
-            };
-
-            var httpClient = new HttpClient(handler)
+                callback = $"https://{host}{path}/ds/callback";
+            }
+            else
             {
-                BaseAddress = new Uri("https://na3.docusign.net/restapi/v2.1/accounts/56483961/users"),
-                Timeout = new TimeSpan(0, 2, 0)
-            };
-
-
-            httpClient.DefaultRequestHeaders.Add("ContentType", "application/json");
-
-
-            httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + User.FindFirst(c => c.Type == "access_token")?.Value);
-
-            HttpResponseMessage response = httpClient.GetAsync("https://na3.docusign.net/restapi/v2.1/accounts/56483961/users").Result;
-            string content = string.Empty;
-
-            using (StreamReader stream = new StreamReader(response.Content.ReadAsStreamAsync().Result))
-            {
-                content = stream.ReadToEnd();
+                callback = $"https://{host}{path}/ds/callback";
             }
 
-            return Ok(content);
+            return Ok(new
+            {
+                url = callback,
+                urlReplace = callback.Replace("/", "%2F").Replace(":", "%3A")
+            });
         }
 
-     
+
     }
 }
