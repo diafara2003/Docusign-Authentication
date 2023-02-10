@@ -17,7 +17,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Model\Model\Model.csproj" />
-    <ProjectReference Include="..\Repository\DocuSignBL\Repository.csproj" />
     <ProjectReference Include="..\Services\Services\Services.csproj" />
     <ProjectReference Include="..\Utilidades\Utilidades\Utilidades.csproj" />
   </ItemGroup>

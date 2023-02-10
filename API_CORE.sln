@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32210.238
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Docusign", "Docusign\Docusign.csproj", "{105C32FD-81F1-45B4-AAB4-C4D334C9D617}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "API_CORE", "Docusign\API_CORE.csproj", "{105C32FD-81F1-45B4-AAB4-C4D334C9D617}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Model", "Model", "{0FF554B4-7BB9-485A-950C-BE727E38B89A}"
 EndProject
@@ -19,7 +19,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{C2
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Repository", "Repository\DocuSignBL\Repository.csproj", "{8C24BED3-895E-4812-ADDA-4128D0870B15}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Services", "Services\Services\Services.csproj", "{7F69F4D9-94F2-44B7-B87F-8BA358A64293}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Services", "Services\Services\Services.csproj", "{7F69F4D9-94F2-44B7-B87F-8BA358A64293}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

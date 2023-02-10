@@ -33,6 +33,9 @@ namespace Docusign.Middleware
         public async Task Invoke(HttpContext context)
         {
             string urlPeticion = context.Request.GetDisplayUrl().ToLower();
+
+            if (urlPeticion.ToLower().Contains("weatherforecast")) await next(context);
+            
             if (!urlPeticion.Contains("callback"))
             {
                 ObtenerSesion(context);
