@@ -149,11 +149,11 @@ namespace Docusign.Repository.Peticion
 
                 return auth;
             }
-
-
-
-            if (token.FirstOrDefault().Fecha <= DateTime.Now.AddHours(8))
-            {
+            
+            
+            //if (token.FirstOrDefault().Fecha <= DateTime.Now.AddHours(8))
+                if (DateTime.Now <= token.FirstOrDefault().Fecha.AddHours(8))
+                {
                 auth.isAuthenticated = true;
                 auth.URL = url;
                 return auth;
