@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using Docusign.Repository.DataBase.Conexion;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Docusign.Repository.Peticion
 {
@@ -25,6 +26,8 @@ namespace Docusign.Repository.Peticion
         Task<T> peticion<T>(string method, MethodRequest type, object data = null);
 
         Task<T> peticionFile<T>(string method, object data = null);
+
+        Task<byte[]> peticionFileDownload<T>(string method);
 
         AuthenticationDTO validationAuthentication();
 
@@ -122,6 +125,32 @@ namespace Docusign.Repository.Peticion
             var x = JsonConvert.DeserializeObject<T>(fileBase64);
 
             return x;
+        }
+
+        public async Task<byte[]> peticionFileDownload<T>(string method)
+        {
+
+            string account = contexto.adpconfig.FirstOrDefault(c => c.CnfCodigo == "CuentaDocuSign").CnfValor;
+            HttpMessageHandler handler = new HttpClientHandler();
+
+            var httpClient = new HttpClient(handler)
+            {
+                BaseAddress = new Uri($"https://na3.docusign.net/restapi/v2.1/accounts/{account}/{method}"),
+                Timeout = new TimeSpan(0, 2, 0)
+            };
+
+            var token = contexto.tokenDocusign.Take(1).First();
+
+            httpClient.DefaultRequestHeaders.Add("ContentType", "application/json");
+            httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + token.Token);
+
+            HttpResponseMessage response = new HttpResponseMessage();
+
+            response = await httpClient.GetAsync($"https://na3.docusign.net/restapi/v2.1/accounts/{account}/{method}");
+
+            byte[] content = await response.Content.ReadAsByteArrayAsync();
+
+            return content;
         }
 
         public AuthenticationDTO validationAuthentication()
