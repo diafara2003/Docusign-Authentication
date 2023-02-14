@@ -12,6 +12,11 @@ using Docusign.Services;
 using Docusign.Middleware;
 using Docusign.Repository.Peticion;
 using Microsoft.AspNetCore.Hosting;
+using System.IO.Compression;
+using System.IO;
+using DocumentFormat.OpenXml.Spreadsheet;
+using System.Collections;
+using DocumentFormat.OpenXml.Vml.Office;
 
 namespace Docusign.Controllers
 {
@@ -170,6 +175,56 @@ namespace Docusign.Controllers
             catch (Exception e)
             {
                 return Ok(new Tuple<AuthenticationDTO, ResponseDocusignAuditoriaDTO>(new AuthenticationDTO() { isAuthenticated = true }, new ResponseDocusignAuditoriaDTO()));
+            }
+        }
+
+        /// <summary>
+        /// Metodo encargado de consultar los firmantes segun un template especifico
+        /// </summary>
+        /// <param name="idTemplate"></param>
+        /// <returns></returns>
+        [HttpGet("envelopes/documents")]
+        public async Task<IActionResult> GetEnvelopeDocuments(string idenvelope)
+        {
+            try
+            {
+                return Ok(await _docusignService.GetEnvelopeDocuments(idenvelope));
+            }
+            catch (Exception e)
+            {
+                return Ok(new Tuple<AuthenticationDTO, ResponseEnvelopeDTO>(new AuthenticationDTO() { isAuthenticated = true }, new ResponseEnvelopeDTO()));
+            }
+        }
+
+        /// <summary>
+        /// Metodo para devolver zip
+        /// </summary>
+        /// <param name="idenvelope"></param>
+        /// <returns></returns>
+        [HttpGet("envelopes/documents/zip")]
+        public async Task<FileResult> GetDocumentsZip(string idenvelope)
+        {
+            Tuple<AuthenticationDTO, ResponseEnvelopeDTO> respuesta = await _docusignService.GetEnvelopeDocuments(idenvelope);
+
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                using (ZipArchive zipArchive = new ZipArchive(memoryStream, ZipArchiveMode.Create, false))
+                {
+                    foreach (var item in respuesta.Item2.envelopeDocuments)
+                    {
+                        ZipArchiveEntry fileInArchive = zipArchive.CreateEntry(item.name + ".pdf", CompressionLevel.Optimal);
+
+                        using (var entryStream = fileInArchive.Open())
+                        {
+                            using (var ms = new MemoryStream(item.file))
+                            {
+                                await ms.CopyToAsync(entryStream);
+                            }
+                        }
+                    }
+                }
+
+                return File(memoryStream.ToArray(), "application/x-zip-compressed", "test-txt-files.zip");
             }
         }
 
