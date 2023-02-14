@@ -126,8 +126,16 @@ namespace Docusign.Controllers
         {
             try
             {
+                var _response = await _docusignService.peticion<envelopeTemplatesDTO>($"templates/{idTemplate}/signers?order_by=name", MethodRequest.GET);
 
-                return Ok(await _docusignService.peticion<envelopeTemplatesDTO>($"templates/{idTemplate}/signers?order_by=name", MethodRequest.GET));
+                foreach (var item in _response.recipients.signers)
+                {
+                    var signerERP = _docusignService.GetFirmantesERP(item.roleName);
+                    item.email = signerERP.email;
+                    item.name = signerERP.nombre;
+                }
+
+                return Ok(_response);
             }
             catch (Exception e)
             {

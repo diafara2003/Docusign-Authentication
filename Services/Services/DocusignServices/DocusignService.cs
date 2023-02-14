@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using Docusign.Repository.Peticion;
 using Docusign.Repository.DataBase.Conexion;
-
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 
 namespace Docusign.Services
 {
@@ -34,6 +34,8 @@ namespace Docusign.Services
         Task<Tuple<AuthenticationDTO, ResponseEnvelopeDTO>> GetEnvelopeDocuments(string idenvelope);
         Task<Tuple<AuthenticationDTO, EnvelopeResponse>> SendEnvelope(EnvelopeSendDTO envelope);
         ResposeStateTokenDTO StateToken(string rootWeb);
+
+        FirmantesERP_DTO GetFirmantesERP(string rolename);
     }
 
     public class DocusignService : IDocusignService
@@ -302,29 +304,53 @@ namespace Docusign.Services
             /*Se obtienen firmantes docising*/
 
             List<signersDTO> signers = new List<signersDTO>();
-
-            signers.AddRange((from item in template.recipients.signers
-                              where item.email != "" && item.name != "" && item.roleName != "" && !item.roleName.ToLower().Contains("contratista")
-                              select new signersDTO
-                              {
-                                  email = item.email,
-                                  name = item.name,
-                                  recipientId = item.recipientId,
-                                  routingOrder = item.routingOrder,
-                                  tabs = new tabsDTO
-                                  {
-                                      signHereTabs = new List<signHereDTO>() {new signHereDTO(){
+            foreach (var item in template.recipients.signers)
+            {
+                if (item.roleName != "" && !item.roleName.ToLower().Contains("contratista"))
+                {
+                    var signersERP = GetFirmantesERP(item.roleName);
+                    signers.Add(new signersDTO
+                    {
+                        email = signersERP.email,
+                        name = signersERP.nombre,
+                        recipientId = item.recipientId,
+                        routingOrder = item.routingOrder,
+                        tabs = new tabsDTO
+                        {
+                            signHereTabs = new List<signHereDTO>() {new signHereDTO(){
                                                                                        anchorString = string.Concat("/" + item.roleName.Replace(' ', '_')),
                                                                                        anchorYOffset = "-6",
                                                                                        name = item.name,
                                                                                        optional = "false",
                                                                                        recipientId = item.recipientId,
-                                                                                       scaleValue = "1"
-                                                                                    }
-                                          },
-                                  }
+                                                                                       scaleValue = "1"}},
+                        }
 
-                              }).ToList());
+                    });
+                }
+            }
+            //signers.AddRange((from item in template.recipients.signers
+            //                  where item.email != "" && item.name != "" && item.roleName != "" && !item.roleName.ToLower().Contains("contratista")
+            //                  select new signersDTO
+            //                  {
+            //                      email = GetFirmantesERP(item.roleName).email,
+            //                      name = GetFirmantesERP(item.roleName).nombre,
+            //                      recipientId = item.recipientId,
+            //                      routingOrder = item.routingOrder,
+            //                      tabs = new tabsDTO
+            //                      {
+            //                          signHereTabs = new List<signHereDTO>() {new signHereDTO(){
+            //                                                                           anchorString = string.Concat("/" + item.roleName.Replace(' ', '_')),
+            //                                                                           anchorYOffset = "-6",
+            //                                                                           name = item.name,
+            //                                                                           optional = "false",
+            //                                                                           recipientId = item.recipientId,
+            //                                                                           scaleValue = "1"
+            //                                                                        }
+            //                              },
+            //                      }
+
+            //                  }).ToList());
 
             /*Se obtienen contratista*/
 
@@ -399,5 +425,17 @@ namespace Docusign.Services
         }
 
 
+        public FirmantesERP_DTO GetFirmantesERP(string rolename)
+        {
+            FirmantesERP_DTO response = new FirmantesERP_DTO();
+            var _res = _contexto.MinutasFirmantes.FirstOrDefault(c => c.MFDescripcion.ToLower().Equals(rolename)) ?? new Model.Entity.ADP_API.MinutasFirmantes();
+            response.email = _res.MFCorreo;
+            response.nombre = _res.MFNombre;
+
+            return response;
+        }
+
+
     }
 }
+

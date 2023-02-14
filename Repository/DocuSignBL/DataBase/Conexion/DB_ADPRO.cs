@@ -20,6 +20,7 @@ namespace Docusign.Repository.DataBase.Conexion
 
         public DbSet<TokenDocusign> tokenDocusign { get; set; }
         public DbSet<ADPConfig> adpconfig { get; set; }
+        public DbSet<MinutasFirmantes> MinutasFirmantes { get; set; }
 
         public DB_ADPRO(IConstruirSession construirSession, IHttpContextAccessor httpContextAccessor) : base(construirSession.ObtenerConextOptions(new DbContextOptionsBuilder<DB_ADPRO>()))
         {
