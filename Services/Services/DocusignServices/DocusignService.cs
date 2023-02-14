@@ -30,6 +30,8 @@ namespace Docusign.Services
         Task<Tuple<AuthenticationDTO, IList<envelopeTemplatesDTO>>> GetTemplatesSigners();
 
         Task<Tuple<AuthenticationDTO, ResponseDocusignAuditoriaDTO>> GetEnvelopeHistory(string idenvelope);
+
+        Task<Tuple<AuthenticationDTO, ResponseEnvelopeDTO>> GetEnvelopeDocuments(string idenvelope);
         Task<Tuple<AuthenticationDTO, EnvelopeResponse>> SendEnvelope(EnvelopeSendDTO envelope);
         ResposeStateTokenDTO StateToken(string rootWeb);
     }
@@ -81,6 +83,38 @@ namespace Docusign.Services
             });
 
             return responseAuth;
+        }
+
+        public async Task<Tuple<AuthenticationDTO, ResponseEnvelopeDTO>> GetEnvelopeDocuments(string idenvelope)
+        {
+            var auth = validationAuthentication();
+            if (!auth.isAuthenticated)
+            {
+                return new Tuple<AuthenticationDTO, ResponseEnvelopeDTO>(auth, new ResponseEnvelopeDTO());
+            }
+
+            ResponseEnvelopeDTO envelopeDocuments = await peticion<ResponseEnvelopeDTO>($"envelopes/{idenvelope}/documents", MethodRequest.GET);
+
+            ResponseEnvelopeDTO envelopeDocumentsResponse = new ResponseEnvelopeDTO();
+
+            envelopeDocumentsResponse.envelopeId = envelopeDocuments.envelopeId;
+
+            foreach (var envelope in envelopeDocuments.envelopeDocuments)
+            {
+                EnvelopeDocumentsDTO envelopeDocumentsDTO = new EnvelopeDocumentsDTO();
+
+                envelopeDocumentsDTO.name = envelope.name;
+                envelopeDocumentsDTO.documentId = envelope.documentId;
+                envelopeDocumentsDTO.uri = envelope.uri;
+                envelopeDocumentsDTO.file = await peticionFileDownload<byte[]>(envelope.uri);
+
+                envelopeDocumentsResponse.envelopeDocuments.Add(envelopeDocumentsDTO);
+            }
+
+            Tuple<AuthenticationDTO, ResponseEnvelopeDTO> responseAuth = new Tuple<AuthenticationDTO, ResponseEnvelopeDTO>(auth, envelopeDocumentsResponse);
+
+            return responseAuth;
+
         }
 
         string StatusEnvelope(string name)
@@ -155,7 +189,7 @@ namespace Docusign.Services
                 IdUsuario = usuario,
                 RefreshToken = token.refresh_token
 
-            }); 
+            });
 
             _contexto.SaveChanges();
             //_peticionDOcusign.AgregarToken(token, usuario, RefreshToken);
@@ -203,6 +237,11 @@ namespace Docusign.Services
         public async Task<T> peticionFile<T>(string method, object data = null)
         {
             return await _peticionDOcusign.peticionFile<T>(method, data);
+        }
+
+        public async Task<byte[]> peticionFileDownload<T>(string method)
+        {
+            return await _peticionDOcusign.peticionFileDownload<T>(method);
         }
 
         public AuthenticationDTO validationAuthentication()
@@ -345,7 +384,7 @@ namespace Docusign.Services
             else
             {
                 AgregarToken(_token, 1);
-              //  _peticionDocuCallBackService.DeleteTokenFile(rootWeb);
+                //  _peticionDocuCallBackService.DeleteTokenFile(rootWeb);
 
                 response.Exist = true;
                 response.Cod = 1;
@@ -358,5 +397,7 @@ namespace Docusign.Services
         {
             return await peticion<TemplateDocuSignDTO>($"templates/{template}/signers", MethodRequest.GET);
         }
+
+
     }
 }

@@ -27,20 +27,35 @@ namespace Model.DTO.Docusign
         public int completedCount { get; set; }
     }
 
-
     public class EnvelopeDocumentsDTO
     {
         public string name { get; set; }
+        public string documentId { get; set; }
+        public string uri { get; set; }
+        public byte[] file { get; set; }
+
     }
 
+    public class ResponseEnvelopeDTO
+    {
+        public ResponseEnvelopeDTO()
+        {
+            this.envelopeDocuments = new List<EnvelopeDocumentsDTO>();
+        }
+        public string envelopeId { get; set; }
+        public List<EnvelopeDocumentsDTO> envelopeDocuments { get; set; }
+    }
 
-    public class EnvelopeDocusignAudit {
+    public class EnvelopeDocusignAudit
+    {
         public List<AuditEventsDocusignDTO> auditEvents { get; set; }
     }
-    public class AuditEventsDocusignDTO {
+    public class AuditEventsDocusignDTO
+    {
         public List<EventFieldsDocuSignDTO> eventFields { get; set; }
     }
-    public class EventFieldsDocuSignDTO {
+    public class EventFieldsDocuSignDTO
+    {
         public EventFieldsDocuSignDTO()
         {
             this.value = string.Empty;
