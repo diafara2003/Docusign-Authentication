@@ -4,7 +4,7 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iis": {
-      "applicationUrl": "https://localhost/Sinco/V3/ADPRO/API_CORE/",
+      "applicationUrl": "http://localhost/Sinco/V3/ADPRO/core/api",
       "sslPort": 0
     },
     "iisExpress": {
@@ -24,7 +24,7 @@
     "API_CORE": {
       "commandName": "IIS",
       "launchBrowser": true,
-      "launchUrl": "https://localhost/Sinco/V3/ADPRO/API_CORE/"
+      "launchUrl": "http://localhost/Sinco/V3/ADPRO/core/api/WeatherForecast"
     }
   }
 }
