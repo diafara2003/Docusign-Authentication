@@ -465,7 +465,11 @@ namespace Docusign.Services
                         if (_zona.Count() > 0)
                         {
 
-                            var _zonaFirmante = _firmante.FirstOrDefault(c => c.IdZona == _zona.FirstOrDefault().ZOAIdZona);
+                            var _zonaFirmante = (from f in _firmante                                                 
+                                                 join z in _zona on f.IdZona equals z.ZOAIdZona
+                                                 select f).ToList().FirstOrDefault();
+                                                 
+                                                 ); 
 
                             response.email = _zonaFirmante.Correo;
                             response.nombre = _zonaFirmante.Nombre;
