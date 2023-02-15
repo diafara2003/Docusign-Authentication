@@ -22,6 +22,7 @@ namespace Docusign.Repository.DataBase.Conexion
         #region DBO
         public DbSet<ADPConfig> adpconfig { get; set; }
         public DbSet<AdpContratos> contrato { get; set; }
+        public DbSet<Terceros> tercero { get; set; }
 
         #endregion
 

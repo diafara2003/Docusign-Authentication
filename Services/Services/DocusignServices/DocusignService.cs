@@ -476,6 +476,14 @@ namespace Docusign.Services
                         }
                     }
                 }
+                else {
+                    if (rolename.ToLower().Trim().Contains("contratista")) {
+
+                        var tercero = _contexto.tercero.Find(_contrato.ConContratista);
+                        response.email = tercero.TerEmail;
+                        response.nombre = tercero.TerNombre;
+                    }
+                }
             }
 
             return response;
