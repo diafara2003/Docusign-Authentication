@@ -469,7 +469,7 @@ namespace Docusign.Services
                                                  join z in _zona on f.IdZona equals z.ZOAIdZona
                                                  select f).ToList().FirstOrDefault();
                                                  
-                                                 ); 
+                                                 
 
                             response.email = _zonaFirmante.Correo;
                             response.nombre = _zonaFirmante.Nombre;
