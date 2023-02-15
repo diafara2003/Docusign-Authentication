@@ -36,6 +36,8 @@ namespace Docusign.Services
         ResposeStateTokenDTO StateToken(string rootWeb);
 
         FirmantesERP_DTO GetFirmantesERP(string rolename);
+
+        Task<envelopeTemplatesDTO> GetSignersByTemplete(string idTemplate, string contrato);
     }
 
     public class DocusignService : IDocusignService
@@ -192,7 +194,7 @@ namespace Docusign.Services
 
             });
 
-            _contexto.SaveChanges();          
+            _contexto.SaveChanges();
         }
 
         public async Task<EnvelopeSignerDTO> GetRecipentsEnvelope(string envelopes)
@@ -407,7 +409,7 @@ namespace Docusign.Services
             else
             {
                 AgregarToken(_token, 1);
-                
+
                 _peticionDocuCallBackService.DeleteTokenFile(rootWeb);
 
                 response.Exist = true;
@@ -423,17 +425,71 @@ namespace Docusign.Services
         }
 
 
-        public FirmantesERP_DTO GetFirmantesERP(string rolename)
+        public FirmantesERP_DTO GetFirmantesERP(string rolename, string contrato = "")
         {
             FirmantesERP_DTO response = new FirmantesERP_DTO();
             var _res = _contexto.MinutasFirmantes.FirstOrDefault(c => c.MFDescripcion.ToLower().Equals(rolename)) ?? new Model.Entity.ADP_API.MinutasFirmantes();
+
             response.email = _res.MFCorreo;
             response.nombre = _res.MFNombre;
+
+
+            if (!string.IsNullOrEmpty(contrato))
+            {
+
+                var _contrato = _contexto.contrato.Find(int.Parse(contrato));
+
+                var _firmante = _contexto.minutasfirmantesZona
+                    .Where(c => c.IdFirmante == _res.MFId)
+                    .ToList();
+
+                //se valida si existe una firma configurada por obra o por zona
+                if (_firmante.Count() > 0)
+                {
+
+                    var _obra = _firmante.FirstOrDefault(c => c.IdFirmante == _res.MFId && c.IdObra == _contrato.ConObra)
+                        ?? new Model.Entity.ADP_API.MinutasFirmantesZona()
+                        {
+                            Id = 0
+                        };
+
+                    if (_obra.Id > 0)
+                    {
+                        response.email = _obra.Correo;
+                        response.nombre = _obra.Nombre;
+                    }
+                    else
+                    {
+                        var _zona = _contexto.zonasObraAsignacion.Where(c => c.ZOAIdObra == _contrato.ConObra).ToList();
+
+                        if (_zona.Count() > 0)
+                        {
+
+                            var _zonaFirmante = _firmante.FirstOrDefault(c => c.IdZona == _zona.FirstOrDefault().ZOAIdZona);
+
+                            response.email = _zonaFirmante.Correo;
+                            response.nombre = _zonaFirmante.Nombre;
+                        }
+                    }
+                }
+            }
 
             return response;
         }
 
+        public async Task<envelopeTemplatesDTO> GetSignersByTemplete(string idTemplate, string contrato)
+        {
+            var _response = await peticion<envelopeTemplatesDTO>($"templates/{idTemplate}/signers?order_by=name", MethodRequest.GET);
 
+            foreach (var item in _response.recipients.signers)
+            {
+                var signerERP = GetFirmantesERP(item.roleName, contrato);
+                item.email = signerERP.email;
+                item.name = signerERP.nombre;
+            }
+
+            return _response;
+        }
     }
 }
 

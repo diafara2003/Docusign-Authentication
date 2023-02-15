@@ -122,20 +122,12 @@ namespace Docusign.Controllers
         /// <param name="idTemplate"></param>
         /// <returns></returns>
         [HttpGet("SignersByTemplete")]
-        public async Task<IActionResult> GetSignersByTemplete(string idTemplate)
+        public async Task<IActionResult> GetSignersByTemplete(string idTemplate, string contrato = "")
         {
             try
             {
-                var _response = await _docusignService.peticion<envelopeTemplatesDTO>($"templates/{idTemplate}/signers?order_by=name", MethodRequest.GET);
 
-                foreach (var item in _response.recipients.signers)
-                {
-                    var signerERP = _docusignService.GetFirmantesERP(item.roleName);
-                    item.email = signerERP.email;
-                    item.name = signerERP.nombre;
-                }
-
-                return Ok(_response);
+                return Ok(await _docusignService.GetSignersByTemplete(idTemplate, contrato));
             }
             catch (Exception e)
             {

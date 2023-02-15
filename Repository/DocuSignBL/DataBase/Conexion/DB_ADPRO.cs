@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Model.Entity.ADP_API;
+using Model.Entity.ADP_API_OBR;
 using Model.Entity.DBO;
 using Repository.DataBase.Model;
 using SincoSoft.Context.Core;
@@ -18,9 +19,25 @@ namespace Docusign.Repository.DataBase.Conexion
     {
         private IHttpContextAccessor _httpContextAccessor { get; }
 
-        public DbSet<TokenDocusign> tokenDocusign { get; set; }
+        #region DBO
         public DbSet<ADPConfig> adpconfig { get; set; }
+        public DbSet<AdpContratos> contrato { get; set; }
+
+        #endregion
+
+
+        #region ADP_API_OBR
+
+        public DbSet<ZonasObraAsignacion> zonasObraAsignacion { get; set; }
+
+        #endregion
+
+
+        #region ADP_API
+        public DbSet<TokenDocusign> tokenDocusign { get; set; }
         public DbSet<MinutasFirmantes> MinutasFirmantes { get; set; }
+        public DbSet<MinutasFirmantesZona> minutasfirmantesZona { get; set; }
+        #endregion
 
         public DB_ADPRO(IConstruirSession construirSession, IHttpContextAccessor httpContextAccessor) : base(construirSession.ObtenerConextOptions(new DbContextOptionsBuilder<DB_ADPRO>()))
         {
