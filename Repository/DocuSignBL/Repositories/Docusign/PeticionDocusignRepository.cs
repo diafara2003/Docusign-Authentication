@@ -161,13 +161,9 @@ namespace Docusign.Repository.Peticion
             var host = httpContextAccessor.HttpContext.Request.Host.Value;
             var path = httpContextAccessor.HttpContext.Request.PathBase.Value;
             string callback = "";
-            if (host.ToLower().Contains("localhost"))
-            {
-                callback = $"https://{host}{path}/api/ds/callback".Replace("/", "%2F").Replace(":", "%3A");
-            }
-            else {
-                callback = $"https://{host}{path}/ds/callback".Replace("/", "%2F").Replace(":", "%3A");
-            }
+
+            callback = $"https://{host}{path}/ds/callback".Replace("/", "%2F").Replace(":", "%3A");
+
 
             string client_id = contexto.adpconfig.Where(c => c.CnfCodigo == "Client_id_docusign").FirstOrDefault().CnfValor;
             var token = contexto.tokenDocusign.ToList();
@@ -184,11 +180,11 @@ namespace Docusign.Repository.Peticion
 
                 return auth;
             }
-            
-            
+
+
             //if (token.FirstOrDefault().Fecha <= DateTime.Now.AddHours(8))
-                if (DateTime.Now <= token.FirstOrDefault().Fecha.AddHours(8))
-                {
+            if (DateTime.Now <= token.FirstOrDefault().Fecha.AddHours(8))
+            {
                 auth.isAuthenticated = true;
                 auth.URL = url;
                 return auth;
