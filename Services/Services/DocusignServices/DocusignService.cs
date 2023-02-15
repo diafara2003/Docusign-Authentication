@@ -307,7 +307,7 @@ namespace Docusign.Services
             {
                 if (item.roleName != "" && !item.roleName.ToLower().Contains("contratista"))
                 {
-                    var signersERP = GetFirmantesERP(item.roleName);
+                    var signersERP = GetFirmantesERP(item.roleName, contrato: envelope.documentId);
                     signers.Add(new signersDTO
                     {
                         email = signersERP.email,
@@ -465,11 +465,11 @@ namespace Docusign.Services
                         if (_zona.Count() > 0)
                         {
 
-                            var _zonaFirmante = (from f in _firmante                                                 
+                            var _zonaFirmante = (from f in _firmante
                                                  join z in _zona on f.IdZona equals z.ZOAIdZona
                                                  select f).ToList().FirstOrDefault();
-                                                 
-                                                 
+
+
 
                             response.email = _zonaFirmante.Correo;
                             response.nombre = _zonaFirmante.Nombre;
