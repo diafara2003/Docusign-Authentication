@@ -7,8 +7,8 @@ namespace Model.Entity.DBO
     public class AdpContratos
     {
         [Key]
-        public string ConID { get; set; }
-        public string ConNumero { get; set; }
+        public int ConID { get; set; }
+        public int ConNumero { get; set; }
         public int ConContratista { get; set; }
         public int ConObra { get; set; }
     }

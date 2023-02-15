@@ -307,7 +307,7 @@ namespace Docusign.Services
             {
                 if (item.roleName != "" && !item.roleName.ToLower().Contains("contratista"))
                 {
-                    var signersERP = GetFirmantesERP(item.roleName, contrato: envelope.documentId);
+                    var signersERP = GetFirmantesERP(item.roleName, contrato: envelope.documentId );
                     signers.Add(new signersDTO
                     {
                         email = signersERP.email,
