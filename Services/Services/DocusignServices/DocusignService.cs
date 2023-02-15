@@ -35,7 +35,7 @@ namespace Docusign.Services
         Task<Tuple<AuthenticationDTO, EnvelopeResponse>> SendEnvelope(EnvelopeSendDTO envelope);
         ResposeStateTokenDTO StateToken(string rootWeb);
 
-        FirmantesERP_DTO GetFirmantesERP(string rolename);
+        FirmantesERP_DTO GetFirmantesERP(string rolename, string contrato);
 
         Task<envelopeTemplatesDTO> GetSignersByTemplete(string idTemplate, string contrato);
     }
