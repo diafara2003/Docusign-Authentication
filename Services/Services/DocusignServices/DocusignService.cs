@@ -179,7 +179,6 @@ namespace Docusign.Services
 
         public void AgregarToken(DocusignAuthDTO token, int usuario)
         {
-
             _contexto.tokenDocusign.ToList().ForEach(c => _contexto.Entry(c).State = Microsoft.EntityFrameworkCore.EntityState.Deleted);
 
             _contexto.tokenDocusign.Add(new Model.Entity.ADP_API.TokenDocusign()
@@ -193,9 +192,7 @@ namespace Docusign.Services
 
             });
 
-            _contexto.SaveChanges();
-            //_peticionDOcusign.AgregarToken(token, usuario, RefreshToken);
-            //_peticionDocuCallBackService.ReadTokenFile(token);
+            _contexto.SaveChanges();          
         }
 
         public async Task<EnvelopeSignerDTO> GetRecipentsEnvelope(string envelopes)
@@ -410,7 +407,8 @@ namespace Docusign.Services
             else
             {
                 AgregarToken(_token, 1);
-                //  _peticionDocuCallBackService.DeleteTokenFile(rootWeb);
+                
+                _peticionDocuCallBackService.DeleteTokenFile(rootWeb);
 
                 response.Exist = true;
                 response.Cod = 1;
