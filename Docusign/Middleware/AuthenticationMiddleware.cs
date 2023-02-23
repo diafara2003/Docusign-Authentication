@@ -34,8 +34,13 @@ namespace Docusign.Middleware
         {
             string urlPeticion = context.Request.GetDisplayUrl().ToLower();
 
-            if (urlPeticion.ToLower().Contains("weatherforecast")) await next(context);
-            
+            if (urlPeticion.ToLower().Contains("weatherforecast")
+                || urlPeticion.ToLower().Contains("oauth")
+                || urlPeticion.ToLower().Contains("modelderivative")
+                || urlPeticion.ToLower().Contains("datamanagement")
+                || urlPeticion.ToLower().Contains("proyecto")
+                ) await next(context);
+
             if (!urlPeticion.Contains("callback"))
             {
                 ObtenerSesion(context);

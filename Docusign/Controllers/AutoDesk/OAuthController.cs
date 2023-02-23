@@ -27,7 +27,7 @@ namespace ForgeAPI.Controllers
 
         [HttpGet]
         [Route("token")]
-        public async Task<AccessToken> auto()
+        public async Task<IActionResult> auto()
         {
             string FORGE_CLIENT_ID = _configuration["FORGE_CLIENT_ID"];// Credentials.GetAppSetting("FORGE_CLIENT_ID");
             string FORGE_CLIENT_SECRET = _configuration["FORGE_CLIENT_SECRET"];//Credentials.GetAppSetting("FORGE_CLIENT_SECRET");
@@ -40,19 +40,18 @@ namespace ForgeAPI.Controllers
                 //httpErrorHandler(bearer, "Failed to get your token");
                 AccessToken = bearer.Data.access_token;
                 Credentials credentials = await Credentials.CreateFromCodeAsync(AccessToken, base.Response.Cookies);
+                AccessToken response = new AccessToken();
 
+                response.access_token = AccessToken;
+                response.expires_in = 0;
 
-                return new AccessToken()
-                {
-                    access_token = AccessToken,
-                    //  expires_in = (int)credentials.ExpiresAt.Subtract(DateTime.Now).TotalSeconds
-                };
+                return Ok(response);
                 //return (bearer);
             }
             catch (Exception ex)
             {
 
-                return new AccessToken();
+                return Ok(new AccessToken());
             }
 
         }
