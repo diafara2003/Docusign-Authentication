@@ -46,12 +46,12 @@ namespace Docusign.Repository.DataBase.Conexion
             //  var cliente = new SqlConnectionStringBuilder(construirSession.ObtenerSession().CadenaConexion);
             // if (!ConstantesEntornoEstaticas.MigracionesAplicadasBD.Any(bd => bd.Equals(cliente.InitialCatalog)))
             //{
-            if (Database.CanConnect())
-            {
-                if (Database.GetPendingMigrations().Any()) Database.Migrate();
-            }
-            else
-                throw new Exception("No se encontro la BD");
+            //if (Database.CanConnect())
+            //{
+            //    if (Database.GetPendingMigrations().Any()) Database.Migrate();
+            //}
+            //else
+            //    throw new Exception("No se encontro la BD");
 
             //  ConstantesEntornoEstaticas.MigracionesAplicadasBD.Add(cliente.InitialCatalog);
         }

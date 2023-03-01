@@ -41,7 +41,7 @@ namespace Docusign
             //services.AddSingleton(config);
 
             services.AddControllers();
-
+            
             services.AddScoped<IHttpContextAccessor, HttpContextAccessor>();
             //services.AddScoped<IConstruirSession, ConstruirSession>();
             //services.AddScoped<IPeticionDocusignRepository, PeticionDocusignRepository>();
