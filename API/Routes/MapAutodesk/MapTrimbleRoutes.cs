@@ -12,7 +12,7 @@ namespace API.Routes.MapAutoDesk
         const string CLIENT_SECRET = "G33fED4fXE1pErnvZpOK3MyGug4a";
         public static void RegisterTrimble(this IEndpointRouteBuilder app)
         {
-            app.MapGet("/Proyectos", (HttpContext _httpContext, string id) =>
+            app.MapGet("/Proyectos", () =>
             {
                 string url = $"https://stage.id.trimblecloud.com/oauth/authorize?response_type=code&state=&client_id={CLIENT_ID}&scope=openid%20{APP_NAME}&redirect_uri={CALLBACK_URL}";
                 var response = new HttpResponseMessage(HttpStatusCode.Redirect);
