@@ -58,6 +58,7 @@ app.UseAuthorization();
 //app.UseMiddleware(typeof(AuthenticationMiddleware));
 
 app.RegisterDocusign();
+app.RegisterDocusignDS();
 app.RegisterWeatherForecast();
 
 app.Run();
