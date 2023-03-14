@@ -39,14 +39,16 @@ builder.Services.AddAuthorization();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-//if (app.Environment.IsDevelopment())
+
 //{
 app.UseSwagger();
 app.UseSwaggerUI();
 //}
 
 //app.UseHttpsRedirection();
-//app.UseMiddleware(typeof(AuthenticationMiddleware));
+
+if (!app.Environment.IsDevelopment())
+    app.UseMiddleware(typeof(AuthenticationMiddleware));
 
 app.UseRouting();
 
