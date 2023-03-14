@@ -3,6 +3,8 @@ using API.Routes.MapDocusign;
 using Docusign.Repository.DataBase.Conexion;
 using API.DI;
 using API.Routes.MapWeatherForecast;
+using API.Routes.MapAutodesk;
+using API.Routes.MapAutoDesk;
 
 var builder = WebApplication.CreateBuilder(args);
 const string origins = "CorsPolicy";
@@ -60,5 +62,13 @@ app.RegisterWeatherForecast();
 
 
 
+app.RegisterDataManagement();
+app.RegisterModelDerivative();
+app.RegisterOAuth();
+app.RegisterProyectos();
+app.RegisterTrimble();
+
+
+app.RegisterDocusignDS();
 app.Run();
 
