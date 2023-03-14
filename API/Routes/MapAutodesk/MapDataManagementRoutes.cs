@@ -6,12 +6,13 @@ namespace API.Routes.MapAutodesk
 {
     public static class MapDataManagementRoutes
     {
+        private static Credentials Credentials { get; set; }
         public static void RegisterDataManagement(this IEndpointRouteBuilder app)
         {
-            app.MapGet("/api/DataManagement", async (Credentials _Credentials, string id = "") =>
+            app.MapGet("/DataManagement", async (HttpContext _httpContext, string id = "") =>
             {
-                _Credentials = await Credentials.FromSessionAsync(base.Request.Cookies, Response.Cookies);
-                if (_Credentials == null) { return null; }
+                Credentials = await Credentials.FromSessionAsync (_httpContext.Request.Cookies, _httpContext.Response.Cookies);
+                if (Credentials == null) { return null; }
 
                 IList<jsTreeNode> nodes = new List<jsTreeNode>();
 
@@ -36,7 +37,7 @@ namespace API.Routes.MapAutodesk
 
                 //  List<jsTreeNode> _file = await new Proyectos().GetFolderContents(folder, projectId, Credentials.TokenInternal, "[items:autodesk.bim360:File]");
 
-                List<jsTreeNode> _r = await new Proyectos().GetItemVersions(folder, projectId, _Credentials.TokenInternal);
+                List<jsTreeNode> _r = await new Proyectos().GetItemVersions(folder, projectId, Credentials.TokenInternal);
 
 
                 return Results.Ok(_r);

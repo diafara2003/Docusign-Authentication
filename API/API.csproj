@@ -26,8 +26,4 @@
     <ProjectReference Include="..\Services\Services\Services.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Routes\MapAutoDesk\" />
-  </ItemGroup>
-
 </Project>
