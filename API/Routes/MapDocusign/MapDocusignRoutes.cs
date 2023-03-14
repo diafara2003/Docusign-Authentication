@@ -20,6 +20,45 @@ namespace API.Routes.MapDocusign
                     return Results.Ok(e.Message);
                 }
             }).WithTags("Docusign");
+
+            app.MapGet("/api/Docusign/Templates", async (IDocusignService _docusignService) =>
+            {
+                try
+                {
+                    var _result = await _docusignService.GetTemplates(); ;
+                    return Results.Ok(_result);
+                }
+                catch (Exception e)
+                {
+                    return Results.Ok(e.Message);
+                }
+            }).WithTags("Docusign");
+
+            app.MapGet("/api/Docusign/TemplatesSigners", async (IDocusignService _docusignService) =>
+            {
+                try
+                {
+                    var _result = await _docusignService.GetTemplatesSigners(); 
+                    return Results.Ok(_result);
+                }
+                catch (Exception e)
+                {
+                    return Results.Ok(e.Message);
+                }
+            }).WithTags("Docusign");
+
+            app.MapGet("/api/Docusign/envelopes/recipents", async (IDocusignService _docusignService) =>
+            {
+                try
+                {
+                    var _result = await _docusignService.GetTemplatesSigners();
+                    return Results.Ok(_result);
+                }
+                catch (Exception e)
+                {
+                    return Results.Ok(e.Message);
+                }
+            }).WithTags("Docusign");
         }
     }
 }
