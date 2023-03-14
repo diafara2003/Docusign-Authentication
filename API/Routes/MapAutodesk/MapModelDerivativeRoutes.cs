@@ -13,7 +13,7 @@ namespace API.Routes.MapAutodesk
         private static Credentials Credentials { get; set; }
         public static void RegisterModelDerivative(this IEndpointRouteBuilder app)
         {
-            app.MapGet("/api/ModelDerivative/folder/info", async ( HttpContext _httpContext,  string id = "") =>
+            app.MapGet("/ModelDerivative/folder/info", async ( HttpContext _httpContext,  string id = "") =>
             {
                 string folder = id.Split('/')[id.Split('/').Length - 1];
                 string projectId = id.Split('/')[6];
@@ -28,7 +28,7 @@ namespace API.Routes.MapAutodesk
                 return Results.Ok(new Tuple<FolferInfo, List<jsTreeNode>>(folfer, content));
             }).WithTags("AutoDesk");
 
-            app.MapGet("/api/ModelDerivative/folder/model/properties", async ( HttpContext _httpContext, string id = "") =>
+            app.MapGet("/ModelDerivative/folder/model/properties", async ( HttpContext _httpContext, string id = "") =>
             {
                 DerivativesApi derivatives = new DerivativesApi();
                 List<jsTreeNode> objlst = new List<jsTreeNode>();
@@ -67,7 +67,7 @@ namespace API.Routes.MapAutodesk
                 return Results.Ok(objresponse.Take(10000));
             }).WithTags("AutoDesk");
 
-            app.MapGet("/api/ModelDerivative/model/metadatas", async (HttpContext _httpContext,string id) =>
+            app.MapGet("/ModelDerivative/model/metadatas", async (HttpContext _httpContext,string id) =>
             {
                 DerivativesApi derivatives = new DerivativesApi();
 
@@ -88,7 +88,7 @@ namespace API.Routes.MapAutodesk
                 return Results.Ok(meta.data.metadata[0].guid);
             }).WithTags("AutoDesk");
 
-            app.MapGet("/api/ModelDerivative/model/hierarchy", async (HttpContext _httpContext, string urn) =>
+            app.MapGet("/ModelDerivative/model/hierarchy", async (HttpContext _httpContext, string urn) =>
             {
                 jsMetaData objresponse = new jsMetaData();
                 DerivativesApi derivatives = new DerivativesApi();
