@@ -4,10 +4,6 @@ using Docusign.Repository.DataBase.Conexion;
 using Autofac;
 using API.DI;
 using API.Routes.MapWeatherForecast;
-using Docusign.Utilidades.Session;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using API.Routes.MapAutodesk;
-using API.Routes.MapAutoDesk;
 
 var builder = WebApplication.CreateBuilder(args);
 const string origins = "CorsPolicy";
@@ -48,7 +44,7 @@ app.UseSwagger();
 app.UseSwaggerUI();
 //}
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 
 app.UseRouting();
@@ -57,17 +53,11 @@ app.UseCors(origins);
 app.UseAuthentication();
 app.UseAuthorization();
 
-//app.UseMiddleware(typeof(AuthenticationMiddleware));
+app.UseMiddleware(typeof(AuthenticationMiddleware));
 
 app.RegisterDocusign();
 app.RegisterDocusignDS();
 app.RegisterWeatherForecast();
-
-app.RegisterDataManagement();
-app.RegisterModelDerivative();
-app.RegisterOAuth();
-app.RegisterProyectos();
-app.RegisterTrimble();
 
 app.Run();
 

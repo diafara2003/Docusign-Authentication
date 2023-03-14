@@ -1,5 +1,4 @@
-﻿{
-
+{
   "profiles": {
     "IIS Express": {
       "commandName": "IISExpress",
@@ -12,8 +11,10 @@
     "API_CORE": {
       "commandName": "IIS",
       "launchBrowser": true,
-
       "launchUrl": "https://localhost/Sinco/V3/ADPRO/core/api/WeatherForecast"
+    },
+    "Profile 1": {
+      "commandName": "IIS"
     }
   },
   "$schema": "http://json.schemastore.org/launchsettings.json",

@@ -14,7 +14,7 @@ namespace API.Routes.MapWeatherForecast
 
         public static void RegisterWeatherForecast(this IEndpointRouteBuilder app)
         {
-            app.MapGet("/api/WeatherForecast",  () =>
+            app.MapGet("/WeatherForecast",  () =>
             {
                 var rng = new Random();
                 return Enumerable.Range(1, 5).Select(index => new

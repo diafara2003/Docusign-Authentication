@@ -11,7 +11,7 @@ namespace API.Routes.MapDocusign
     {
         public static void RegisterDocusign(this IEndpointRouteBuilder app)
         {
-            app.MapGet("/api/Docusign/userInfo", async (IDocusignService _docusignService) =>
+            app.MapGet("/Docusign/userInfo", async (IDocusignService _docusignService) =>
             {
                 try
                 {
@@ -24,7 +24,7 @@ namespace API.Routes.MapDocusign
                 }
             }).WithTags("Docusign");
 
-            app.MapGet("/api/Docusign/Templates", async (IDocusignService _docusignService) =>
+            app.MapGet("/Docusign/Templates", async (IDocusignService _docusignService) =>
             {
                 try
                 {
@@ -37,7 +37,7 @@ namespace API.Routes.MapDocusign
                 }
             }).WithTags("Docusign");
 
-            app.MapGet("/api/Docusign/TemplatesSigners", async (IDocusignService _docusignService) =>
+            app.MapGet("/Docusign/TemplatesSigners", async (IDocusignService _docusignService) =>
             {
                 try
                 {
@@ -50,7 +50,7 @@ namespace API.Routes.MapDocusign
                 }
             }).WithTags("Docusign");
 
-            app.MapGet("/api/Docusign/envelopes/recipents", async (IDocusignService _docusignService, string envelope) =>
+            app.MapGet("/Docusign/envelopes/recipents", async (IDocusignService _docusignService, string envelope) =>
             {
                 try
                 {
@@ -63,7 +63,7 @@ namespace API.Routes.MapDocusign
                 }
             }).WithTags("Docusign");
 
-            app.MapGet("/api/Docusign/SignersByTemplete", async (IDocusignService _docusignService, string idTemplate, string contrato = "") =>
+            app.MapGet("/Docusign/SignersByTemplete", async (IDocusignService _docusignService, string idTemplate, string contrato = "") =>
             {
                 try
                 {
@@ -77,7 +77,7 @@ namespace API.Routes.MapDocusign
             }).WithTags("Docusign");
 
 
-            app.MapPost("/api/Docusign/envelopes/send", async (IDocusignService _docusignService, EnvelopeSendDTO envelope) =>
+            app.MapPost("/Docusign/envelopes/send", async (IDocusignService _docusignService, EnvelopeSendDTO envelope) =>
             {
                 try
                 {
@@ -90,7 +90,7 @@ namespace API.Routes.MapDocusign
                 }
             }).WithTags("Docusign");
 
-            app.MapGet("/api/Docusign/envelopes/status", async (IDocusignService _docusignService, string idenvelope) =>
+            app.MapGet("/Docusign/envelopes/status", async (IDocusignService _docusignService, string idenvelope) =>
             {
                 var response = await _docusignService.peticion<DocusignAuditoriaDTO>($"envelopes/{idenvelope}?include=recipients,documents", MethodRequest.GET);
 
@@ -102,7 +102,7 @@ namespace API.Routes.MapDocusign
             }).WithTags("Docusign");
 
 
-            app.MapGet("/api/Docusign/envelopes/history", async (IDocusignService _docusignService, string idenvelope) =>
+            app.MapGet("/Docusign/envelopes/history", async (IDocusignService _docusignService, string idenvelope) =>
             {
                 try
                 {
@@ -114,7 +114,7 @@ namespace API.Routes.MapDocusign
                 }
             }).WithTags("Docusign");
 
-            app.MapGet("/api/Docusign/envelopes/documents", async (IDocusignService _docusignService, string idenvelope) =>
+            app.MapGet("/Docusign/envelopes/documents", async (IDocusignService _docusignService, string idenvelope) =>
             {
                 try
                 {
@@ -126,7 +126,7 @@ namespace API.Routes.MapDocusign
                 }
             }).WithTags("Docusign");
 
-            app.MapGet("/api/Docusign/envelopes/documents/zip", async (IDocusignService _docusignService, string idenvelope) =>
+            app.MapGet("/Docusign/envelopes/documents/zip", async (IDocusignService _docusignService, string idenvelope) =>
             {
                 Tuple<AuthenticationDTO, ResponseEnvelopeDTO> respuesta = await _docusignService.GetEnvelopeDocuments(idenvelope);
 
@@ -153,7 +153,7 @@ namespace API.Routes.MapDocusign
             }).WithTags("Docusign");
 
 
-            app.MapGet("/api/Docusign/state/token",  (IDocusignService _docusignService, IWebHostEnvironment _webHostEnvironment) =>
+            app.MapGet("/Docusign/state/token",  (IDocusignService _docusignService, IWebHostEnvironment _webHostEnvironment) =>
             {
                 try
                 {
@@ -165,7 +165,7 @@ namespace API.Routes.MapDocusign
                 }
             }).WithTags("Docusign");
 
-            app.MapGet("/api/Docusign/validarsesion",  (IDocusignService _docusignService) =>
+            app.MapGet("/Docusign/validarsesion",  (IDocusignService _docusignService) =>
             {
                 return Results.Ok(new Tuple<AuthenticationDTO, string>(_docusignService.validationAuthentication(), string.Empty));
             }).WithTags("Docusign");
