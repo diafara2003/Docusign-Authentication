@@ -55,7 +55,7 @@ app.UseCors(origins);
 app.UseAuthentication();
 app.UseAuthorization();
 
-//app.UseMiddleware(typeof(AuthenticationMiddleware));
+app.UseMiddleware(typeof(AuthenticationMiddleware));
 
 app.RegisterDocusign();
 app.RegisterDocusignDS();
