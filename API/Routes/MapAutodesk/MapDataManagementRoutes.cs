@@ -8,39 +8,39 @@ namespace API.Routes.MapAutodesk
     {
         public static void RegisterDataManagement(this IEndpointRouteBuilder app)
         {
-            app.MapGet("/api/DataManagement", async (Credentials _Credentials, string id = "") =>
-            {
-                _Credentials = await Credentials.FromSessionAsync(base.Request.Cookies, Response.Cookies);
-                if (_Credentials == null) { return null; }
+            //app.MapGet("/api/DataManagement", async (Credentials _Credentials, string id = "") =>
+            //{
+            //    _Credentials = await Credentials.FromSessionAsync(base.Request.Cookies, Response.Cookies);
+            //    if (_Credentials == null) { return null; }
 
-                IList<jsTreeNode> nodes = new List<jsTreeNode>();
+            //    IList<jsTreeNode> nodes = new List<jsTreeNode>();
 
-                /*
-                // root
-                List<jsTreeNode> _hubs = await new Proyectos().GetHubsAsync(Credentials.TokenInternal);
-                List<jsTreeNode> _projects = await new Proyectos().GetProjectsAsync(_hubs.First().id, Credentials.TokenInternal);
-                jsTreeNode _content_forlder = await new Proyectos().GetProjectContents(_hubs.First().id, _projects.First().id, Credentials.TokenInternal)
-                    .ContinueWith(c => c.Result
-                    .Where(c => c.text.Equals("Project Files"))
-                    .FirstOrDefault());
-
-
-                List<jsTreeNode> _files = await new Proyectos().GetFolderContents(_content_forlder.id, _projects.First().id, Credentials.TokenInternal);
-
-                List<jsTreeNode> _rs = await new Proyectos().GetItemVersions(_files.FirstOrDefault().id, _projects.First().id, Credentials.TokenInternal);
-                    return _rs;
-                */
-                // root
-                string folder = id.Split('/')[id.Split('/').Length - 1];
-                string projectId = id.Split('/')[6];
-
-                //  List<jsTreeNode> _file = await new Proyectos().GetFolderContents(folder, projectId, Credentials.TokenInternal, "[items:autodesk.bim360:File]");
-
-                List<jsTreeNode> _r = await new Proyectos().GetItemVersions(folder, projectId, _Credentials.TokenInternal);
+            //    /*
+            //    // root
+            //    List<jsTreeNode> _hubs = await new Proyectos().GetHubsAsync(Credentials.TokenInternal);
+            //    List<jsTreeNode> _projects = await new Proyectos().GetProjectsAsync(_hubs.First().id, Credentials.TokenInternal);
+            //    jsTreeNode _content_forlder = await new Proyectos().GetProjectContents(_hubs.First().id, _projects.First().id, Credentials.TokenInternal)
+            //        .ContinueWith(c => c.Result
+            //        .Where(c => c.text.Equals("Project Files"))
+            //        .FirstOrDefault());
 
 
-                return Results.Ok(_r);
-            }).WithTags("Docusign");
+            //    List<jsTreeNode> _files = await new Proyectos().GetFolderContents(_content_forlder.id, _projects.First().id, Credentials.TokenInternal);
+
+            //    List<jsTreeNode> _rs = await new Proyectos().GetItemVersions(_files.FirstOrDefault().id, _projects.First().id, Credentials.TokenInternal);
+            //        return _rs;
+            //    */
+            //    // root
+            //    string folder = id.Split('/')[id.Split('/').Length - 1];
+            //    string projectId = id.Split('/')[6];
+
+            //    //  List<jsTreeNode> _file = await new Proyectos().GetFolderContents(folder, projectId, Credentials.TokenInternal, "[items:autodesk.bim360:File]");
+
+            //    List<jsTreeNode> _r = await new Proyectos().GetItemVersions(folder, projectId, _Credentials.TokenInternal);
+
+
+            //    return Results.Ok(_r);
+            //}).WithTags("Docusign");
         }
     }
 }
