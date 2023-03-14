@@ -76,7 +76,6 @@ namespace API.Routes.MapDocusign
                 }
             }).WithTags("Docusign");
 
-
             app.MapPost("/Docusign/envelopes/send", async (IDocusignService _docusignService, EnvelopeSendDTO envelope) =>
             {
                 try
@@ -100,7 +99,6 @@ namespace API.Routes.MapDocusign
                     isAuthenticated = true,
                 }, response));
             }).WithTags("Docusign");
-
 
             app.MapGet("/Docusign/envelopes/history", async (IDocusignService _docusignService, string idenvelope) =>
             {
@@ -152,7 +150,6 @@ namespace API.Routes.MapDocusign
                 }
             }).WithTags("Docusign");
 
-
             app.MapGet("/Docusign/state/token",  (IDocusignService _docusignService, IWebHostEnvironment _webHostEnvironment) =>
             {
                 try
@@ -165,9 +162,13 @@ namespace API.Routes.MapDocusign
                 }
             }).WithTags("Docusign");
 
-            app.MapGet("/Docusign/validarsesion",  (IDocusignService _docusignService) =>
+            app.MapGet("Docusign/validarsesion",  (IDocusignService _docusignService) =>
             {
                 return Results.Ok(new Tuple<AuthenticationDTO, string>(_docusignService.validationAuthentication(), string.Empty));
+            }).WithTags("Docusign");
+            app.MapGet("Docusign", (IDocusignService _docusignService) =>
+            {
+                return Results.Ok("hola");
             }).WithTags("Docusign");
 
         }

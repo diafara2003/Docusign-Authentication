@@ -1,7 +1,6 @@
 using API.Middleware;
 using API.Routes.MapDocusign;
 using Docusign.Repository.DataBase.Conexion;
-using Autofac;
 using API.DI;
 using API.Routes.MapWeatherForecast;
 using API.Routes.MapAutodesk;
@@ -47,7 +46,7 @@ app.UseSwaggerUI();
 //}
 
 //app.UseHttpsRedirection();
-
+//app.UseMiddleware(typeof(AuthenticationMiddleware));
 
 app.UseRouting();
 
@@ -60,6 +59,8 @@ app.UseMiddleware(typeof(AuthenticationMiddleware));
 app.RegisterDocusign();
 app.RegisterDocusignDS();
 app.RegisterWeatherForecast();
+
+
 
 app.RegisterDataManagement();
 app.RegisterModelDerivative();
