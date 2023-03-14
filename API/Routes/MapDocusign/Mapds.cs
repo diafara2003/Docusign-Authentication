@@ -6,7 +6,7 @@ namespace API.Routes.MapDocusign
     {
         public static void RegisterDocusignDS(this IEndpointRouteBuilder app)
         {
-            app.MapGet("/api/ds/callback",  (IDocusignCallbackService _docusignService, IWebHostEnvironment _webHostEnvironment, string code) =>
+            app.MapGet("/ds/callback",  (IDocusignCallbackService _docusignService, IWebHostEnvironment _webHostEnvironment, string code) =>
             {
                 _docusignService.SaveTokenFile(code, _webHostEnvironment.ContentRootPath);
 
@@ -14,7 +14,7 @@ namespace API.Routes.MapDocusign
             }).WithTags("Docusign Callback");
 
 
-            app.MapGet("/api/ds/callback/verificacion", (IDocusignCallbackService _docusignService, IWebHostEnvironment _webHostEnvironment, string code) =>
+            app.MapGet("/ds/callback/verificacion", (IDocusignCallbackService _docusignService, IWebHostEnvironment _webHostEnvironment, string code) =>
             {
                 return Results.Ok(_docusignService.ReadTokenFile(_webHostEnvironment.ContentRootPath));
             }).WithTags("Docusign Callback");
