@@ -4,8 +4,6 @@ using Docusign.Repository.DataBase.Conexion;
 using Autofac;
 using API.DI;
 using API.Routes.MapWeatherForecast;
-using Docusign.Utilidades.Session;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 const string origins = "CorsPolicy";
