@@ -6,7 +6,7 @@ namespace API.Routes.MapDocusign
 {
     public static class MapDocusignRoutes
     {
-        public static void RegisterActividadEconomica(this IEndpointRouteBuilder app)
+        public static void RegisterDocusign(this IEndpointRouteBuilder app)
         {
             app.MapGet("/api/Docusign/userInfo",async  (IDocusignService _docusignService) =>
             {

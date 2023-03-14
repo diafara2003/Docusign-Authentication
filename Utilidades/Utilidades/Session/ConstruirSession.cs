@@ -14,12 +14,12 @@ namespace Docusign.Utilidades.Session
     }
     public class ConstruirSession : IConstruirSession
     {
-        private readonly IConfiguration Configuracion;
+       // private readonly IConfiguration Configuracion;
         private readonly IHttpContextAccessor HttpContextAccessor;
 
-        public ConstruirSession(IConfiguration configuracion, IHttpContextAccessor _HttpContextAccessor)
+        public ConstruirSession( IHttpContextAccessor _HttpContextAccessor)
         {
-            Configuracion = configuracion;
+            
             HttpContextAccessor = _HttpContextAccessor;
         }
         public DbContextOptions ObtenerConextOptions(DbContextOptionsBuilder builder)
