@@ -30,10 +30,7 @@ namespace API.Middleware
             string urlPeticion = context.Request.GetDisplayUrl().ToLower();
 
             if (urlPeticion.ToLower().Contains("weatherforecast")
-                || urlPeticion.ToLower().Contains("oauth")
-                || urlPeticion.ToLower().Contains("modelderivative")
-                || urlPeticion.ToLower().Contains("datamanagement")
-                || urlPeticion.ToLower().Contains("proyecto")
+                || urlPeticion.ToLower().Contains("bim360")
                 || urlPeticion.ToLower().Contains("callback")
                 ) await next(context);
 

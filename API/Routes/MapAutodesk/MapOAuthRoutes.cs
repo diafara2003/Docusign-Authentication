@@ -16,7 +16,7 @@ namespace API.Routes.MapAutodesk
         public static void RegisterOAuth(this IEndpointRouteBuilder app)
         {
 
-            app.MapGet("/OAuth/token", async (HttpContext _httpContext,IConfiguration _configuration) =>
+            app.MapGet("/EDT/BIM360/OAuth/token", async (HttpContext _httpContext,IConfiguration _configuration) =>
             {
                 string FORGE_CLIENT_ID = _configuration["FORGE_CLIENT_ID"];// Credentials.GetAppSetting("FORGE_CLIENT_ID");
                 string FORGE_CLIENT_SECRET = _configuration["FORGE_CLIENT_SECRET"];//Credentials.GetAppSetting("FORGE_CLIENT_SECRET");
