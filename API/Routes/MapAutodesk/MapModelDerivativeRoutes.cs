@@ -13,10 +13,10 @@ namespace API.Routes.MapAutodesk
         private static Credentials Credentials { get; set; }
         public static void RegisterModelDerivative(this IEndpointRouteBuilder app)
         {
-            app.MapGet("/EDT/BIM360/ModelDerivative/folder/info", async ( HttpContext _httpContext,  string id = "") =>
+            app.MapGet("/edt/BIM360/ModelDerivative/folder/info", async ( HttpContext _httpContext,  string ids = "") =>
             {
-                string folder = id.Split('/')[id.Split('/').Length - 1];
-                string projectId = id.Split('/')[6];
+                string folder = ids.Split('/')[ids.Split('/').Length - 1];
+                string projectId = ids.Split('/')[6];
 
                 Credentials = await Credentials.FromSessionAsync(_httpContext.Request.Cookies, _httpContext.Response.Cookies);
 

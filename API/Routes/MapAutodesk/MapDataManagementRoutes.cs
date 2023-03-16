@@ -9,9 +9,8 @@ namespace API.Routes.MapAutodesk
     {
         public static void RegisterDataManagement(this IEndpointRouteBuilder app)
         {
-            app.MapGet("/api/DataManagement", async (HttpContext _, string ids = "") =>
+            app.MapGet("/EDT/BIM360/DataManagement", async (HttpContext _, string ids = "") =>
             {
-
         var credentials = await Credentials.FromSessionAsync(_.Request.Cookies, _.Response.Cookies);
                 if (credentials == null) { return null; }
 
