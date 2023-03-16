@@ -61,7 +61,8 @@ namespace Docusign.Repository.DataBase.Conexion
 
             CurrentContext contextoActual = new CurrentContext(this._httpContextAccessor);
             // connect to sql server with connection string from app settings
-            options.UseSqlServer(contextoActual.CadenaConexion);
+            //options.UseSqlServer(contextoActual.CadenaConexion);
+            options.UseSqlServer($"{contextoActual.CadenaConexion};TrustServerCertificate=True");
         }
 
         public DataTable ExecuteStoreQuery(ProcedureDTO obj)
