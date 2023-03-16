@@ -58,10 +58,12 @@ app.UseAuthorization();
 
 app.UseMiddleware(typeof(AuthenticationMiddleware));
 
+
+
+
 app.RegisterDocusign();
 app.RegisterDocusignDS();
 app.RegisterWeatherForecast();
-
 
 
 app.RegisterDataManagement();
@@ -70,7 +72,5 @@ app.RegisterOAuth();
 app.RegisterProyectos();
 app.RegisterTrimble();
 
-
-app.RegisterDocusignDS();
 app.Run();
 

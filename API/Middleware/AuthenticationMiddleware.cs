@@ -17,7 +17,7 @@ namespace API.Middleware
         public AuthenticationMiddleware(RequestDelegate next
         //, IConfiguration _configuration
         , IHttpContextAccessor _httpContextAccessor
-        ,IConstruirSession _construirSession
+        , IConstruirSession _construirSession
         )
         {
             this.next = next;
@@ -34,6 +34,7 @@ namespace API.Middleware
                 || urlPeticion.ToLower().Contains("modelderivative")
                 || urlPeticion.ToLower().Contains("datamanagement")
                 || urlPeticion.ToLower().Contains("proyecto")
+                || urlPeticion.ToLower().Contains("callback")
                 ) await next(context);
 
             if (!urlPeticion.Contains("callback"))

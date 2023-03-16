@@ -6,9 +6,10 @@ namespace Model.Entity.ADP_API_OBR
     [Table("ZonasObraAsignacion", Schema = "ADP_API_OBR")]
     public class ZonasObraAsignacion
     {
-        [Key]
+        
         public int ZOAIdZona { get; set; }
         public int ZOAIdObra { get; set; }
+        [Key]
         public int ZOAid { get; set; }
     }
 }
