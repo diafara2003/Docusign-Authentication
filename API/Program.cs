@@ -45,10 +45,8 @@ app.UseSwagger();
 app.UseSwaggerUI();
 //}
 
-//app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 
-if (!app.Environment.IsDevelopment())
-    app.UseMiddleware(typeof(AuthenticationMiddleware));
 
 app.UseRouting();
 
