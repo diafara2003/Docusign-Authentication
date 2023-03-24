@@ -53,7 +53,7 @@ namespace Docusign.Controllers
             //var auth = new PeticionDocusign().validationAuthentication();
             //if (!auth.isAuthenticated)
             //{
-            //    Tuple<AuthenticationDTO, string> responseAuth = new Tuple<AuthenticationDTO, string>(auth, string.Empty);
+            //    Tuple<AuthenticationDTO, stringDocusign/SignersByTemplete responseAuth = new Tuple<AuthenticationDTO, string>(auth, string.Empty);
             //    return Ok(responseAuth);
             //}
             try

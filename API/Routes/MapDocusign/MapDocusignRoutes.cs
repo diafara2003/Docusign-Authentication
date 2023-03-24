@@ -63,7 +63,7 @@ namespace API.Routes.MapDocusign
                 }
             }).WithTags("Docusign");
 
-            app.MapGet("/Docusign/SignersByTemplete", async (IDocusignService _docusignService, string idTemplate, string contrato = "") =>
+            app.MapGet("Docusign/SignersByTemplete", async (IDocusignService _docusignService, string idTemplate, string contrato = "") =>
             {
                 try
                 {

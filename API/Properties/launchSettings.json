@@ -10,8 +10,9 @@
     },
     "API_CORE": {
       "commandName": "IIS",
+      "workingDirectory": "C:\\Fuenrtes_Docusign\\Docusign-Authentication\\API",
       "launchBrowser": true,
-      "launchUrl": "https://localhost/Sinco/V3/ADPRO/core/api/WeatherForecast"
+      "launchUrl": "http://localhost/Sinco/V3/ADPRO/core/api/WeatherForecast"
     },
     "Profile 1": {
       "commandName": "IIS"
@@ -22,7 +23,7 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iis": {
-      "applicationUrl": "https://localhost/Sinco/V3/ADPRO/core/api",
+      "applicationUrl": "http://localhost/Sinco/V3/ADPRO/core/api",
       "sslPort": 0
     },
     "iisExpress": {
