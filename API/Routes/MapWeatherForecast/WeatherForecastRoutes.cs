@@ -37,11 +37,12 @@ namespace API.Routes.MapWeatherForecast
             }).WithTags("WeatherForecast");
 
 
-            app.MapGet("/WeatherForecast/pdf", async (IPeticionDocusignRepository service,string path) =>
+            app.MapGet("/WeatherForecast/pdf", async (IPeticionDocusignRepository service, string path) =>
             {
+                
                 var d=  await service.FileToPDF(path);
                 var mimeType = "application/pdf";
-                 return Results.File(d, contentType: mimeType);
+                return Results.File(d, contentType: mimeType);
 
             }).WithTags("WeatherForecast");
         }

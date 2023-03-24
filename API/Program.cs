@@ -45,7 +45,7 @@ app.UseSwagger();
 app.UseSwaggerUI();
 //}
 
-if (!app.Environment.IsDevelopment()) app.UseHttpsRedirection();
+//if (!app.Environment.IsDevelopment()) app.UseHttpsRedirection();
 
 
 app.UseRouting();
