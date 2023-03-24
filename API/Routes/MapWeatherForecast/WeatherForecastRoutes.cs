@@ -1,6 +1,16 @@
 ﻿
+using Autodesk.Forge.Model;
+using Azure;
+using Azure.Core;
+using Docusign.Repository.Peticion;
 using Docusign.Services;
-
+using Microsoft.AspNetCore.Mvc;
+using System.Collections;
+using System.IO;
+using System.Net;
+using System.Net.Http.Headers;
+using System.Net.Mime;
+using System.Web;
 
 namespace API.Routes.MapWeatherForecast
 {
@@ -14,7 +24,7 @@ namespace API.Routes.MapWeatherForecast
 
         public static void RegisterWeatherForecast(this IEndpointRouteBuilder app)
         {
-            app.MapGet("/WeatherForecast",  () =>
+            app.MapGet("/WeatherForecast", () =>
             {
                 var rng = new Random();
                 return Enumerable.Range(1, 5).Select(index => new
@@ -25,7 +35,17 @@ namespace API.Routes.MapWeatherForecast
                 })
                 .ToArray();
             }).WithTags("WeatherForecast");
+
+
+            app.MapGet("/WeatherForecast/pdf", async (IPeticionDocusignRepository service,string path) =>
+            {
+                var d=  await service.FileToPDF(path);
+                var mimeType = "application/pdf";
+                 return Results.File(d, contentType: mimeType);
+
+            }).WithTags("WeatherForecast");
         }
+
     }
 
 }

@@ -12,6 +12,8 @@ using System.Linq;
 using Docusign.Repository.DataBase.Conexion;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Net.Http.Headers;
+using System.Reflection.Metadata;
 
 namespace Docusign.Repository.Peticion
 {
@@ -31,7 +33,7 @@ namespace Docusign.Repository.Peticion
 
         AuthenticationDTO validationAuthentication();
 
-
+        Task<byte[]> FileToPDF(string filePath);
     }
 
     public class PeticionDocusignRepository : IPeticionDocusignRepository
@@ -42,6 +44,39 @@ namespace Docusign.Repository.Peticion
         {
             this.contexto = _contexto;
             this.httpContextAccessor = _httpContextAccessor;
+        }
+
+        public async Task<byte[]> FileToPDF(string filePath)
+        {
+            using (var multipartFormContent = new MultipartFormDataContent())
+            {
+                //Load the file and set the file's Content-Type header
+                var fileStreamContent = new StreamContent(File.OpenRead(filePath));
+                fileStreamContent.Headers.ContentType = new MediaTypeHeaderValue("application/msword");
+
+                //Add the file
+                multipartFormContent.Add(fileStreamContent, name: "file", fileName: Path.GetFileName(filePath));
+                var httpClient = new HttpClient();
+                //Send it
+                try
+                {
+                    var response = await httpClient.PostAsync("https://desarrollo.sincoerp.com/SincoOk/V3/ConversionDocumentos/WordToPDF", multipartFormContent);
+                    var _byte = await response.Content.ReadAsByteArrayAsync();
+
+
+
+                    return _byte;
+                }
+                catch (Exception e)
+                {
+
+                    return null;
+                }
+
+                // return await response.Content.ReadAsByteArrayAsync();
+
+
+            }
         }
 
         //public PeticionDocusignRepository(IConstruirSession construirSession, IHttpContextAccessor httpContextAccessor)
