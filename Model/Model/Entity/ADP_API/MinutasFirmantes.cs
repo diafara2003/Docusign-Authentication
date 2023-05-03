@@ -16,5 +16,6 @@ namespace Model.Entity.ADP_API
         public string MFDescripcion { get; set; }
         public string MFNombre { get; set; }
         public string MFCorreo { get; set; }
+        public bool MFIsEditable{ get; set; }
     }
 }

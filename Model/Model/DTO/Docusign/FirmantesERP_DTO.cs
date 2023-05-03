@@ -10,5 +10,6 @@ namespace Model.DTO.Docusign
     {
         public string nombre { get; set; }
         public string email { get; set; }
+        public bool isEditable { get; set; }    
     }
 }

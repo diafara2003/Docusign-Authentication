@@ -269,7 +269,7 @@ namespace Docusign.Services
             docu.documentId = envelope.documentId;
             docu.fileExtension = envelope.fileExtension;
             docu.name = envelope.name;
-
+            
             foreach (var doc in template.documents)
             {
                 if (doc.documentId != envelope.documentId)
@@ -307,10 +307,16 @@ namespace Docusign.Services
             {
                 if (item.roleName != "" && !item.roleName.ToLower().Contains("contratista"))
                 {
-                    var signersERP = GetFirmantesERP(item.roleName, contrato: envelope.documentId );
+
+                    var signersERP = GetFirmantesERP(item.roleName, contrato: envelope.documentId);
+
+                    var _SignerEditable = (from f in envelope.finalSigners
+                                         where f.idSigner == item.recipientId
+                                         select f).FirstOrDefault();
+
                     signers.Add(new signersDTO
                     {
-                        email = signersERP.email,
+                        email = _SignerEditable != null ? _SignerEditable.email : signersERP.email,
                         name = signersERP.nombre,
                         recipientId = item.recipientId,
                         routingOrder = item.routingOrder,
@@ -325,7 +331,7 @@ namespace Docusign.Services
                                                                                        scaleValue = "1"}},
                         }
 
-                    });
+                    }); ;
                 }
             }
             //signers.AddRange((from item in template.recipients.signers
@@ -432,7 +438,7 @@ namespace Docusign.Services
 
             response.email = _res.MFCorreo;
             response.nombre = _res.MFNombre;
-
+            response.isEditable = _res.MFIsEditable;
 
             if (!string.IsNullOrEmpty(contrato))
             {
@@ -458,7 +464,7 @@ namespace Docusign.Services
                         response.email = _obra.Correo;
                         response.nombre = _obra.Nombre;
                     }
-                    else
+                    else 
                     {
                         var _zona = _contexto.zonasObraAsignacion.Where(c => c.ZOAIdObra == _contrato.ConObra).ToList();
 
@@ -468,16 +474,19 @@ namespace Docusign.Services
                             var _zonaFirmante = (from f in _firmante
                                                  join z in _zona on f.IdZona equals z.ZOAIdZona
                                                  select f).ToList().FirstOrDefault();
-
-
-
-                            response.email = _zonaFirmante.Correo;
-                            response.nombre = _zonaFirmante.Nombre;
+                            if (_zonaFirmante!= null)
+                            {
+                                response.email = _zonaFirmante.Correo;
+                                response.nombre = _zonaFirmante.Nombre;
+                            }
+                            
                         }
-                    }
+                    }                  
                 }
-                else {
-                    if (rolename.ToLower().Trim().Contains("contratista")) {
+                else
+                {
+                    if (rolename.ToLower().Trim().Contains("contratista"))
+                    {
 
                         var tercero = _contexto.tercero.Find(_contrato.ConContratista);
                         response.email = tercero.TerEmail;
@@ -498,6 +507,7 @@ namespace Docusign.Services
                 var signerERP = GetFirmantesERP(item.roleName, contrato);
                 item.email = signerERP.email;
                 item.name = signerERP.nombre;
+                item.isEditable = signerERP.isEditable;
             }
 
             return _response;
