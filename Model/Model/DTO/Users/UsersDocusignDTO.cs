@@ -42,7 +42,7 @@ namespace Model.DTO.Users
         public string name { get; set; }
         public string emailSubject { get; set; }
         public string emailBlurb { get; set; }
-        public string status { get; set; }
+        public string status { get; set; }        
         public IList<documentsDTO> documents { get; set; }
         public recipientsDTO recipients { get; set; }
 
@@ -173,13 +173,14 @@ public class EnvelopeSendDTO
     public string nameTer { get; set; }
     public string emailTer { get; set; }
     public string IdTer { get; set; }
+       
     public IList<signersFinalDTO> finalSigners { get; set; }
 }
 public class signersFinalDTO
 {
     public string email { get; set; }
     public string idSigner { get; set; }
-    public string roleName { get; set; }
+    public string name { get; set; }
     public bool isEditable { get; set; }
 
 }

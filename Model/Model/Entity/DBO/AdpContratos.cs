@@ -11,5 +11,6 @@ namespace Model.Entity.DBO
         public int ConNumero { get; set; }
         public int ConContratista { get; set; }
         public int ConObra { get; set; }
+        public string ConTipoContrato { get; set; }
     }
 }

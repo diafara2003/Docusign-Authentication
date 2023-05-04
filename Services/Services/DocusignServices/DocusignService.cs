@@ -257,8 +257,12 @@ namespace Docusign.Services
             EnvelopeResponse envelopeResponse = new EnvelopeResponse();
             envelopeTemplatesDTO envelopeToSend = new envelopeTemplatesDTO();
 
+            var _contrato = _contexto.contrato.Find(int.Parse(envelope.documentId));
+            var _tipoCont = _contexto.tipoContratos.Find(_contrato.ConTipoContrato);
+            var _obra = _contexto.obra.Find(_contrato.ConObra);
 
-            envelopeToSend.emailSubject = template.emailSubject;
+            var subjectCont = $"Contrato {_contrato.ConNumero} - {_obra.ObrNombre} - {_tipoCont.TcnDesc}";
+            envelopeToSend.emailSubject = subjectCont;
 
             /*Se obtienen los documentos*/
 
@@ -317,7 +321,7 @@ namespace Docusign.Services
                     signers.Add(new signersDTO
                     {
                         email = _SignerEditable != null ? _SignerEditable.email : signersERP.email,
-                        name = signersERP.nombre,
+                        name = _SignerEditable != null ? _SignerEditable.name : signersERP.nombre,
                         recipientId = item.recipientId,
                         routingOrder = item.routingOrder,
                         tabs = new tabsDTO
