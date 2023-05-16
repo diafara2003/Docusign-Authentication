@@ -129,25 +129,25 @@ namespace API.Routes.MapDocusign
             {
                 Tuple<AuthenticationDTO, ResponseEnvelopeDTO> respuesta = await _docusignService.GetEnvelopeDocuments(idenvelope);
 
-                using (MemoryStream memoryStream = new MemoryStream())
-                {
-                    using (ZipArchive zipArchive = new ZipArchive(memoryStream, ZipArchiveMode.Create, false))
+                    using (MemoryStream memoryStream = new MemoryStream())
                     {
-                        foreach (var item in respuesta.Item2.envelopeDocuments)
+                        using (ZipArchive zipArchive = new ZipArchive(memoryStream, ZipArchiveMode.Create, false))
                         {
-                            ZipArchiveEntry fileInArchive = zipArchive.CreateEntry(item.name + ".pdf", CompressionLevel.Optimal);
-
-                            using (var entryStream = fileInArchive.Open())
+                            foreach (var item in respuesta.Item2.envelopeDocuments)
                             {
-                                using (var ms = new MemoryStream(item.file))
+                                ZipArchiveEntry fileInArchive = zipArchive.CreateEntry(item.name + ".pdf", CompressionLevel.Optimal);
+
+                                using (var entryStream = fileInArchive.Open())
                                 {
-                                    await ms.CopyToAsync(entryStream);
+                                    using (var ms = new MemoryStream(item.file))
+                                    {
+                                        await ms.CopyToAsync(entryStream);
+                                    }
                                 }
                             }
                         }
-                    }
 
-                    return Results.File(memoryStream.ToArray(), "application/x-zip-compressed", "test-txt-files.zip");
+                        return Results.File(memoryStream.ToArray(), "application/x-zip-compressed", "test-txt-files.zip");
                 }
             }).WithTags("Docusign");
 
