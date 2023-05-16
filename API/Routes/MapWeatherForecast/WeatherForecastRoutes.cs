@@ -37,6 +37,9 @@ namespace API.Routes.MapWeatherForecast
             }).WithTags("WeatherForecast");
 
 
+            
+
+
             app.MapGet("/WeatherForecast/pdf", async (IPeticionDocusignRepository service, string path) =>
             {
                 

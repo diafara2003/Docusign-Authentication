@@ -60,7 +60,7 @@ namespace Docusign.Repository.Peticion
                 //Send it
                 try
                 {
-                    var response = await httpClient.PostAsync("https://desarrollo.sincoerp.com/SincoOk/V3/ConversionDocumentos/WordToPDF", multipartFormContent);
+                    var response = await httpClient.PostAsync("https://core.sincoerp.com/ConversionDocumentos/WordToPDF", multipartFormContent);
                     var _byte = await response.Content.ReadAsByteArrayAsync();
 
 
