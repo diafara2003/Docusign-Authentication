@@ -24,6 +24,7 @@ namespace Model.DTO.Docusign
 
     public class EnvelopesDTO
     {
+        public string status{ get; set; }
         public string envelopeId { get; set; }
         public SignersDTO recipients { get; set; }
 
