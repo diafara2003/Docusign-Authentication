@@ -24,6 +24,8 @@ namespace Docusign.Repository.DataBase.Conexion
         public DbSet<AdpContratos> contrato { get; set; }
         public DbSet<ADPTipoContratos> tipoContratos { get; set; }
         public DbSet<Terceros> tercero { get; set; }
+        public DbSet<TercerosContactos> tercerosContactos { get; set; }
+        public DbSet<TiposContacto> tiposContacto { get; set; }
         public DbSet<ADPObras> obra { get; set; }
 
         #endregion

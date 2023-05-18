@@ -8,6 +8,7 @@ using System.Linq;
 using Docusign.Repository.Peticion;
 using Docusign.Repository.DataBase.Conexion;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using System.Runtime.ConstrainedExecution;
 
 namespace Docusign.Services
 {
@@ -491,10 +492,26 @@ namespace Docusign.Services
                 {
                     if (rolename.ToLower().Trim().Contains("contratista"))
                     {
+                        var configActasMail = _contexto.adpconfig.Where(c => c.CnfCodigo == "Act_MailTercero").FirstOrDefault() ?? new Model.Entity.DBO.ADPConfig() { CnfValor ="0"};
+                        var tipoContacto = _contexto.tiposContacto.Where(c => c.TipoContDesc == "Envio de actas para facturar").FirstOrDefault();
 
+                        var correo =string.Empty;
+                        var name = string.Empty;
                         var tercero = _contexto.tercero.Find(_contrato.ConContratista);
-                        response.email = tercero.TerEmail;
-                        response.nombre = tercero.TerNombre;
+                        name = tercero.TerNombre;
+                        if (configActasMail.CnfValor == "1")                                                    
+                            correo = tercero.TerEmailCto; 
+                        else
+                        {
+                             correo = (from C in _contexto.contrato
+                                      join Ter in _contexto.tercero on C.ConContratista equals Ter.TerID
+                                      join TC in _contexto.tercerosContactos on Ter.TerID equals TC.TCTercero                                     
+                                      where TC.TCTipo == tipoContacto.TipoContId && C.ConID == int.Parse(contrato)
+                                      select TC.TCMail).FirstOrDefault() ?? "";                           
+                        }
+
+                        response.email = correo;
+                        response.nombre = name;
                     }
                 }
             }
