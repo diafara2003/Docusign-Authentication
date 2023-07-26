@@ -1,10 +1,7 @@
 using API.Middleware;
-using API.Routes.MapDocusign;
 using Docusign.Repository.DataBase.Conexion;
-using API.DI;
-using API.Routes.MapWeatherForecast;
-using API.Routes.MapAutodesk;
-using API.Routes.MapAutoDesk;
+using API.RegisterInterface;
+using API.Routes;
 
 var builder = WebApplication.CreateBuilder(args);
 const string origins = "CorsPolicy";
@@ -12,13 +9,12 @@ const string origins = "CorsPolicy";
 
 builder.Services.Register();
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 
-//builder.Services.Register();
+
 builder.Services.AddDbContext<DB_ADPRO>();
 
 
@@ -32,45 +28,25 @@ builder.Services.AddCors(options =>
 });
 
 
-
-
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-
-//{
 app.UseSwagger();
 app.UseSwaggerUI();
-//}
-
-//if (!app.Environment.IsDevelopment()) 
 
 //app.UseHttpsRedirection();
-
-
 app.UseRouting();
 
 app.UseCors(origins);
-app.UseAuthentication();
-app.UseAuthorization();
+//app.UseAuthentication();
+//app.UseAuthorization();
 
 app.UseMiddleware(typeof(AuthenticationMiddleware));
 
 
 
-
-app.RegisterDocusign();
-app.RegisterDocusignDS();
-app.RegisterWeatherForecast();
-
-
-app.RegisterDataManagement();
-app.RegisterModelDerivative();
-app.RegisterOAuth();
-app.RegisterProyectos();
-app.RegisterTrimble();
+//endpoint api
+app.RegisterRoutes();
 
 app.Run();
-

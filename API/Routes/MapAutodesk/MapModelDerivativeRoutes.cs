@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Model.DTO.Autodesk;
 using Newtonsoft.Json.Linq;
 using Repository.AutoDesk.forgeAPI;
+using Services.BIM360Services;
 using System.Net.Http;
 
 namespace API.Routes.MapAutodesk
@@ -13,7 +14,7 @@ namespace API.Routes.MapAutodesk
         private static Credentials Credentials { get; set; }
         public static void RegisterModelDerivative(this IEndpointRouteBuilder app)
         {
-            app.MapGet("/edt/BIM360/ModelDerivative/folder/info", async ( HttpContext _httpContext,  string ids = "") =>
+            app.MapGet("/edt/BIM360/ModelDerivative/folder/info", async (HttpContext _httpContext, string ids = "") =>
             {
                 string folder = ids.Split('/')[ids.Split('/').Length - 1];
                 string projectId = ids.Split('/')[6];
@@ -28,11 +29,11 @@ namespace API.Routes.MapAutodesk
                 return Results.Ok(new Tuple<FolferInfo, List<jsTreeNode>>(folfer, content));
             }).WithTags("AutoDesk");
 
-            app.MapGet("/EDT/BIM360/ModelDerivative/folder/model/properties", async ( HttpContext _httpContext, string id = "") =>
+            app.MapGet("/EDT/BIM360/ModelDerivative/folder/model/properties", async (IBIM360Services bim, HttpContext _httpContext, string id = "") =>
             {
                 DerivativesApi derivatives = new DerivativesApi();
                 List<jsTreeNode> objlst = new List<jsTreeNode>();
-                List<ExtraccionModeloRevitDTO> objresponse = new List<ExtraccionModeloRevitDTO>();
+                List<MigracionRevitDTO> objresponse = new List<MigracionRevitDTO>();
 
                 Credentials = await Credentials.FromSessionAsync(_httpContext.Request.Cookies, _httpContext.Response.Cookies);
                 if (Credentials == null) { return null; }
@@ -58,16 +59,22 @@ namespace API.Routes.MapAutodesk
                 {
                     if (!item.text.ToLower().Contains("3d") && item.text.ToLower().Contains(".rvt"))
                     {
-                        List<ExtraccionModeloRevitDTO> objResultado = await new ModelosRVT().ExtraerData(item.id, Credentials.TokenInternal, derivatives);
+                        List<MigracionRevitDTO> objResultado = await new ModelosRVT().ExtraerData(item.id, Credentials.TokenInternal, derivatives);
 
                         objResultado.ForEach(c => objresponse.Add(c));
                     }
                 }
-                
-                return Results.Ok(objresponse.Take(10000));
+                var _res = bim.MigracionRevit(objresponse.ToList());
+                return Results.Ok(new
+                {
+
+                    datos = objresponse.Take(500),
+                    resultado = _res,
+                    totalregistros= objresponse.Count
+                });
             }).WithTags("AutoDesk");
 
-            app.MapGet("/EDT/BIM360/ModelDerivative/model/metadatas", async (HttpContext _httpContext,string id) =>
+            app.MapGet("/EDT/BIM360/ModelDerivative/model/metadatas", async (HttpContext _httpContext, string id) =>
             {
                 DerivativesApi derivatives = new DerivativesApi();
 
@@ -105,7 +112,7 @@ namespace API.Routes.MapAutodesk
 
 
                 objresponse.jstreenode = ConvertToActivity(manifest.data.objects[0].objects);
-                objresponse.jsSingleNode = ConvertProperties(properties.data.collection);                
+                objresponse.jsSingleNode = ConvertProperties(properties.data.collection);
 
                 return Results.Ok(objresponse);
             }).WithTags("AutoDesk");
