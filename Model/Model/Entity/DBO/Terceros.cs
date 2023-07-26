@@ -10,5 +10,6 @@ namespace Model.Entity.DBO
         public int TerID { get; set; }
         public string TerNombre { get; set; }
         public string TerEmail { get; set; }
+        public string TerEmailCto { get; set; }
     }
 }
