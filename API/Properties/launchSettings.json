@@ -10,7 +10,6 @@
     },
     "API_CORE": {
       "commandName": "IIS",
-      "workingDirectory": "C:\\Fuenrtes_Docusign\\Docusign-Authentication\\API",
       "launchBrowser": true,
       "launchUrl": "http://localhost/Sinco/V3/ADPRO/core/api/WeatherForecast"
     },

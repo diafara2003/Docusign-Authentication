@@ -9,15 +9,17 @@ namespace Repository.AutoDesk.Mappers
 {
     public static class MapExtraccionModeloRevit
     {
-        public static IList<ExtraccionModeloRevitDTO> Map(dynamic values, string nameFile, string guid, string urn, dynamic properties)
+        public static IList<MigracionRevitDTO> Map(dynamic values, string nameFile, string guid, string urn, dynamic properties)
         {
-            IList<ExtraccionModeloRevitDTO> objresult = new List<ExtraccionModeloRevitDTO>();
+            IList<MigracionRevitDTO> objresult = new List<MigracionRevitDTO>();
 
             foreach (var item in ((Autodesk.Forge.Model.DynamicDictionary)values).Dictionary)
             {
                 if (item.Value == null) continue;
 
-                ExtraccionModeloRevitDTO _obj = new ExtraccionModeloRevitDTO();
+               // if (objresult.Count == 11) break;
+
+                MigracionRevitDTO _obj = new MigracionRevitDTO();
 
                 foreach (var _data in ((Autodesk.Forge.Model.DynamicDictionary)item.Value).Dictionary)
                 {
@@ -199,11 +201,29 @@ namespace Repository.AutoDesk.Mappers
                         _obj.Longitud = _obj.Ancho;
                     }
 
+
+
+                  
+
                 }
                 _obj.archivo = nameFile;
                 _obj.urn = urn;
                 _obj.guid = guid;
-                objresult.Add(_obj);
+
+                if ((string.IsNullOrEmpty(_obj.Area) || _obj.Area == "0")
+                      && (string.IsNullOrEmpty(_obj.Longitud) || _obj.Longitud == "0")
+                      && (string.IsNullOrEmpty(_obj.volumen) || _obj.volumen == "0")
+                      && (string.IsNullOrEmpty(_obj.SubCapitulo))
+                      && (string.IsNullOrEmpty(_obj.Categoria))
+                      && (string.IsNullOrEmpty(_obj.Tipo))
+                      && (string.IsNullOrEmpty(_obj.IdElemento))
+                      )
+                {
+                    
+                }
+                else {
+                    objresult.Add(_obj);
+                }
 
             }
             return objresult;

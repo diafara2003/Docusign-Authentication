@@ -33,7 +33,7 @@ namespace Docusign.Repository.Peticion
 
         AuthenticationDTO validationAuthentication();
 
-        Task<byte[]> FileToPDF(string filePath);
+        Task<dynamic> FileToPDF(string filePath);
     }
 
     public class PeticionDocusignRepository : IPeticionDocusignRepository
@@ -46,36 +46,33 @@ namespace Docusign.Repository.Peticion
             this.httpContextAccessor = _httpContextAccessor;
         }
 
-        public async Task<byte[]> FileToPDF(string filePath)
+        public async Task<dynamic> FileToPDF(string filePath)
         {
-            using (var multipartFormContent = new MultipartFormDataContent())
+            try
             {
-                //Load the file and set the file's Content-Type header
-                var fileStreamContent = new StreamContent(File.OpenRead(filePath));
-                fileStreamContent.Headers.ContentType = new MediaTypeHeaderValue("application/msword");
-
-                //Add the file
-                multipartFormContent.Add(fileStreamContent, name: "file", fileName: Path.GetFileName(filePath));
-                var httpClient = new HttpClient();
-                //Send it
-                try
+                using (var multipartFormContent = new MultipartFormDataContent())
                 {
-                    var response = await httpClient.PostAsync("https://desarrollo.sincoerp.com/SincoOk/V3/ConversionDocumentos/WordToPDF", multipartFormContent);
+                    //Load the file and set the file's Content-Type header
+                    var fileStreamContent = new StreamContent(File.OpenRead(filePath));
+                    fileStreamContent.Headers.ContentType = new MediaTypeHeaderValue("application/msword");
+
+                    //Add the file
+                    multipartFormContent.Add(fileStreamContent, name: "file", fileName: Path.GetFileName(filePath));
+                    var httpClient = new HttpClient();
+                    //Send it
+
+                    var response = await httpClient.PostAsync("https://core.sincoerp.com/ConversionDocumentos/WordToPDF", multipartFormContent);
                     var _byte = await response.Content.ReadAsByteArrayAsync();
 
 
-
                     return _byte;
+
                 }
-                catch (Exception e)
-                {
+            }
+            catch (Exception e)
+            {
 
-                    return null;
-                }
-
-                // return await response.Content.ReadAsByteArrayAsync();
-
-
+                return e.Message;
             }
         }
 

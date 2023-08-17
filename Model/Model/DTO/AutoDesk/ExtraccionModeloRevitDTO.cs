@@ -2,10 +2,10 @@
 
 namespace Model.DTO.Autodesk
 {
-    public class ExtraccionModeloRevitDTO
+    public class MigracionRevitDTO
     {
 
-        public ExtraccionModeloRevitDTO()
+        public MigracionRevitDTO()
         {            
             this.IdElemento = String.Empty;
             this.Nombre = String.Empty;
@@ -31,6 +31,7 @@ namespace Model.DTO.Autodesk
             this.archivo = String.Empty;
             this.urn = String.Empty;
             this.guid = String.Empty;
+            this.Objeto = string.Empty;
         }
 
         public string IdElemento { get; set; }
@@ -57,5 +58,6 @@ namespace Model.DTO.Autodesk
         public string archivo { get; set; }
         public string urn { get; set; }
         public string guid { get; set; }
+        public string Objeto { get; set; }
     }
 }

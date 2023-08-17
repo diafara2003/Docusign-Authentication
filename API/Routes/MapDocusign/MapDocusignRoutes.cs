@@ -67,6 +67,7 @@ namespace API.Routes.MapDocusign
             {
                 try
                 {
+
                     var _result = await _docusignService.GetSignersByTemplete(idTemplate, contrato);
                     return Results.Ok(_result);
                 }

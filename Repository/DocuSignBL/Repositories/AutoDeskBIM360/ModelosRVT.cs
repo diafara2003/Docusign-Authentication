@@ -10,7 +10,7 @@ namespace Repository.AutoDesk.forgeAPI
     public class ModelosRVT
     {
 
-        public async Task<List<ExtraccionModeloRevitDTO>> ExtraerData(string urn, string TokenInternal, DerivativesApi derivatives)
+        public async Task<List<MigracionRevitDTO>> ExtraerData(string urn, string TokenInternal, DerivativesApi derivatives)
         {
 
             derivatives.Configuration.AccessToken = TokenInternal;
@@ -34,9 +34,12 @@ namespace Repository.AutoDesk.forgeAPI
             if (properties.data != null && properties.data.collection != null)
                 return MapExtraccionModeloRevit.Map(properties.data.collection, name, guid, version_document.FirstOrDefault().id, d);
             else 
-            return new List<ExtraccionModeloRevitDTO>();
+            return new List<MigracionRevitDTO>();
 
         }
+
+
+
 
 
     }

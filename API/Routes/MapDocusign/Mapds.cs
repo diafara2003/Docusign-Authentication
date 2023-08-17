@@ -10,7 +10,7 @@ namespace API.Routes.MapDocusign
             {
                 _docusignService.SaveTokenFile(code, _webHostEnvironment.ContentRootPath);
 
-                return Results.Ok("Se autentico en DocuSign correctamente, puede cerrar esta ventana.");
+                return Results.Ok("Se autenticó en DocuSign correctamente, puede cerrar esta ventana.");
             }).WithTags("Docusign Callback");
 
 
