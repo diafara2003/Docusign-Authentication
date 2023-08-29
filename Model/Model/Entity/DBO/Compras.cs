@@ -16,13 +16,13 @@ namespace Model.Entity.DBO
         public int CompNo { get; set; }
         public int CompProv { get; set; }
         public int CompSuc { get; set; }
-        public Int16 CompEstado { get; set; }
+        public byte CompEstado { get; set; }
         public int CompFormaPago { get; set; }
         public DateTime CompFecha { get; set; }
         public decimal CompTotalPagar { get; set; }
         public decimal CompTotalPagarMM { get; set; }
-        public Int16 CompEstadoReal { get; set; }
-        public Int16 CompMoneda { get; set; }
+        public byte CompEstadoReal { get; set; }
+        public byte CompMoneda { get; set; }
         public string CompSitioEnt { get; set; }
         public string CompDesc { get; set; }
         public DateTime CompFechaReq { get; set; }

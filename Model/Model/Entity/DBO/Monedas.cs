@@ -12,7 +12,7 @@ namespace Model.Entity.DBO
     public class Monedas
     {
         [Key]
-        public Int16 MonID { get; set; }
+        public byte MonID { get; set; }
         public string MonDesc { get; set; }
         public string MonAbrev { get; set; }
         public string MonSimbolo { get; set; }

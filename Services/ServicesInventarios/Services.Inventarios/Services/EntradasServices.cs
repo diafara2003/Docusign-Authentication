@@ -1,10 +1,12 @@
-﻿using Docusign.Repository.DataBase.Conexion;
+﻿using Autodesk.Forge.Model;
+using Docusign.Repository.DataBase.Conexion;
 using Microsoft.AspNetCore.Http;
 using Model.DTO.ComprasD;
 using Model.DTO.Inventarios;
 using Model.Entity.DBO;
 using Repository.DataBase.Conexion;
 using System.Data;
+using System.Text.RegularExpressions;
 
 namespace Services.Inventarios
 {
@@ -63,7 +65,7 @@ namespace Services.Inventarios
                             join CD in _contexto.comprasDet on C.CompID equals CD.CompDetCompras
                             where (T.TerNombre.Contains(filter) || T.TerID.ToString().Contains(filter))
                             && C.CompSuc.Equals(int.Parse(suc)) && (C.CompEstado.Equals(1) || C.CompEstado.Equals(2))
-                            select T).ToList() ?? new List<Terceros>();
+                            select T).ToList().GroupBy(x => x.TerID).Select(x => x.First()).ToList();
             }
 
             return terceros;
@@ -78,8 +80,8 @@ namespace Services.Inventarios
                 compras = (from C in _contexto.compras
                            join FP in _contexto.formaPago on C.CompFormaPago equals FP.FrPID
                            join M in _contexto.monedas on C.CompMoneda equals M.MonID
-                           where C.CompProv.Equals(proveedor) && C.CompSuc.Equals(suc) &&
-                                    (C.CompEstado.Equals(1) || C.CompEstado.Equals(2))
+                           where C.CompProv.Equals(int.Parse(proveedor)) && C.CompSuc.Equals(int.Parse(suc))
+                           && (C.CompEstado.Equals(1) || C.CompEstado.Equals(2))
 
                            select new ComprasDTO()
                            {
