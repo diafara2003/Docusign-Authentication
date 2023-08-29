@@ -22,11 +22,11 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy(origins,
         builder => builder
-        .WithOrigins("*")
+        //.WithOrigins("http://localhost:3000","*").
+        .AllowAnyOrigin()
         .AllowAnyMethod()
         .AllowAnyHeader());
 });
-
 
 builder.Services.AddAuthorization();
 
@@ -36,11 +36,12 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 //app.UseHttpsRedirection();
+app.UseCors(origins);
+
 app.UseRouting();
 
-app.UseCors(origins);
-//app.UseAuthentication();
-//app.UseAuthorization();
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseMiddleware(typeof(AuthenticationMiddleware));
 

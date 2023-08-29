@@ -1,6 +1,7 @@
 ﻿using API.Routes.MapAutodesk;
 using API.Routes.MapAutoDesk;
 using API.Routes.MapDocusign;
+using API.Routes.MapInventarios;
 using API.Routes.MapWeatherForecast;
 
 namespace API.Routes
@@ -12,6 +13,7 @@ namespace API.Routes
 
             app.RegisterDocusign();
             app.RegisterDocusignDS();
+            app.RegisterInventarios();
             app.RegisterWeatherForecast();
 
 

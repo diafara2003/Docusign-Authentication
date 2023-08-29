@@ -23,6 +23,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "API", "API", "{8BB94131-960
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "API", "API\API.csproj", "{D563F0AD-28B6-4937-82E9-985A4C14C73B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inventarios", "Services\ServicesInventarios\Services.Inventarios\Inventarios.csproj", "{83357599-1147-4AFD-940E-9C0743ADFF7F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,6 +51,10 @@ Global
 		{D563F0AD-28B6-4937-82E9-985A4C14C73B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D563F0AD-28B6-4937-82E9-985A4C14C73B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D563F0AD-28B6-4937-82E9-985A4C14C73B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{83357599-1147-4AFD-940E-9C0743ADFF7F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83357599-1147-4AFD-940E-9C0743ADFF7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83357599-1147-4AFD-940E-9C0743ADFF7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83357599-1147-4AFD-940E-9C0743ADFF7F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -59,6 +65,7 @@ Global
 		{8C24BED3-895E-4812-ADDA-4128D0870B15} = {67D93A5F-3D4E-4D34-83E5-3DECBC6742B1}
 		{7F69F4D9-94F2-44B7-B87F-8BA358A64293} = {C2DA2A8C-A3FE-4924-B8FB-F6578254236D}
 		{D563F0AD-28B6-4937-82E9-985A4C14C73B} = {8BB94131-960B-47D5-AA60-3871EA227D31}
+		{83357599-1147-4AFD-940E-9C0743ADFF7F} = {C2DA2A8C-A3FE-4924-B8FB-F6578254236D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B42C9A41-8425-48B6-9D44-238307F8002D}

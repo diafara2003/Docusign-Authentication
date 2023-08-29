@@ -14,7 +14,7 @@ namespace API.Routes.MapAutodesk
         private static Credentials Credentials { get; set; }
         public static void RegisterModelDerivative(this IEndpointRouteBuilder app)
         {
-            app.MapGet("/edt/BIM360/ModelDerivative/folder/info", async (HttpContext _httpContext, string ids = "") =>
+            app.MapGet("/edt/BIM360/ModelDerivative/folder/info", async (HttpContext _httpContext, string ids) =>
             {
                 string folder = ids.Split('/')[ids.Split('/').Length - 1];
                 string projectId = ids.Split('/')[6];
@@ -29,7 +29,7 @@ namespace API.Routes.MapAutodesk
                 return Results.Ok(new Tuple<FolferInfo, List<jsTreeNode>>(folfer, content));
             }).WithTags("AutoDesk");
 
-            app.MapGet("/EDT/BIM360/ModelDerivative/folder/model/properties", async (IBIM360Services bim, HttpContext _httpContext, string id = "") =>
+            app.MapGet("/EDT/BIM360/ModelDerivative/folder/model/properties", async (IBIM360Services bim, HttpContext _httpContext, string id) =>
             {
                 DerivativesApi derivatives = new DerivativesApi();
                 List<jsTreeNode> objlst = new List<jsTreeNode>();
