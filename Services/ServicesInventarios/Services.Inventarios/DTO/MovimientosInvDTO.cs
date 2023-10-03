@@ -10,6 +10,11 @@ namespace Model.DTO.Inventarios
 {
     public class MovimientosInvDTO
     {
+        public MovimientosInvDTO()
+        {
+            this.movimientosInv = new MovimientosInv();
+            this.comprasDet = new ComprasDetDTO();
+        }
         public MovimientosInv movimientosInv { get; set; }
         public ComprasDetDTO comprasDet { get; set; }
         public int DevAsociada { get; set; }
