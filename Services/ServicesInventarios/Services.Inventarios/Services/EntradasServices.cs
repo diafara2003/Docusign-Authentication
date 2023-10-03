@@ -53,6 +53,7 @@ namespace Services.Inventarios
             return configEntradas;
         }
 
+
         public List<Terceros> TercerosEntradas(string filter, string suc)
         {
             List<Terceros> terceros = new List<Terceros>();
