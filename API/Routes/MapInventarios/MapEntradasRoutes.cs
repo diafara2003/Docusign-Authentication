@@ -85,7 +85,7 @@ namespace API.Routes.MapInventarios
                 {
 
                     data.EnAReciboNo = HttpUtility.UrlDecode(data.EnAReciboNo);
-                    var mov = data.Detalle.movimientosInv;
+                    var mov = data.movimientosInv;
                     var encoding = Encoding.GetEncoding("ISO-8859-1");
                     System.Xml.Serialization.XmlSerializer Encabezado = new System.Xml.Serialization.XmlSerializer(data.GetType()); ;
                     XmlWriterSettings xmlWriterSettings = new XmlWriterSettings

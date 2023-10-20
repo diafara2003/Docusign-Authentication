@@ -37,9 +37,9 @@ namespace Model.DTO.Inventarios
     {
         public GuardarEntradaDTO()
         {
-            this.Detalle = new MovimientosInvDTO();
+            this.movimientosInv = new MovimientosInv();
         }
-        public MovimientosInvDTO Detalle { get; set; }
+        public MovimientosInv movimientosInv { get; set; }
 
         public int EnAID { get; set; }
         public int EnANo { get; set; }

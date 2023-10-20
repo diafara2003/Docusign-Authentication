@@ -287,15 +287,15 @@ namespace Services.Inventarios
                 parametros.Add("IdCompra", data.EnAOC);
                 parametros.Add("IdBodega", data.Bodega);
                 parametros.Add("XmlEncabezadoEA", XmlEncabezadoEA);
-                parametros.Add("IdDetOC", data.Detalle.movimientosInv.MvICompDetID);
-                parametros.Add("IdMov", data.Detalle.movimientosInv.MvIID);
-                parametros.Add("CantEA", data.Detalle.movimientosInv.MvICant);
-                parametros.Add("VrUnitEA", data.Detalle.movimientosInv.MvIVrUnit);
+                parametros.Add("IdDetOC", data.movimientosInv.MvICompDetID);
+                parametros.Add("IdMov", data.movimientosInv.MvIID);
+                parametros.Add("CantEA", data.movimientosInv.MvICant);
+                parametros.Add("VrUnitEA", data.movimientosInv.MvIVrUnit);
                 parametros.Add("SoloEncabezado", data.SoloEncabezado);
                 parametros.Add("IdUsuario", data.EnAUsu);
                 parametros.Add("FechaMin", data.FechaMin);
-                parametros.Add("VrBaseIva", data.Detalle.movimientosInv.MvIBaseIvaDiff);
-                parametros.Add("VrBaseIva2", data.Detalle.movimientosInv.MvIBaseIvaDiff2);
+                parametros.Add("VrBaseIva", data.movimientosInv.MvIBaseIvaDiff);
+                parametros.Add("VrBaseIva2", data.movimientosInv.MvIBaseIvaDiff2);
 
                 var resultado = new DB_Execute().ExecuteStoreQuery(_httpContextAccessor, new Repository.DataBase.Model.ProcedureDTO()
                 {
