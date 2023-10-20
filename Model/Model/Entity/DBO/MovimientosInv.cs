@@ -15,6 +15,10 @@ namespace Model.Entity.DBO
         public decimal MvICant { get; set; }
         public decimal MvIVrUnitMM { get; set; }
         public decimal MvIVrTotal { get; set; }
-        public decimal MvIVrTotalMM { get; set; }      
+        public decimal MvIVrTotalMM { get; set; }
+        public decimal MvIBaseIvaDiff { get; set; }
+        public decimal MvIBaseIvaDiff2 { get; set; }
+        public int MvIBodega { get; set; }
+        public int MvICompDetID { get; set; }
     }
 }

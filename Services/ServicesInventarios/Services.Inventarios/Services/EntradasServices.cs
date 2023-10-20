@@ -2,6 +2,7 @@
 using Docusign.Repository.DataBase.Conexion;
 using Inventarios.DTO;
 using Microsoft.AspNetCore.Http;
+using Model.DTO;
 using Model.DTO.ComprasD;
 using Model.DTO.Inventarios;
 using Model.Entity.DBO;
@@ -18,6 +19,7 @@ namespace Services.Inventarios
         List<Terceros> TercerosEntradas(string filter, string suc);
         List<ComprasDTO> ComprasProveedor(string proveedor, string suc);
         DetalllesOCEADTO ConsultaDetallesOC(string compra, string suc);
+        EntradaAlmacenDTO GuardarEntrada(GuardarEntradaDTO data, string XmlEncabezadoEA);
     }
     public class EntradasServices : IEntradasService
     {
@@ -80,7 +82,7 @@ namespace Services.Inventarios
                                          BoSDescripcion = (string)data["BoSDescripcion"],
                                          BoSId = (int)data["BoSId"],
                                          BoSucursal = (short)data["BoSucursal"]
-                                     }, 
+                                     },
                                      FechaMaxMov = (string)data["FechaMaxMov"]
                                  }).ToList();
 
@@ -267,6 +269,61 @@ namespace Services.Inventarios
             {
                 dataRespuesta.Encabezado = new EntradaAlmacenDTO();
                 dataRespuesta.Detalles = new List<MovimientosInvDTO>();
+            }
+
+            return dataRespuesta;
+        }
+
+        public EntradaAlmacenDTO GuardarEntrada(GuardarEntradaDTO data, string XmlEncabezadoEA)
+        {
+            EntradaAlmacenDTO dataRespuesta = new EntradaAlmacenDTO();
+            Dictionary<string, object> parametros = new Dictionary<string, object>();
+
+            try
+            {
+                parametros.Add("IdEntrada", data.EnAID);
+                parametros.Add("IdSucursal", data.EnASuc);
+                parametros.Add("IdCompra", data.EnAOC);
+                parametros.Add("IdBodega", data.Bodega);
+                parametros.Add("XmlEncabezadoEA", XmlEncabezadoEA);
+                parametros.Add("IdDetOC", data.Detalle.movimientosInv.MvICompDetID);
+                parametros.Add("IdMov", data.Detalle.movimientosInv.MvIID);
+                parametros.Add("CantEA", data.Detalle.movimientosInv.MvICant);
+                parametros.Add("VrUnitEA", data.Detalle.movimientosInv.MvIVrUnit);
+                parametros.Add("SoloEncabezado", data.SoloEncabezado);
+                parametros.Add("IdUsuario", data.EnAUsu);
+                parametros.Add("FechaMin", data.FechaMin);
+                parametros.Add("VrBaseIva", data.Detalle.movimientosInv.MvIBaseIvaDiff);
+                parametros.Add("VrBaseIva2", data.Detalle.movimientosInv.MvIBaseIvaDiff2);
+
+                var resultado = new DB_Execute().ExecuteStoreQuery(_httpContextAccessor, new Repository.DataBase.Model.ProcedureDTO()
+                {
+                    commandText = "[ADP_API_EA].[GuardaEntradaAlmacen]",
+                    parametros = parametros
+                });
+
+                dataRespuesta = (from datalq in resultado.AsEnumerable()
+                                 select new EntradaAlmacenDTO()
+                                 {
+                                     entrada = new ADPEntradasAlmacen()
+                                     {
+
+                                         EnAID = (int)datalq["IdEntrada"],
+                                         EnANo = (int)datalq["NoEntrada"]
+                                     },
+                                     Respuesta = new ResponseV3DTO()
+                                     {
+                                         codigo = (int)datalq["Codigo"],
+                                         mensaje = (string)datalq["Mensaje"],
+                                         OtroValor = Convert.ToString((int)datalq["IdMov"])
+                                     }
+                                 }).FirstOrDefault();
+
+
+            }
+            catch (Exception e)
+            {
+                dataRespuesta = new EntradaAlmacenDTO();
             }
 
             return dataRespuesta;

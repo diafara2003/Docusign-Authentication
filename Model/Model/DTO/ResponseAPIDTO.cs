@@ -22,7 +22,7 @@ namespace Model.DTO
         public string mensaje { get; set; }
         public decimal diferencia { get; set; }
         public string id { get; set; }
-        public string OtroValor { get; set; }
+        public string OtroValor { get; set; } = string.Empty;
         public decimal valor { get; set; }
         public int Tipomigracion { get; set; }
         public int TipoM { get; set; }
