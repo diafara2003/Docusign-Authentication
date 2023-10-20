@@ -1,5 +1,6 @@
 ﻿using Autodesk.Forge.Model;
 using Docusign.Repository.DataBase.Conexion;
+using Inventarios.DTO;
 using Microsoft.AspNetCore.Http;
 using Model.DTO.ComprasD;
 using Model.DTO.Inventarios;
@@ -13,6 +14,7 @@ namespace Services.Inventarios
     public interface IEntradasService
     {
         List<ADPConfig> ConfigEntradas();
+        List<BodegasSucursalDTO> ConsultaBodegas(string suc, string usuario);
         List<Terceros> TercerosEntradas(string filter, string suc);
         List<ComprasDTO> ComprasProveedor(string proveedor, string suc);
         DetalllesOCEADTO ConsultaDetallesOC(string compra, string suc);
@@ -51,6 +53,44 @@ namespace Services.Inventarios
             };
 
             return configEntradas;
+        }
+
+        public List<BodegasSucursalDTO> ConsultaBodegas(string suc, string usuario)
+        {
+            List<BodegasSucursalDTO> dataRespuesta = new List<BodegasSucursalDTO>();
+            Dictionary<string, object> parametros = new Dictionary<string, object>();
+
+            try
+            {
+                parametros.Add("suc", suc);
+                parametros.Add("usuario", usuario);
+
+                var resultado = new DB_Execute().ExecuteStoreQuery(_httpContextAccessor, new Repository.DataBase.Model.ProcedureDTO()
+                {
+                    commandText = "[ADP_API_INV].[BodegasSucursalXUsuario]",
+                    parametros = parametros
+                });
+
+                dataRespuesta = (from data in resultado.AsEnumerable()
+                                 select new BodegasSucursalDTO()
+                                 {
+                                     Bodega = new BodegasSucursal()
+                                     {
+                                         BoSAutoNum = (int)data["BoSAutoNum"],
+                                         BoSDescripcion = (string)data["BoSDescripcion"],
+                                         BoSId = (int)data["BoSId"],
+                                         BoSucursal = (short)data["BoSucursal"]
+                                     }, 
+                                     FechaMaxMov = (string)data["FechaMaxMov"]
+                                 }).ToList();
+
+            }
+            catch (Exception e)
+            {
+                dataRespuesta = new List<BodegasSucursalDTO>();
+            }
+
+            return dataRespuesta;
         }
 
 
@@ -124,97 +164,97 @@ namespace Services.Inventarios
                 });
 
                 var datosEncabezado = (from dataLiq in resultado.AsEnumerable()
-                                                     select new EntradaAlmacenDTO()
-                                                     {
-                                                         entrada = new ADPEntradasAlmacen()
-                                                         {
-                                                             EnAID = (int)dataLiq["IdEntrada"],
-                                                             EnANo = (int)dataLiq["IdEntrada"],
-                                                             EnAFecha = DateTime.Parse((string)dataLiq["EnaFecha"]),
-                                                             EnAFechaFac = DateTime.Parse((string)dataLiq["EnaFecha"]),
-                                                             EnAFechaReciboNo = DateTime.Parse((string)dataLiq["EnaFecha"]),
-                                                             EnAObra = (int)dataLiq["ObrObra"]
-                                                         },
-                                                         compra = new ComprasDTO()
-                                                         {
-                                                             compra = new Compras()
-                                                             {
-                                                                 CompID = (int)dataLiq["CompId"],
-                                                                 CompNo = (int)dataLiq["CompNo"],
-                                                                 CompObs = (string)dataLiq["CompObs"],
-                                                                 CompSitioEnt = (string)dataLiq["CompSitioEnt"],
-                                                                 CompDesc = (string)dataLiq["CompDesc"],
-                                                                 CompProv = (int)dataLiq["CompProv"],
-                                                                 CompTotalPagar = (decimal)dataLiq["CompTotalPagarMM"],
-                                                                 CompFechaReq = DateTime.Parse((string)dataLiq["CompFechaReq"]),
-                                                                 CompMonedaTC = (decimal)dataLiq["CompMonedaTC"]
-                                                             },
-                                                             sucursal = new Sucursal()
-                                                             {
-                                                                 SucID = (short)dataLiq["CompSuc"],
-                                                                 SucDesc = (string)dataLiq["SucDesc"]
-                                                             },
-                                                             EstadoOrden = new EstadoOrdenCompraDTO()
-                                                             {
-                                                                 EOrID = (byte)dataLiq["CompEstado"],
-                                                                 EOrDesc = (string)dataLiq["EOrDesc"]
-                                                             },
-                                                             moneda = new Monedas()
-                                                             {
-                                                                 MonDesc = (string)dataLiq["MonDesc"],
-                                                                 MonAbrev = (string)dataLiq["MonAbrev"]
-                                                             },
-                                                             terceros = _contexto.tercero.Find((int)dataLiq["CompProv"])
+                                       select new EntradaAlmacenDTO()
+                                       {
+                                           entrada = new ADPEntradasAlmacen()
+                                           {
+                                               EnAID = (int)dataLiq["IdEntrada"],
+                                               EnANo = (int)dataLiq["IdEntrada"],
+                                               EnAFecha = DateTime.Parse((string)dataLiq["EnaFecha"]),
+                                               EnAFechaFac = DateTime.Parse((string)dataLiq["EnaFecha"]),
+                                               EnAFechaReciboNo = DateTime.Parse((string)dataLiq["EnaFecha"]),
+                                               EnAObra = (int)dataLiq["ObrObra"]
+                                           },
+                                           compra = new ComprasDTO()
+                                           {
+                                               compra = new Compras()
+                                               {
+                                                   CompID = (int)dataLiq["CompId"],
+                                                   CompNo = (int)dataLiq["CompNo"],
+                                                   CompObs = (string)dataLiq["CompObs"],
+                                                   CompSitioEnt = (string)dataLiq["CompSitioEnt"],
+                                                   CompDesc = (string)dataLiq["CompDesc"],
+                                                   CompProv = (int)dataLiq["CompProv"],
+                                                   CompTotalPagar = (decimal)dataLiq["CompTotalPagarMM"],
+                                                   CompFechaReq = DateTime.Parse((string)dataLiq["CompFechaReq"]),
+                                                   CompMonedaTC = (decimal)dataLiq["CompMonedaTC"]
+                                               },
+                                               sucursal = new Sucursal()
+                                               {
+                                                   SucID = (short)dataLiq["CompSuc"],
+                                                   SucDesc = (string)dataLiq["SucDesc"]
+                                               },
+                                               EstadoOrden = new EstadoOrdenCompraDTO()
+                                               {
+                                                   EOrID = (byte)dataLiq["CompEstado"],
+                                                   EOrDesc = (string)dataLiq["EOrDesc"]
+                                               },
+                                               moneda = new Monedas()
+                                               {
+                                                   MonDesc = (string)dataLiq["MonDesc"],
+                                                   MonAbrev = (string)dataLiq["MonAbrev"]
+                                               },
+                                               terceros = _contexto.tercero.Find((int)dataLiq["CompProv"])
 
-                                                         }
-                                                     }).FirstOrDefault();
+                                           }
+                                       }).FirstOrDefault();
 
                 dataRespuesta.Encabezado = datosEncabezado;
 
                 if (dataRespuesta.Encabezado != null)
                 {
                     var datosDetalles = (from data in resultado.AsEnumerable()
-                                                             select new MovimientosInvDTO()
-                                                             {
-                                                                 movimientosInv = new MovimientosInv()
-                                                                 {
-                                                                     MvIID = (int)data["DetEA"],
-                                                                     MvIVrUnitMM = (decimal)data["CompDetUnitarioMM"],
-                                                                     MvICant = (decimal)data["CantDetEA"],
-                                                                     MvIVrTotalMM = (decimal)data["VrTotalEA"]
-                                                                 },
-                                                                 comprasDet = new ComprasDetDTO()
-                                                                 {
-                                                                     comprasDet = new ComprasDet()
-                                                                     {
-                                                                         CompDetID = (int)data["CompDetID"],
-                                                                         CompDetCompras = (int)data["CompId"],
-                                                                         CompDetFechaReq = DateTime.Parse((string)data["CompDetFechaReq"]),
-                                                                         CompDetCant = (decimal)data["CompDetCant"],
-                                                                         CompDetUnitarioMM = (decimal)data["CompDetUnitarioMM"],
-                                                                         CompDetIVA = (decimal)data["CompDetIVA"],
-                                                                         CompDetBaseIvaDiff = (decimal)data["CompDetBaseIvaDiff"],
-                                                                         CompDetBaseIvaDiff2 = (decimal)data["CompDetBaseIvaDiff2"]
-                                                                     },
-                                                                     producto = new Producto()
-                                                                     {
-                                                                         ProCod = (int)data["ProCod"],
-                                                                         ProDesc = (string)data["ProDesc"],
-                                                                         ProUnidadCont = (string)data["ProUnidadCont"],
-                                                                         ProStockMinimo = (decimal)data["ProStockMinimo"],
-                                                                         ProCodBIM = (string)data["ProCodBIM"]
+                                         select new MovimientosInvDTO()
+                                         {
+                                             movimientosInv = new MovimientosInv()
+                                             {
+                                                 MvIID = (int)data["DetEA"],
+                                                 MvIVrUnitMM = (decimal)data["CompDetUnitarioMM"],
+                                                 MvICant = (decimal)data["CantDetEA"],
+                                                 MvIVrTotalMM = (decimal)data["VrTotalEA"]
+                                             },
+                                             comprasDet = new ComprasDetDTO()
+                                             {
+                                                 comprasDet = new ComprasDet()
+                                                 {
+                                                     CompDetID = (int)data["CompDetID"],
+                                                     CompDetCompras = (int)data["CompId"],
+                                                     CompDetFechaReq = DateTime.Parse((string)data["CompDetFechaReq"]),
+                                                     CompDetCant = (decimal)data["CompDetCant"],
+                                                     CompDetUnitarioMM = (decimal)data["CompDetUnitarioMM"],
+                                                     CompDetIVA = (decimal)data["CompDetIVA"],
+                                                     CompDetBaseIvaDiff = (decimal)data["CompDetBaseIvaDiff"],
+                                                     CompDetBaseIvaDiff2 = (decimal)data["CompDetBaseIvaDiff2"]
+                                                 },
+                                                 producto = new Producto()
+                                                 {
+                                                     ProCod = (int)data["ProCod"],
+                                                     ProDesc = (string)data["ProDesc"],
+                                                     ProUnidadCont = (string)data["ProUnidadCont"],
+                                                     ProStockMinimo = (decimal)data["ProStockMinimo"],
+                                                     ProCodBIM = (string)data["ProCodBIM"]
 
-                                                                     },
+                                                 },
 
-                                                                     BIDIFF = Convert.ToBoolean((int)data["BIDIFF"])
-                                                                 },
-                                                                 DevAsociada = (int)data["DevAsoc"],
-                                                                 CantidadPendiente = (decimal)data["CantPendiente"],
-                                                                 CantMax = (decimal)data["CantMax"],
-                                                                 CantMin = (decimal)data["CantMin"],
-                                                                 CantInv = (decimal)data["CantInv"]
+                                                 BIDIFF = Convert.ToBoolean((int)data["BIDIFF"])
+                                             },
+                                             DevAsociada = (int)data["DevAsoc"],
+                                             CantidadPendiente = (decimal)data["CantPendiente"],
+                                             CantMax = (decimal)data["CantMax"],
+                                             CantMin = (decimal)data["CantMin"],
+                                             CantInv = (decimal)data["CantInv"]
 
-                                                             }).ToList();
+                                         }).ToList();
 
                     dataRespuesta.Detalles = datosDetalles;
                 }

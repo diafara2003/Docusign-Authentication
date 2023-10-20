@@ -1,4 +1,5 @@
-﻿using Model.DTO.ComprasD;
+﻿using Inventarios.DTO;
+using Model.DTO.ComprasD;
 using Model.DTO.Inventarios;
 using Model.Entity.DBO;
 using Services.Inventarios;
@@ -21,6 +22,20 @@ namespace API.Routes.MapInventarios
                     return Results.Ok(e.Message);
                 }
             }).WithTags("Entradas");
+
+            app.MapGet("/Entradas/Bodega", (IEntradasService _entradasService, string suc, string usuario) =>
+            {
+                try
+                {
+                    List<BodegasSucursalDTO> bodegas = _entradasService.ConsultaBodegas(suc, usuario);
+                    return Results.Ok(bodegas);
+                }
+                catch (Exception e)                             
+                {
+                    return Results.Ok(e.Message);
+                }
+            }).WithTags("Entradas");
+
 
             app.MapGet("/Entradas/Proveedor", (IEntradasService _entradasService, string filter, string suc) =>
             {
