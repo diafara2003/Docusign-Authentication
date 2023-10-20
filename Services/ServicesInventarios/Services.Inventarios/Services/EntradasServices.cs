@@ -64,7 +64,7 @@ namespace Services.Inventarios
                             join C in _contexto.compras on T.TerID equals C.CompProv
                             join FP in _contexto.formaPago on C.CompFormaPago equals FP.FrPID
                             join CD in _contexto.comprasDet on C.CompID equals CD.CompDetCompras
-                            where (T.TerNombre.Contains(filter) || T.TerID.ToString().Contains(filter))
+                            where (T.TerNombre.Contains(filter) || T.TerID.ToString().Contains(filter) || (T.TerID.ToString() + " - " + T.TerNombre).Contains(filter))
                             && C.CompSuc.Equals(int.Parse(suc)) && (C.CompEstado.Equals(1) || C.CompEstado.Equals(2))
                             select T).ToList().GroupBy(x => x.TerID).Select(x => x.First()).ToList();
             }
