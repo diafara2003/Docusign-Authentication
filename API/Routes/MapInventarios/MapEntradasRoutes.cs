@@ -30,7 +30,7 @@ namespace API.Routes.MapInventarios
                     List<BodegasSucursalDTO> bodegas = _entradasService.ConsultaBodegas(suc, usuario);
                     return Results.Ok(bodegas);
                 }
-                catch (Exception e)
+                catch (Exception e)                             
                 {
                     return Results.Ok(e.Message);
                 }
