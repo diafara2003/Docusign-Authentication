@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace Model.DTO.Inventarios
 {
-    public class EntradaAlmacenDTO
+    public class EntradaAlmacenTableDTO
     {
-        public EntradaAlmacenDTO()
+        public EntradaAlmacenTableDTO()
         {
             this.entrada = new ADPEntradasAlmacen();
             this.compra = new ComprasDTO();
@@ -26,16 +26,16 @@ namespace Model.DTO.Inventarios
     {
         public DetalllesOCEADTO()
         {
-            this.Encabezado = new EntradaAlmacenDTO();
+            this.Encabezado = new EntradaAlmacenTableDTO();
             this.Detalles = new List<MovimientosInvDTO>();
         }
-        public EntradaAlmacenDTO Encabezado { get; set; }
+        public EntradaAlmacenTableDTO Encabezado { get; set; }
         public List<MovimientosInvDTO> Detalles { get; set; }
     }
 
-    public class GuardarEntradaDTO 
+    public class EntradaAlmacenDTO
     {
-        public GuardarEntradaDTO()
+        public EntradaAlmacenDTO()
         {
             this.movimientosInv = new MovimientosInv();
         }

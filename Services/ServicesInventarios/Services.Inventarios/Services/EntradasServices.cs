@@ -19,7 +19,7 @@ namespace Services.Inventarios
         List<Terceros> TercerosEntradas(string filter, string suc);
         List<ComprasDTO> ComprasProveedor(string proveedor, string suc);
         DetalllesOCEADTO ConsultaDetallesOC(string compra, string suc);
-        EntradaAlmacenDTO GuardarEntrada(GuardarEntradaDTO data, string XmlEncabezadoEA);
+        EntradaAlmacenTableDTO GuardarEntrada(EntradaAlmacenDTO data, string XmlEncabezadoEA);
     }
     public class EntradasServices : IEntradasService
     {
@@ -166,7 +166,7 @@ namespace Services.Inventarios
                 });
 
                 var datosEncabezado = (from dataLiq in resultado.AsEnumerable()
-                                       select new EntradaAlmacenDTO()
+                                       select new EntradaAlmacenTableDTO()
                                        {
                                            entrada = new ADPEntradasAlmacen()
                                            {
@@ -268,16 +268,16 @@ namespace Services.Inventarios
             }
             catch (Exception e)
             {
-                dataRespuesta.Encabezado = new EntradaAlmacenDTO();
+                dataRespuesta.Encabezado = new EntradaAlmacenTableDTO();
                 dataRespuesta.Detalles = new List<MovimientosInvDTO>();
             }
 
             return dataRespuesta;
         }
 
-        public EntradaAlmacenDTO GuardarEntrada(GuardarEntradaDTO data, string XmlEncabezadoEA)
+        public EntradaAlmacenTableDTO GuardarEntrada(EntradaAlmacenDTO data, string XmlEncabezadoEA)
         {
-            EntradaAlmacenDTO dataRespuesta = new EntradaAlmacenDTO();
+            EntradaAlmacenTableDTO dataRespuesta = new EntradaAlmacenTableDTO();
             Dictionary<string, object> parametros = new Dictionary<string, object>();
 
             try
@@ -304,7 +304,7 @@ namespace Services.Inventarios
                 });
 
                 dataRespuesta = (from datalq in resultado.AsEnumerable()
-                                 select new EntradaAlmacenDTO()
+                                 select new EntradaAlmacenTableDTO()
                                  {
                                      entrada = new ADPEntradasAlmacen()
                                      {
@@ -324,7 +324,7 @@ namespace Services.Inventarios
             }
             catch (Exception e)
             {
-                dataRespuesta = new EntradaAlmacenDTO();
+                dataRespuesta = new EntradaAlmacenTableDTO();
             }
 
             return dataRespuesta;

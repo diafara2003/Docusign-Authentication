@@ -79,7 +79,7 @@ namespace API.Routes.MapInventarios
                 }
             }).WithTags("Entradas");
 
-            app.MapPut("/Entradas/Guarda", (IEntradasService _entradasService, GuardarEntradaDTO data) =>
+            app.MapPut("/Entradas/Guarda", (IEntradasService _entradasService, EntradaAlmacenDTO data) =>
             {
                 try
                 {
@@ -102,7 +102,7 @@ namespace API.Routes.MapInventarios
                             Encabezado.Serialize(xmlWriter, data);
                         }
 
-                        EntradaAlmacenDTO response = _entradasService.GuardarEntrada(data, encoding.GetString(stream.ToArray()));
+                        EntradaAlmacenTableDTO response = _entradasService.GuardarEntrada(data, encoding.GetString(stream.ToArray()));
                         return Results.Ok(response);
                     }
                     
