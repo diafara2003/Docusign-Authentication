@@ -3,6 +3,9 @@ using Model.DTO.ComprasD;
 using Model.DTO.Inventarios;
 using Model.Entity.DBO;
 using Services.Inventarios;
+using System.Text;
+using System.Web;
+using System.Xml;
 
 namespace API.Routes.MapInventarios
 {
@@ -75,6 +78,41 @@ namespace API.Routes.MapInventarios
                     return Results.Ok(e.Message);
                 }
             }).WithTags("Entradas");
+
+            app.MapPut("/Entradas/Guarda", (IEntradasService _entradasService, GuardarEntradaDTO data) =>
+            {
+                try
+                {
+
+                    data.EnAReciboNo = HttpUtility.UrlDecode(data.EnAReciboNo);
+                    var mov = data.movimientosInv;
+                    var encoding = Encoding.GetEncoding("ISO-8859-1");
+                    System.Xml.Serialization.XmlSerializer Encabezado = new System.Xml.Serialization.XmlSerializer(data.GetType()); ;
+                    XmlWriterSettings xmlWriterSettings = new XmlWriterSettings
+                    {
+                        Indent = true,
+                        OmitXmlDeclaration = false,
+                        Encoding = encoding
+                    };
+
+                    using (var stream = new MemoryStream())
+                    {
+                        using (var xmlWriter = XmlWriter.Create(stream, xmlWriterSettings))
+                        {
+                            Encabezado.Serialize(xmlWriter, data);
+                        }
+
+                        EntradaAlmacenDTO response = _entradasService.GuardarEntrada(data, encoding.GetString(stream.ToArray()));
+                        return Results.Ok(response);
+                    }
+                    
+                }
+                catch (Exception e)
+                {
+                    return Results.Ok(e.Message);
+                }
+            }).WithTags("Entradas");
+
         }
     }
 }
