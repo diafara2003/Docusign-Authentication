@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using System.Data.Common;
 using System.Data.SqlClient;
 
 using Microsoft.AspNetCore.Http;
@@ -24,7 +25,13 @@ namespace Docusign.Repository.DataBase.Conexion
         public DbSet<TercerosContactos> tercerosContactos { get; set; }
         public DbSet<TiposContacto> tiposContacto { get; set; }
         public DbSet<ADPObras> obra { get; set; }
-
+        public DbSet<Compras> compras { get; set; }
+        public DbSet<FormaPago> formaPago { get; set; }
+        public DbSet<ComprasDet> comprasDet { get; set; }
+        public DbSet<MovimientosInv> movimientosInv { get; set; }
+        public DbSet<Monedas> monedas { get; set; }
+        public DbSet<Sucursal> sucursal { get; set; }
+        public DbSet<Producto> producto { get; set; }
         #endregion
 
 
@@ -57,6 +64,7 @@ namespace Docusign.Repository.DataBase.Conexion
             //  ConstantesEntornoEstaticas.MigracionesAplicadasBD.Add(cliente.InitialCatalog);
         }
 
+
         protected override void OnConfiguring(DbContextOptionsBuilder options)
         {
 
@@ -66,7 +74,7 @@ namespace Docusign.Repository.DataBase.Conexion
             options.UseSqlServer($"{contextoActual.CadenaConexion};TrustServerCertificate=True");
         }
 
-      
+
 
     }
 

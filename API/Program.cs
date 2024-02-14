@@ -28,7 +28,6 @@ builder.Services.AddCors(options =>
         .AllowAnyHeader());
 });
 
-
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
@@ -42,6 +41,8 @@ app.UseSwaggerUI();
 app.UseCors(origins);
 
 //app.UseHttpsRedirection();
+app.UseCors(origins);
+
 app.UseRouting();
 
 app.UseAuthentication();

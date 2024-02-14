@@ -26,4 +26,8 @@
     <ProjectReference Include="..\..\Utilidades\Utilidades\Utilidades.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Repositories\Inventarios\" />
+  </ItemGroup>
+
 </Project>
