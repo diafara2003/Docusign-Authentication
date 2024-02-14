@@ -14,7 +14,7 @@ namespace Docusign.Repository.Peticion
 
     public interface IPeticionDocusignAuth
     {
-        Task<DocusignAuthDTO> GetAccesToken(string code);
+        Task<DocusignAuthDTO> GetAccesToken(string key,string code);
     }
 
 
@@ -26,11 +26,11 @@ namespace Docusign.Repository.Peticion
             this._configuration = configuration;
 
         }
-        public async Task<DocusignAuthDTO> GetAccesToken(string code)
+        public async Task<DocusignAuthDTO> GetAccesToken(string key, string code)
         {
             HttpMessageHandler handler = new HttpClientHandler();
-            string clientId = _configuration["DocuSign_Coninsa:ClientId"];
-            string ClientSecret = _configuration["DocuSign_Coninsa:ClientSecret"];
+            string clientId = _configuration[$"DocuSign_{key}:ClientId"];
+            string ClientSecret = _configuration[$"DocuSign_{key}:ClientSecret"];
 
 
             var httpClient = new HttpClient(handler)
