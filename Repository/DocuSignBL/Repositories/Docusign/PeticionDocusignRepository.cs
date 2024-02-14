@@ -188,13 +188,13 @@ namespace Docusign.Repository.Peticion
         public AuthenticationDTO validationAuthentication()
         {
             AuthenticationDTO auth = new AuthenticationDTO();
-
+            string empresa = contexto.adpconfig.Where(c => c.CnfCodigo == "Name_id_docusign").FirstOrDefault().CnfValor;
 
             var host = httpContextAccessor.HttpContext.Request.Host.Value;
             var path = httpContextAccessor.HttpContext.Request.PathBase.Value;
             string callback = "";
 
-            callback = $"https://{host}{path}/ds/callback".Replace("/", "%2F").Replace(":", "%3A");
+            callback = $"https://{host}{path}/ds/{empresa}/callback".Replace("/", "%2F").Replace(":", "%3A");
 
 
             string client_id = contexto.adpconfig.Where(c => c.CnfCodigo == "Client_id_docusign").FirstOrDefault().CnfValor;

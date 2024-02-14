@@ -6,7 +6,7 @@ namespace API.Routes.MapDocusign
     {
         public static void RegisterDocusignDS(this IEndpointRouteBuilder app)
         {
-            app.MapGet("/ds/callback/{id}", (HttpRequest request, IDocusignCallbackService _docusignService, IWebHostEnvironment _webHostEnvironment, string code) =>
+            app.MapGet("/ds/{id}/callback/", (HttpRequest request, IDocusignCallbackService _docusignService, IWebHostEnvironment _webHostEnvironment, string code) =>
             {
                 string key = (request.RouteValues["id"] ?? "").ToString();
 

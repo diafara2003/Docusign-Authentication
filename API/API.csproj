@@ -22,7 +22,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Repository\DocuSignBL\Repository.csproj" />
-    <ProjectReference Include="..\Services\ServicesInventarios\Services.Inventarios\Inventarios.csproj" />
     <ProjectReference Include="..\Services\Services\Services.csproj" />
   </ItemGroup>
 

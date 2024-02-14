@@ -4,7 +4,7 @@ using Docusign.Services;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Repository.DataBase.Model;
 using Services.BIM360Services;
-using Services.Inventarios;
+//using Services.Inventarios;
 
 namespace API.RegisterInterface
 {
@@ -24,7 +24,7 @@ namespace API.RegisterInterface
 
             builder.AddScoped<IDocusignService, DocusignService>();
 
-            builder.AddScoped<IEntradasService, EntradasServices>();
+         //  builder.AddScoped<IEntradasService, EntradasServices>();
         }
     }
 }
