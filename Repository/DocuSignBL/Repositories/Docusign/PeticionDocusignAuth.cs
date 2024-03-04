@@ -46,9 +46,6 @@ namespace Docusign.Repository.Peticion
 
             HttpResponseMessage response = new HttpResponseMessage();
 
-
-
-
             var data = new[]
 {
     new KeyValuePair<string, string>("grant_type", "authorization_code"),
