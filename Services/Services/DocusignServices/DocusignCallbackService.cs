@@ -5,12 +5,13 @@ using Model.DTO.Docusign;
 using Newtonsoft.Json;
 using System.IO;
 using System.Threading.Tasks;
+using static System.Runtime.CompilerServices.RuntimeHelpers;
 
 namespace Docusign.Services
 {
     public interface IDocusignCallbackService
     {
-        void SaveTokenFile(string code, string root);
+        void SaveTokenFile(string key,string code, string root);
 
         string GetNameFile();
 
@@ -37,10 +38,10 @@ namespace Docusign.Services
             return rutaRequest.ToLower();
         }
 
-        public async void SaveTokenFile(string code, string root)
+        public async void SaveTokenFile(string key,string code, string root)
         {
             string name = GetNameFile();
-            var access = await _peticionDocusignAuth.GetAccesToken(code);
+            var access = await _peticionDocusignAuth.GetAccesToken(key,code);
             string ruta = $"{root}\\token\\";
 
 

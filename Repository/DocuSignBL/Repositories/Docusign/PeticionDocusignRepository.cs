@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http.Headers;
 using System.Reflection.Metadata;
+using Microsoft.Extensions.Configuration;
 
 namespace Docusign.Repository.Peticion
 {
@@ -40,10 +41,12 @@ namespace Docusign.Repository.Peticion
     {
         private DB_ADPRO contexto;
         private IHttpContextAccessor httpContextAccessor;
-        public PeticionDocusignRepository(DB_ADPRO _contexto, IHttpContextAccessor _httpContextAccessor)
+        private IConfiguration configuration;
+        public PeticionDocusignRepository(DB_ADPRO _contexto, IHttpContextAccessor _httpContextAccessor, IConfiguration _configuration)
         {
             this.contexto = _contexto;
             this.httpContextAccessor = _httpContextAccessor;
+            this.configuration = _configuration;
         }
 
         public async Task<dynamic> FileToPDF(string filePath)
@@ -91,7 +94,7 @@ namespace Docusign.Repository.Peticion
 
             var httpClient = new HttpClient(handler)
             {
-                BaseAddress = new Uri($"https://na3.docusign.net/restapi/v2.1/accounts/{account}/{method}"),
+                BaseAddress = new Uri($"{configuration["Docusign_uri:entorno"]}/{account}/{method}"),
                 Timeout = new TimeSpan(0, 2, 0)
             };
 
@@ -103,13 +106,13 @@ namespace Docusign.Repository.Peticion
 
             if (type == MethodRequest.GET)
             {
-                response = await httpClient.GetAsync($"https://na3.docusign.net/restapi/v2.1/accounts/{account}/{method}");
+                response = await httpClient.GetAsync($"{configuration["Docusign_uri:entorno"]}/{account}/{method}");
             }
             else if (type == MethodRequest.POST)
             {
                 var json = JsonConvert.SerializeObject(data);
                 var dataEnvio = new StringContent(json, Encoding.UTF8, "application/json");
-                response = await httpClient.PostAsync($"https://na3.docusign.net/restapi/v2.1/accounts/{account}/{method}", dataEnvio);
+                response = await httpClient.PostAsync($"{configuration["Docusign_uri:entorno"]}/{account}/{method}", dataEnvio);
             }
 
 
@@ -133,7 +136,7 @@ namespace Docusign.Repository.Peticion
 
             var httpClient = new HttpClient(handler)
             {
-                BaseAddress = new Uri($"https://na3.docusign.net/restapi/v2.1/accounts/{account}/{method}"),
+                BaseAddress = new Uri($"{configuration["Docusign_uri:entorno"]}/{account}/{method}"),
                 Timeout = new TimeSpan(0, 2, 0)
             };
 
@@ -146,7 +149,7 @@ namespace Docusign.Repository.Peticion
 
             HttpResponseMessage response = new HttpResponseMessage();
 
-            response = await httpClient.GetAsync($"https://na3.docusign.net/restapi/v2.1/accounts/{account}/{method}");
+            response = await httpClient.GetAsync($"{configuration["Docusign_uri:entorno"]}/{account}/{method}");
 
             byte[] content = await response.Content.ReadAsByteArrayAsync();
 
@@ -167,7 +170,7 @@ namespace Docusign.Repository.Peticion
 
             var httpClient = new HttpClient(handler)
             {
-                BaseAddress = new Uri($"https://na3.docusign.net/restapi/v2.1/accounts/{account}/{method}"),
+                BaseAddress = new Uri($"{configuration["Docusign_uri:entorno"]}/{account}/{method}"),
                 Timeout = new TimeSpan(0, 2, 0)
             };
 
@@ -178,7 +181,7 @@ namespace Docusign.Repository.Peticion
 
             HttpResponseMessage response = new HttpResponseMessage();
 
-            response = await httpClient.GetAsync($"https://na3.docusign.net/restapi/v2.1/accounts/{account}/{method}");
+            response = await httpClient.GetAsync($"{configuration["Docusign_uri:entorno"]}/{account}/{method}");
 
             byte[] content = await response.Content.ReadAsByteArrayAsync();
 
@@ -188,18 +191,18 @@ namespace Docusign.Repository.Peticion
         public AuthenticationDTO validationAuthentication()
         {
             AuthenticationDTO auth = new AuthenticationDTO();
-
+            string empresa = contexto.adpconfig.Where(c => c.CnfCodigo == "Name_id_docusign").FirstOrDefault().CnfValor;
 
             var host = httpContextAccessor.HttpContext.Request.Host.Value;
             var path = httpContextAccessor.HttpContext.Request.PathBase.Value;
             string callback = "";
 
-            callback = $"https://{host}{path}/ds/callback".Replace("/", "%2F").Replace(":", "%3A");
+            callback = $"https://{host}{path}/ds/{empresa}/callback".Replace("/", "%2F").Replace(":", "%3A");
 
 
             string client_id = contexto.adpconfig.Where(c => c.CnfCodigo == "Client_id_docusign").FirstOrDefault().CnfValor;
             var token = contexto.tokenDocusign.ToList();
-            string url = $"https://account.docusign.com/oauth/auth?client_id={client_id}&scope=signature&response_type=code&redirect_uri={callback}";
+            string url = $"{configuration["Docusign_uri:entornoLogin"]}/oauth/auth?client_id={client_id}&scope=signature&response_type=code&redirect_uri={callback}";
 
 
             if (token.Count == 0)

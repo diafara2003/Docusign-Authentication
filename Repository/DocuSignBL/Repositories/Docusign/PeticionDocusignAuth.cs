@@ -14,7 +14,7 @@ namespace Docusign.Repository.Peticion
 
     public interface IPeticionDocusignAuth
     {
-        Task<DocusignAuthDTO> GetAccesToken(string code);
+        Task<DocusignAuthDTO> GetAccesToken(string key,string code);
     }
 
 
@@ -26,16 +26,16 @@ namespace Docusign.Repository.Peticion
             this._configuration = configuration;
 
         }
-        public async Task<DocusignAuthDTO> GetAccesToken(string code)
+        public async Task<DocusignAuthDTO> GetAccesToken(string key, string code)
         {
             HttpMessageHandler handler = new HttpClientHandler();
-            string clientId = _configuration["DocuSign_Coninsa:ClientId"];
-            string ClientSecret = _configuration["DocuSign_Coninsa:ClientSecret"];
+            string clientId = _configuration[$"DocuSign_{key}:ClientId"];
+            string ClientSecret = _configuration[$"DocuSign_{key}:ClientSecret"];
 
 
             var httpClient = new HttpClient(handler)
             {
-                BaseAddress = new Uri($"https://account.docusign.com/oauth/token"),
+                BaseAddress = new Uri($"{_configuration["Docusign_uri:entornoLogin"]}/oauth/token"),
                 Timeout = new TimeSpan(0, 2, 0)
             };
 
@@ -46,9 +46,6 @@ namespace Docusign.Repository.Peticion
 
             HttpResponseMessage response = new HttpResponseMessage();
 
-
-
-
             var data = new[]
 {
     new KeyValuePair<string, string>("grant_type", "authorization_code"),
@@ -56,7 +53,7 @@ namespace Docusign.Repository.Peticion
 };
             try
             {
-                response = await httpClient.PostAsync($"https://account.docusign.com/oauth/token", new FormUrlEncodedContent(data));
+                response = await httpClient.PostAsync($"{_configuration["Docusign_uri:entornoLogin"]}/oauth/token", new FormUrlEncodedContent(data));
             }
             catch (Exception e)
             {
