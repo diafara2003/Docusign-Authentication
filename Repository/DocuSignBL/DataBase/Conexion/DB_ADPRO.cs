@@ -32,6 +32,7 @@ namespace Docusign.Repository.DataBase.Conexion
         public DbSet<Monedas> monedas { get; set; }
         public DbSet<Sucursal> sucursal { get; set; }
         public DbSet<Producto> producto { get; set; }
+        public DbSet<ADPEntradasAlmacen> adpEntradasAlmacen { get; set; }
         #endregion
 
 

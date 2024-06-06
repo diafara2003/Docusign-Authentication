@@ -14,6 +14,7 @@ namespace Model.Entity.DBO
         [Key]
         public int EnAID { get; set; }
         public int EnANo { get; set; }
+        public int EnAOC { get; set; }
         public int EnASuc { get; set; }
         public int EnAObra { get; set; }
         public int EnAUsu { get; set; }

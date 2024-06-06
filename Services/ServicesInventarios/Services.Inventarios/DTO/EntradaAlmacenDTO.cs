@@ -59,4 +59,31 @@ namespace Model.DTO.Inventarios
         public string EnAFechaReciboNo { get; set; } = string.Empty;
         public string EnASticker { get; set; } = string.Empty;
     }
+
+    public class ListaEntradaAlmacenDTO
+    {
+        public int EnAID { get; set; }
+        public int EnASuc { get; set; }
+        public string Sucursal { get; set; } = string.Empty;
+        public int EnAOC { get; set; }
+        public int EnANo { get; set; }
+        public string EnAReciboNo { get; set; } = string.Empty;
+        public string TerNombre { get; set; } = string.Empty;
+        public string EnAFecha { get; set; } = string.Empty;
+        public string MvIVrTotalMM { get; set; } = string.Empty;
+        public string EOrDesc { get; set; } = string.Empty;
+        public string configuracion { get; set; } = string.Empty;
+        public decimal CantEA { get; set; }
+    }
+
+    public class PendienteEntradaDTO
+    {
+        public int EnASuc { get; set; }
+        public string NombreSuc { get; set; } = string.Empty;
+        public int EnAOC { get; set; }
+        public string TerNombre { get; set; } = string.Empty;
+        public int TerID { get; set; }
+        public int NoEntradas { get; set; }
+        public string FechaUltimaEntrada { get; set; } = string.Empty;
+    }
 }

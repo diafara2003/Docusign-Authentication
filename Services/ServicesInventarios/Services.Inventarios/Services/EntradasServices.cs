@@ -8,6 +8,7 @@ using Model.DTO.Inventarios;
 using Model.Entity.DBO;
 using Repository.DataBase.Conexion;
 using System.Data;
+using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 
 namespace Services.Inventarios
@@ -18,8 +19,11 @@ namespace Services.Inventarios
         List<BodegasSucursalDTO> ConsultaBodegas(string suc, string usuario);
         List<Terceros> TercerosEntradas(string filter, string suc);
         List<ComprasDTO> ComprasProveedor(string proveedor, string suc);
+        List<PendienteEntradaDTO> ComprasPendientesXSuc(string suc);
         DetalllesOCEADTO ConsultaDetallesOC(string compra, string suc);
         EntradaAlmacenTableDTO GuardarEntrada(EntradaAlmacenDTO data, string XmlEncabezadoEA);
+        List<ListaEntradaAlmacenDTO> ListadoEntradasEdicion(int suc, string oc, int usu, int prov, int estado, string fechai, string fechaf, string ea);
+        DetalllesOCEADTO ConsultaEntradaAlmacen(string idea, string suc);
     }
     public class EntradasServices : IEntradasService
     {
@@ -107,7 +111,7 @@ namespace Services.Inventarios
                             join FP in _contexto.formaPago on C.CompFormaPago equals FP.FrPID
                             join CD in _contexto.comprasDet on C.CompID equals CD.CompDetCompras
                             where (T.TerNombre.Contains(filter) || T.TerID.ToString().Contains(filter) || (T.TerID.ToString() + " - " + T.TerNombre).Contains(filter))
-                            && C.CompSuc.Equals(int.Parse(suc)) && (C.CompEstado.Equals(1) || C.CompEstado.Equals(2))
+                            && C.CompSuc.Equals(Convert.ToInt16(suc)) && (C.CompEstado.Equals(1) || C.CompEstado.Equals(2))
                             select T).ToList().GroupBy(x => x.TerID).Select(x => x.First()).ToList();
             }
 
@@ -123,7 +127,7 @@ namespace Services.Inventarios
                 compras = (from C in _contexto.compras
                            join FP in _contexto.formaPago on C.CompFormaPago equals FP.FrPID
                            join M in _contexto.monedas on C.CompMoneda equals M.MonID
-                           where C.CompProv.Equals(int.Parse(proveedor)) && C.CompSuc.Equals(int.Parse(suc))
+                           where C.CompProv.Equals(int.Parse(proveedor)) && C.CompSuc.Equals(Convert.ToInt16(suc))
                            && (C.CompEstado.Equals(1) || C.CompEstado.Equals(2))
 
                            select new ComprasDTO()
@@ -144,6 +148,31 @@ namespace Services.Inventarios
                                    MonAbrev = M.MonAbrev
                                }
                            }).ToList() ?? new List<ComprasDTO>();
+            }
+            return compras;
+        }
+
+        public List<PendienteEntradaDTO> ComprasPendientesXSuc(string suc)
+        {
+            List<PendienteEntradaDTO> compras = new List<PendienteEntradaDTO>();
+
+            if (!string.IsNullOrEmpty(suc))
+            {
+                compras = (from C in _contexto.compras
+                           join T in _contexto.tercero on C.CompProv equals T.TerID
+                           where C.CompSuc.Equals(Convert.ToInt16(suc))
+                           && (C.CompEstado.Equals(1) || C.CompEstado.Equals(2))
+
+                           select new PendienteEntradaDTO()
+                           {
+                               EnASuc = Convert.ToInt32(C.CompSuc),
+                               NombreSuc = "",
+                               EnAOC = C.CompID,
+                               TerNombre = T.TerNombre,
+                               TerID = C.CompProv,
+                               NoEntradas = (from E in _contexto.adpEntradasAlmacen where E.EnAOC.Equals(C.CompID) select E.EnAID).Count(),
+                               FechaUltimaEntrada = (from E in _contexto.adpEntradasAlmacen where E.EnAOC.Equals(C.CompID) select E.EnAFecha).Max().ToString()
+                           }).ToList() ?? new List<PendienteEntradaDTO>();
             }
             return compras;
         }
@@ -275,6 +304,9 @@ namespace Services.Inventarios
             return dataRespuesta;
         }
 
+
+
+
         public EntradaAlmacenTableDTO GuardarEntrada(EntradaAlmacenDTO data, string XmlEncabezadoEA)
         {
             EntradaAlmacenTableDTO dataRespuesta = new EntradaAlmacenTableDTO();
@@ -303,28 +335,199 @@ namespace Services.Inventarios
                     parametros = parametros
                 });
 
-                dataRespuesta = (from datalq in resultado.AsEnumerable()
-                                 select new EntradaAlmacenTableDTO()
-                                 {
-                                     entrada = new ADPEntradasAlmacen()
-                                     {
+                ADPEntradasAlmacen entrada = new ADPEntradasAlmacen();
+                entrada.EnAID = (int)resultado.Rows[0]["IdEntrada"];
+                entrada.EnANo = (int)resultado.Rows[0]["NoEntrada"];
 
-                                         EnAID = (int)datalq["IdEntrada"],
-                                         EnANo = (int)datalq["NoEntrada"]
-                                     },
-                                     Respuesta = new ResponseV3DTO()
-                                     {
-                                         codigo = (int)datalq["Codigo"],
-                                         mensaje = (string)datalq["Mensaje"],
-                                         OtroValor = Convert.ToString((int)datalq["IdMov"])
-                                     }
-                                 }).FirstOrDefault();
+                ResponseV3DTO Respuesta = new ResponseV3DTO();
+                Respuesta.codigo = (int)resultado.Rows[0]["Codigo"];
+                Respuesta.mensaje = (string)resultado.Rows[0]["Mensaje"];
+                Respuesta.OtroValor = Convert.ToString((int)resultado.Rows[0]["IdMov"]);
 
-
+                dataRespuesta.entrada = entrada;
+                dataRespuesta.Respuesta = Respuesta;
             }
             catch (Exception e)
             {
                 dataRespuesta = new EntradaAlmacenTableDTO();
+            }
+
+            return dataRespuesta;
+        }
+
+
+        public List<ListaEntradaAlmacenDTO> ListadoEntradasEdicion(int suc, string oc, int usu, int prov, int estado, string fechai, string fechaf, string ea)
+        {
+            List<ListaEntradaAlmacenDTO> dataRespuesta = new List<ListaEntradaAlmacenDTO>();
+            Dictionary<string, object> parametros = new Dictionary<string, object>();
+
+            try
+            {
+                parametros.Add("sucursal", suc);
+                parametros.Add("OC", oc);
+                parametros.Add("Usu", usu);
+                parametros.Add("Proveedor", prov);
+                parametros.Add("Estado", estado);
+                parametros.Add("FechaInicial", fechai);
+                parametros.Add("FechaFinal", fechaf);
+                parametros.Add("EnANo", ea);
+
+
+                var resultado = new DB_Execute().ExecuteStoreQuery(_httpContextAccessor, new Repository.DataBase.Model.ProcedureDTO()
+                {
+                    commandText = "[ADP_API_EA].[ConsultaEntradasEditar]",
+                    parametros = parametros
+                });
+
+                dataRespuesta = (from data in resultado.AsEnumerable()
+                                 select new ListaEntradaAlmacenDTO()
+                                 {
+                                     EnAID = (int)data["EnAID"],
+                                     EnASuc = Convert.ToInt32((Int16)data["EnASuc"]),
+                                     Sucursal = (string)data["SucDesc"],
+                                     EnAOC = (int)data["EnAOC"],
+                                     EnANo = (int)data["EnANoInt"],
+                                     EnAReciboNo = (string)data["EnAReciboNo"],
+                                     TerNombre = (string)data["TerNombre"],
+                                     EnAFecha = (string)data["EnAFecha"],
+                                     MvIVrTotalMM = (string)data["MvIVrTotalMM"],
+                                     EOrDesc = (string)data["EOrDesc"],
+                                     configuracion = (string)data["configuracion"],
+                                     CantEA = (decimal)data["MviCant"]
+                                 }).ToList();
+
+            }
+            catch (Exception e)
+            {
+                dataRespuesta = new List<ListaEntradaAlmacenDTO>();
+            }
+
+            return dataRespuesta;
+        }
+
+        public DetalllesOCEADTO ConsultaEntradaAlmacen(string idea, string suc)
+        {
+            DetalllesOCEADTO dataRespuesta = new DetalllesOCEADTO();
+            Dictionary<string, object> parametros = new Dictionary<string, object>();
+
+            try
+            {
+
+                parametros.Add("IdEntrada", idea);
+                parametros.Add("IdSucursal", suc);
+
+                var resultado = new DB_Execute().ExecuteStoreQuery(_httpContextAccessor, new Repository.DataBase.Model.ProcedureDTO()
+                {
+                    commandText = "[ADP_API_EA].[ConsultaEntradaAlmacen]",
+                    parametros = parametros
+                });
+
+                var datosEncabezado = (from dataLiq in resultado.AsEnumerable()
+                                       select new EntradaAlmacenTableDTO()
+                                       {
+                                           entrada = new ADPEntradasAlmacen()
+                                           {
+                                               EnAID = (int)dataLiq["EnAID"],
+                                               EnANo = (int)dataLiq["EnANo"],
+                                               EnAFecha = DateTime.Parse((string)dataLiq["EnaFecha"]),
+                                               EnAFechaFac = DateTime.Parse((string)dataLiq["EnAFechaFac"]),
+                                               EnAFechaReciboNo = DateTime.Parse((string)dataLiq["EnAFechaReciboNo"]),
+                                               EnAObra = (int)dataLiq["ObrObra"]
+                                           },
+                                           compra = new ComprasDTO()
+                                           {
+                                               compra = new Compras()
+                                               {
+                                                   CompID = (int)dataLiq["CompId"],
+                                                   CompNo = (int)dataLiq["CompNo"],
+                                                   CompObs = (string)dataLiq["CompObs"],
+                                                   CompSitioEnt = (string)dataLiq["CompSitioEnt"],
+                                                   CompDesc = (string)dataLiq["CompDesc"],
+                                                   CompProv = (int)dataLiq["CompProv"],
+                                                   CompTotalPagar = (decimal)dataLiq["CompTotalPagarMM"],
+                                                   CompFechaReq = DateTime.Parse((string)dataLiq["CompFechaReq"]),
+                                                   CompMonedaTC = (decimal)dataLiq["CompMonedaTC"]
+                                               },
+                                               sucursal = new Sucursal()
+                                               {
+                                                   SucID = (short)dataLiq["CompSuc"],
+                                                   SucDesc = (string)dataLiq["SucDesc"]
+                                               },
+                                               EstadoOrden = new EstadoOrdenCompraDTO()
+                                               {
+                                                   EOrID = (byte)dataLiq["CompEstado"],
+                                                   EOrDesc = (string)dataLiq["EOrDesc"]
+                                               },
+                                               moneda = new Monedas()
+                                               {
+                                                   MonDesc = (string)dataLiq["MonDesc"],
+                                                   MonAbrev = (string)dataLiq["MonAbrev"]
+                                               },
+                                               terceros = _contexto.tercero.Find((int)dataLiq["CompProv"])
+
+                                           }
+                                       }).FirstOrDefault();
+
+                dataRespuesta.Encabezado = datosEncabezado;
+
+                if (dataRespuesta.Encabezado != null)
+                {
+                    var datosDetalles = (from data in resultado.AsEnumerable()
+                                         select new MovimientosInvDTO()
+                                         {
+                                             movimientosInv = new MovimientosInv()
+                                             {
+                                                 MvIID = (int)data["MvIID"],
+                                                 MvIVrUnitMM = (decimal)data["MvIVrUnitMM"],
+                                                 MvICant = (decimal)data["MvICant"],
+                                                 MvIVrTotalMM = (decimal)data["MvIVrTotalMM"]
+                                             },
+                                             comprasDet = new ComprasDetDTO()
+                                             {
+                                                 comprasDet = new ComprasDet()
+                                                 {
+                                                     CompDetID = (int)data["CompDetID"],
+                                                     CompDetCompras = (int)data["CompId"],
+                                                     CompDetFechaReq = DateTime.Parse((string)data["CompDetFechaReq"]),
+                                                     CompDetCant = (decimal)data["CompDetCant"],
+                                                     CompDetUnitarioMM = (decimal)data["CompDetUnitarioMM"],
+                                                     CompDetIVA = (decimal)data["CompDetIVA"],
+                                                     CompDetBaseIvaDiff = (decimal)data["CompDetBaseIvaDiff"],
+                                                     CompDetBaseIvaDiff2 = (decimal)data["CompDetBaseIvaDiff2"]
+                                                 },
+                                                 producto = new Producto()
+                                                 {
+                                                     ProCod = (int)data["ProCod"],
+                                                     ProDesc = (string)data["ProDesc"],
+                                                     ProUnidadCont = (string)data["ProUnidadCont"],
+                                                     ProStockMinimo = (decimal)data["ProStockMinimo"],
+                                                     ProCodBIM = (string)data["ProCodBIM"]
+
+                                                 },
+
+                                                 BIDIFF = Convert.ToBoolean((int)data["BIDIFF"])
+                                             },
+                                             DevAsociada = (int)data["CantDevAsoc"],
+                                             CantidadPendiente = (decimal)data["CantPendiente"],
+                                             NotasAsociadas = (int)data["NotasAsociadas"],
+                                             CantMax = (decimal)data["CantMax"],
+                                             CantMin = (decimal)data["CantMin"],
+                                             CantInv = (decimal)data["CantInv"]
+
+                                         }).ToList();
+
+                    dataRespuesta.Detalles = datosDetalles;
+                }
+                else
+                {
+                    dataRespuesta.Detalles = new List<MovimientosInvDTO>();
+                }
+
+            }
+            catch (Exception e)
+            {
+                dataRespuesta.Encabezado = new EntradaAlmacenTableDTO();
+                dataRespuesta.Detalles = new List<MovimientosInvDTO>();
             }
 
             return dataRespuesta;
