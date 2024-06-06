@@ -6,7 +6,6 @@ using Model.Entity.DBO;
 using System.Text;
 using System.Web;
 using System.Xml;
-using static Model.DTO.Inventarios.EntradaAlmacenDTO;
 
 namespace API.Routes.MapInventarios
 {
