@@ -100,27 +100,37 @@ namespace Services.Inventarios
         }
 
 
-        public List<Terceros> TercerosEntradas(string filter, string suc)
+        public List<TercerosDTO> TercerosEntradas(string filter, string suc)
         {
-            List<Terceros> terceros = new List<Terceros>();
+            List<TercerosDTO> terceros = new List<TercerosDTO>();
 
             if (!string.IsNullOrEmpty(suc))
             {
+
+                if (filter == "_")
+                {
+                    filter = " ";
+                }
+
                 terceros = (from T in _contexto.tercero
                             join C in _contexto.compras on T.TerID equals C.CompProv
                             join FP in _contexto.formaPago on C.CompFormaPago equals FP.FrPID
                             join CD in _contexto.comprasDet on C.CompID equals CD.CompDetCompras
                             where (T.TerNombre.Contains(filter) || T.TerID.ToString().Contains(filter) || (T.TerID.ToString() + " - " + T.TerNombre).Contains(filter))
-                            && C.CompSuc.Equals(Convert.ToInt16(suc)) && (C.CompEstado.Equals(1) || C.CompEstado.Equals(2))
-                            select T).ToList().GroupBy(x => x.TerID).Select(x => x.First()).ToList();
+                            && C.CompSuc.Equals(int.Parse(suc)) && (C.CompEstado.Equals(1) || C.CompEstado.Equals(2))
+                            select new TercerosDTO()
+                            {
+                                id = T.TerID,
+                                nombre = T.TerNombre,
+                            }).ToList().GroupBy(x => x.id).Select(x => x.First()).ToList();
             }
 
             return terceros;
         }
 
-        public List<ComprasDTO> ComprasProveedor(string proveedor, string suc)
+        public List<CompraDTO> ComprasProveedor(string proveedor, string suc)
         {
-            List<ComprasDTO> compras = new List<ComprasDTO>();
+            List<CompraDTO> compras = new List<CompraDTO>();
 
             if (!string.IsNullOrEmpty(proveedor) && !string.IsNullOrEmpty(suc))
             {
@@ -130,24 +140,14 @@ namespace Services.Inventarios
                            where C.CompProv.Equals(int.Parse(proveedor)) && C.CompSuc.Equals(Convert.ToInt16(suc))
                            && (C.CompEstado.Equals(1) || C.CompEstado.Equals(2))
 
-                           select new ComprasDTO()
+                           select new CompraDTO()
                            {
-                               compra = new Compras()
-                               {
-                                   CompID = C.CompID,
-                                   CompNo = C.CompNo,
-                                   CompFecha = C.CompFecha,
-                                   CompEstado = C.CompEstado,
-                                   CompTotalPagar = C.CompTotalPagar,
-                                   CompTotalPagarMM = C.CompTotalPagarMM
-                               },
-                               moneda = new Monedas()
-                               {
-                                   MonSimbolo = M.MonSimbolo,
-                                   MonDesc = M.MonDesc,
-                                   MonAbrev = M.MonAbrev
-                               }
-                           }).ToList() ?? new List<ComprasDTO>();
+                                CompID = C.CompID,
+                                CompTotalPagar = C.CompTotalPagar,
+                                CompTotalPagarMM = C.CompTotalPagarMM,
+                                MonSimbolo = M.MonSimbolo,
+                                MonAbrev = M.MonAbrev
+                           }).ToList() ?? new List<CompraDTO>();
             }
             return compras;
         }

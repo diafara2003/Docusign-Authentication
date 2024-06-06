@@ -58,6 +58,35 @@ namespace Model.DTO.Inventarios
         public string EnAReciboNo { get; set; } = string.Empty;
         public string EnAFechaReciboNo { get; set; } = string.Empty;
         public string EnASticker { get; set; } = string.Empty;
+
+
+        public class TercerosDTO
+        {
+            public int id { get; set; }
+            public string nombre { get; set; } = string.Empty;
+
+        }
+
+        public class CompraDTO
+        {
+            public int CompID { get; set; }
+            public decimal CompTotalPagar { get; set; }
+            public decimal CompTotalPagarMM { get; set; }
+            public string MonAbrev { get; set; } = string.Empty;
+            public string MonSimbolo { get; set; } = string.Empty;
+
+        }
+        public class DetallesCompraDTO
+        {
+            public DetallesCompraDTO()
+            {
+                this.entrada = new ADPEntradasAlmacen();
+                this.compra = new ComprasDTO();
+            }
+            public ADPEntradasAlmacen entrada { get; set; }
+            public ComprasDTO compra { get; set; }
+
+        }
     }
 
     public class ListaEntradaAlmacenDTO
