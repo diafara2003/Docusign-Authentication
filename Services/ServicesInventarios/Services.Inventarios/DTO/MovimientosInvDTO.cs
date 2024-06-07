@@ -18,6 +18,7 @@ namespace Model.DTO.Inventarios
         public MovimientosInv movimientosInv { get; set; }
         public ComprasDetDTO comprasDet { get; set; }
         public int DevAsociada { get; set; }
+        public int NotasAsociadas { get; set; }
         public decimal CantidadPendiente { get; set; }
         public decimal CantMin { get; set; }
         public decimal CantMax { get; set; }

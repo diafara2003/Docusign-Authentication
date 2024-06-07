@@ -15,7 +15,7 @@ namespace Model.Entity.DBO
         public int CompID { get; set; }
         public int CompNo { get; set; }
         public int CompProv { get; set; }
-        public int CompSuc { get; set; }
+        public Int16 CompSuc { get; set; }
         public byte CompEstado { get; set; }
         public int CompFormaPago { get; set; }
         public DateTime CompFecha { get; set; }

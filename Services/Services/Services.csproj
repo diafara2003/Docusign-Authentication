@@ -9,8 +9,4 @@
     <ProjectReference Include="..\..\Repository\DocuSignBL\Repository.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Inventarios\" />
-  </ItemGroup>
-
 </Project>
