@@ -115,4 +115,21 @@ namespace Model.DTO.Inventarios
         public int NoEntradas { get; set; }
         public string FechaUltimaEntrada { get; set; } = string.Empty;
     }
+
+    public class CompraDTO
+    {
+        public int CompID { get; set; }
+        public decimal CompTotalPagar { get; set; }
+        public decimal CompTotalPagarMM { get; set; }
+        public string MonSimbolo { get; set; }
+        public string MonAbrev { get; set; }
+
+    }
+
+    public class TercerosDTO
+    {
+        public int id { get; set; }
+        public string nombre { get; set; }
+
+    }
 }

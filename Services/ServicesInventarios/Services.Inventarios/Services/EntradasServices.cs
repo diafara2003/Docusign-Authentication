@@ -17,8 +17,8 @@ namespace Services.Inventarios
     {
         List<ADPConfig> ConfigEntradas();
         List<BodegasSucursalDTO> ConsultaBodegas(string suc, string usuario);
-        List<Terceros> TercerosEntradas(string filter, string suc);
-        List<ComprasDTO> ComprasProveedor(string proveedor, string suc);
+        List<TercerosDTO> TercerosEntradas(string filter, string suc);
+        List<CompraDTO> ComprasProveedor(string proveedor, string suc);
         List<PendienteEntradaDTO> ComprasPendientesXSuc(string suc);
         DetalllesOCEADTO ConsultaDetallesOC(string compra, string suc);
         EntradaAlmacenTableDTO GuardarEntrada(EntradaAlmacenDTO data, string XmlEncabezadoEA);
@@ -117,7 +117,7 @@ namespace Services.Inventarios
                             join FP in _contexto.formaPago on C.CompFormaPago equals FP.FrPID
                             join CD in _contexto.comprasDet on C.CompID equals CD.CompDetCompras
                             where (T.TerNombre.Contains(filter) || T.TerID.ToString().Contains(filter) || (T.TerID.ToString() + " - " + T.TerNombre).Contains(filter))
-                            && C.CompSuc.Equals(int.Parse(suc)) && (C.CompEstado.Equals(1) || C.CompEstado.Equals(2))
+                                   && (C.CompEstado.Equals(1) || C.CompEstado.Equals(2)) && C.CompSuc.Equals(Convert.ToInt16(suc))
                             select new TercerosDTO()
                             {
                                 id = T.TerID,
@@ -179,6 +179,7 @@ namespace Services.Inventarios
 
         public DetalllesOCEADTO ConsultaDetallesOC(string compra, string suc)
         {
+
             DetalllesOCEADTO dataRespuesta = new DetalllesOCEADTO();
             Dictionary<string, object> parametros = new Dictionary<string, object>();
 
@@ -304,9 +305,6 @@ namespace Services.Inventarios
             return dataRespuesta;
         }
 
-
-
-
         public EntradaAlmacenTableDTO GuardarEntrada(EntradaAlmacenDTO data, string XmlEncabezadoEA)
         {
             EntradaAlmacenTableDTO dataRespuesta = new EntradaAlmacenTableDTO();
@@ -354,7 +352,6 @@ namespace Services.Inventarios
 
             return dataRespuesta;
         }
-
 
         public List<ListaEntradaAlmacenDTO> ListadoEntradasEdicion(int suc, string oc, int usu, int prov, int estado, string fechai, string fechaf, string ea)
         {

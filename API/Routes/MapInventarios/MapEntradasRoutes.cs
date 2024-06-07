@@ -44,7 +44,7 @@ namespace API.Routes.MapInventarios
             {
                 try
                 {
-                    List<Terceros> _config = _entradasService.TercerosEntradas(filter, suc);
+                    List<TercerosDTO> _config = _entradasService.TercerosEntradas(filter, suc);
                     return Results.Ok(_config);
                 }
                 catch (Exception e)
@@ -57,7 +57,7 @@ namespace API.Routes.MapInventarios
             {
                 try
                 {
-                    List<ComprasDTO> _config = _entradasService.ComprasProveedor(proveedor, suc);
+                    List<CompraDTO> _config = _entradasService.ComprasProveedor(proveedor, suc);
                     return Results.Ok(_config);
                 }
                 catch (Exception e)
