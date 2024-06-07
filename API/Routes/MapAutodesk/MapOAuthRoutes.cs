@@ -1,8 +1,6 @@
 ﻿using Autodesk.Forge.Client;
 using Autodesk.Forge;
 using Repository.AutoDesk.forgeAPI;
-using Autodesk.Forge.Model;
-using Model.DTO.Autodesk;
 
 namespace API.Routes.MapAutodesk
 {
@@ -42,7 +40,7 @@ namespace API.Routes.MapAutodesk
 
                     return Results.Ok(new AccessToken());
                 }
-            }).WithTags("AutoDesk");
+            }).WithTags("BIM360");
         }
         public struct AccessToken
         {

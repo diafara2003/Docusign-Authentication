@@ -1,16 +1,6 @@
 ﻿
-using Autodesk.Forge.Model;
-using Azure;
-using Azure.Core;
 using Docusign.Repository.Peticion;
-using Docusign.Services;
-using Microsoft.AspNetCore.Mvc;
-using System.Collections;
-using System.IO;
-using System.Net;
-using System.Net.Http.Headers;
-using System.Net.Mime;
-using System.Web;
+
 
 namespace API.Routes.MapWeatherForecast
 {
@@ -24,21 +14,14 @@ namespace API.Routes.MapWeatherForecast
 
         public static void RegisterWeatherForecast(this IEndpointRouteBuilder app)
         {
-            app.MapGet("/WeatherForecast", () =>
-            {
-                var rng = new Random();
-                return Enumerable.Range(1, 5).Select(index => new
-                {
-                    Date = DateTime.Now.AddDays(index),
-                    TemperatureC = rng.Next(-20, 55),
-                    Summary = Summaries[rng.Next(Summaries.Length)]
-                })  
-                .ToArray();
-            }).WithTags("WeatherForecast");
+            app.MapGet("/WeatherForecast",  () =>
+            {           
 
+                return Results.Ok("bien");
 
-            
-
+            }).WithTags("WeatherForecast")
+              .WithDescription("API de ejemplo para validar el funcionamiento del convertidor de pdf")
+              .Produces<Stream>().WithOpenApi();
 
             app.MapGet("/WeatherForecast/pdf", async (IPeticionDocusignRepository service, string path) =>
             {
@@ -49,7 +32,9 @@ namespace API.Routes.MapWeatherForecast
 
                 //return Results.Ok(path);
 
-            }).WithTags("WeatherForecast");
+            }).WithTags("WeatherForecast")
+               .WithDescription("API de ejemplo para validar el funcionamiento del convertidor de pdf")
+               .Produces<Stream>().WithOpenApi();
         }
 
     }

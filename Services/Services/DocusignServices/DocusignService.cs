@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
 using Docusign.Repository.Peticion;
-using Docusign.Repository.DataBase.Conexion;
+using Repository.DataBase.Conexion;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using System.Runtime.ConstrainedExecution;
 

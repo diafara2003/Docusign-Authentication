@@ -10,5 +10,6 @@ namespace Model.Entity.DBO
         public string CnfCodigo { get; set; }
         public string CnfValor { get; set; }
         public int CnfGrupos { get; set; }
+        public string CnfDescripcion { get; set; }
     }
 }
