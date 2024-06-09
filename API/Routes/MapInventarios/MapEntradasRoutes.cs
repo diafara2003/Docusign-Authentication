@@ -151,6 +151,19 @@ namespace API.Routes.MapInventarios
                     return Results.Ok(e.Message);
                 }
             }).WithTags("Entradas");
+
+            app.MapDelete("/Entradas/EliminaEntradaAlmacen", (IEntradasService _entradasService, int IdEA, string IdUsuario) =>
+            {
+                try
+                {
+                    ResponseDTO entrada = _entradasService.EliminaEntradaAlmacen(IdEA, IdUsuario);
+                    return Results.Ok(entrada);
+                }
+                catch (Exception e)
+                {
+                    return Results.Ok(e.Message);
+                }
+            }).WithTags("Entradas");
         }
     }
 }

@@ -2,6 +2,7 @@
 using Docusign.Repository.DataBase.Conexion;
 using Inventarios.DTO;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Model.DTO;
 using Model.DTO.ComprasD;
 using Model.DTO.Inventarios;
@@ -10,6 +11,7 @@ using Repository.DataBase.Conexion;
 using System.Data;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Services.Inventarios
 {
@@ -24,6 +26,8 @@ namespace Services.Inventarios
         EntradaAlmacenTableDTO GuardarEntrada(EntradaAlmacenDTO data, string XmlEncabezadoEA);
         List<ListaEntradaAlmacenDTO> ListadoEntradasEdicion(int suc, string oc, int usu, int prov, int estado, string fechai, string fechaf, string ea);
         DetalllesOCEADTO ConsultaEntradaAlmacen(string idea, string suc);
+        ResponseDTO EliminaEntradaAlmacen(int IdEA, string IdUsuario);
+
     }
     public class EntradasServices : IEntradasService
     {
@@ -429,7 +433,11 @@ namespace Services.Inventarios
                                                EnAFecha = DateTime.Parse((string)dataLiq["EnaFecha"]),
                                                EnAFechaFac = DateTime.Parse((string)dataLiq["EnAFechaFac"]),
                                                EnAFechaReciboNo = DateTime.Parse((string)dataLiq["EnAFechaReciboNo"]),
-                                               EnAObra = (int)dataLiq["ObrObra"]
+                                               EnAObra = (int)dataLiq["ObrObra"],
+                                               EnAFac = (string)dataLiq["EnAFac"],
+                                               EnAReciboNo = (string)dataLiq["EnAReciboNo"],
+                                               EnAObs = (string)dataLiq["EnAObs"],
+                                               Bodega = (int)dataLiq["BoSId"],
                                            },
                                            compra = new ComprasDTO()
                                            {
@@ -528,6 +536,40 @@ namespace Services.Inventarios
             }
 
             return dataRespuesta;
+        }
+
+        public ResponseDTO EliminaEntradaAlmacen(int IdEA, string IdUsuario)
+        {
+
+            ResponseDTO dataRespuesta = new ResponseDTO();
+            Dictionary<string, object> parametros = new Dictionary<string, object>();
+
+            try
+            {
+                parametros.Add("IdEA", IdEA);
+                parametros.Add("IdUsuario", IdUsuario);
+
+
+                var resultado = new DB_Execute().ExecuteStoreQuery(_httpContextAccessor, new Repository.DataBase.Model.ProcedureDTO()
+                {
+                    commandText = "[ADP_API_EA].[EliminaEntradaAlmacen]",
+                    parametros = parametros
+                });
+
+                dataRespuesta.codigo = (int)resultado.Rows[0]["Codigo"];
+                dataRespuesta.mensaje = (string)resultado.Rows[0]["Mensaje"];
+                dataRespuesta.success = true;
+                
+            }
+            catch (Exception e)
+            {
+                dataRespuesta.codigo = -1;
+                dataRespuesta.mensaje = e.Message;
+                dataRespuesta.success = false;
+            }
+
+            return dataRespuesta;
+
         }
     }
 }

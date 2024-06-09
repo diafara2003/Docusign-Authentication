@@ -18,13 +18,15 @@ namespace Model.Entity.DBO
         public int EnASuc { get; set; }
         public int EnAObra { get; set; }
         public int EnAUsu { get; set; }
-        public string EnAFac { get; set; }
+        public string? EnAFac { get; set; } = null;
+        public string? EnAReciboNo { get; set; } = null;
         public DateTime EnAFecha { get; set; }
         public DateTime EnAFechaFac { get; set; }
         public DateTime EnAFechaPago { get; set; }
         public DateTime EnAFechaReciboNo { get; set; }
         public Int16 EnAMoneda { get; set; }
         public string EnAObs { get; set; }
+        public int? Bodega { get;set; }
 
     }
 }
