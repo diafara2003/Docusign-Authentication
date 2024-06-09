@@ -23,7 +23,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "API", "API", "{8BB94131-960
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "API", "API\API.csproj", "{D563F0AD-28B6-4937-82E9-985A4C14C73B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inventarios", "Services\ServicesInventarios\Services.Inventarios\Inventarios.csproj", "{83357599-1147-4AFD-940E-9C0743ADFF7F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inventarios", "Services\ServicesInventarios\Services.Inventarios\Inventarios.csproj", "{83357599-1147-4AFD-940E-9C0743ADFF7F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Addons", "Services\Addons\Addons\Addons.csproj", "{B524D2C4-61ED-4F43-93EE-3830096655A9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -55,6 +57,10 @@ Global
 		{83357599-1147-4AFD-940E-9C0743ADFF7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{83357599-1147-4AFD-940E-9C0743ADFF7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{83357599-1147-4AFD-940E-9C0743ADFF7F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B524D2C4-61ED-4F43-93EE-3830096655A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B524D2C4-61ED-4F43-93EE-3830096655A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B524D2C4-61ED-4F43-93EE-3830096655A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B524D2C4-61ED-4F43-93EE-3830096655A9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -66,6 +72,7 @@ Global
 		{7F69F4D9-94F2-44B7-B87F-8BA358A64293} = {C2DA2A8C-A3FE-4924-B8FB-F6578254236D}
 		{D563F0AD-28B6-4937-82E9-985A4C14C73B} = {8BB94131-960B-47D5-AA60-3871EA227D31}
 		{83357599-1147-4AFD-940E-9C0743ADFF7F} = {C2DA2A8C-A3FE-4924-B8FB-F6578254236D}
+		{B524D2C4-61ED-4F43-93EE-3830096655A9} = {C2DA2A8C-A3FE-4924-B8FB-F6578254236D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B42C9A41-8425-48B6-9D44-238307F8002D}

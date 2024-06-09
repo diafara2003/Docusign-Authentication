@@ -8,6 +8,14 @@ namespace Model.DTO
 
 
 
+    public class ResponseEstandarDTO
+    {
+        public bool success { get; set; }
+        public int codigo { get; set; }
+        public string mensaje { get; set; }
+    }
+
+
     public class ResponseV3DTO
     {
         public ResponseV3DTO()

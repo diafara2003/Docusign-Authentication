@@ -21,13 +21,24 @@ namespace API.Routes.MapAutodesk
 
                 Credentials = await Credentials.FromSessionAsync(_httpContext.Request.Cookies, _httpContext.Response.Cookies);
 
-                FolferInfo folfer = await new Proyectos().Getfolfer(folder, projectId, Credentials.TokenInternal);
+                try
+                {
+                    FolferInfo folfer = await new Proyectos().Getfolfer(folder, projectId, Credentials.TokenInternal);
 
-                List<jsTreeNode> content = await new Proyectos().GetFolderContents(folder, projectId, Credentials.TokenInternal, null);
+                    List<jsTreeNode> content = await new Proyectos().GetFolderContents(folder, projectId, Credentials.TokenInternal, null);
 
 
-                return Results.Ok(new Tuple<FolferInfo, List<jsTreeNode>>(folfer, content));
-            }).WithTags("AutoDesk");
+                    return Results.Ok(new Tuple<FolferInfo, List<jsTreeNode>>(folfer, content));
+                }
+                catch (Exception e)
+                {
+
+                    throw e;
+                }
+                
+
+                
+            }).WithTags("BIM360");
 
             app.MapGet("/EDT/BIM360/ModelDerivative/folder/model/properties", async (IBIM360Services bim, HttpContext _httpContext, string id) =>
             {
@@ -57,7 +68,7 @@ namespace API.Routes.MapAutodesk
 
                 foreach (var item in objlst)
                 {
-                    if (!item.text.ToLower().Contains("3d") && item.text.ToLower().Contains(".rvt"))
+                    if ( item.text.ToLower().Contains(".rvt"))
                     {
                         List<MigracionRevitDTO> objResultado = await new ModelosRVT().ExtraerData(item.id, Credentials.TokenInternal, derivatives);
 
@@ -72,7 +83,7 @@ namespace API.Routes.MapAutodesk
                     resultado = _res,
                     totalregistros= objresponse.Count
                 });
-            }).WithTags("AutoDesk");
+            }).WithTags("BIM360");
 
             app.MapGet("/EDT/BIM360/ModelDerivative/model/metadatas", async (HttpContext _httpContext, string id) =>
             {
@@ -93,7 +104,7 @@ namespace API.Routes.MapAutodesk
                 dynamic meta = (await derivatives.GetMetadataAsync(urn.FirstOrDefault().id));
 
                 return Results.Ok(meta.data.metadata[0].guid);
-            }).WithTags("AutoDesk");
+            }).WithTags("BIM360");
 
             app.MapGet("/EDT/BIM360/ModelDerivative/model/hierarchy", async (HttpContext _httpContext, string urn) =>
             {
@@ -115,7 +126,7 @@ namespace API.Routes.MapAutodesk
                 objresponse.jsSingleNode = ConvertProperties(properties.data.collection);
 
                 return Results.Ok(objresponse);
-            }).WithTags("AutoDesk");
+            }).WithTags("BIM360");
 
 
             List<jsTreeNode> ConvertProperties(dynamic res)

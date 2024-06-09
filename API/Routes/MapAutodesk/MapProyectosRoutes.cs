@@ -39,7 +39,7 @@ namespace API.Routes.MapAutoDesk
                         return Results.Ok(await new Proyectos().GetItemVersions(ids, Credentials.TokenInternal));
                 }
                 return Results.Ok(objresponse);
-            }).WithTags("AutoDesk");
+            }).WithTags("BIM360");
         }
     }
 }

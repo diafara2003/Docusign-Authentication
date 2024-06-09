@@ -11,7 +11,7 @@
     "API_CORE": {
       "commandName": "IIS",
       "launchBrowser": true,
-      "launchUrl": "http://localhost/Sinco/V3/ADPRO/core/api/WeatherForecast"
+      "launchUrl": "http://localhost/Sinco/V3/ADPRO/core/api/Swagger"
     },
     "Profile 1": {
       "commandName": "IIS"
