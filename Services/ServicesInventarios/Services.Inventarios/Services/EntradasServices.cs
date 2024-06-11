@@ -26,7 +26,7 @@ namespace Services.Inventarios
         EntradaAlmacenTableDTO GuardarEntrada(EntradaAlmacenDTO data, string XmlEncabezadoEA);
         List<ListaEntradaAlmacenDTO> ListadoEntradasEdicion(int suc, string oc, int usu, int prov, int estado, string fechai, string fechaf, string ea);
         DetalllesOCEADTO ConsultaEntradaAlmacen(string idea, string suc);
-        ResponseDTO EliminaEntradaAlmacen(int IdEA, string IdUsuario);
+        ResponseEstandarDTO EliminaEntradaAlmacen(int IdEA, string IdUsuario);
 
     }
     public class EntradasServices : IEntradasService
@@ -538,10 +538,10 @@ namespace Services.Inventarios
             return dataRespuesta;
         }
 
-        public ResponseDTO EliminaEntradaAlmacen(int IdEA, string IdUsuario)
+        public ResponseEstandarDTO EliminaEntradaAlmacen(int IdEA, string IdUsuario)
         {
 
-            ResponseDTO dataRespuesta = new ResponseDTO();
+            ResponseEstandarDTO dataRespuesta = new ResponseEstandarDTO();
             Dictionary<string, object> parametros = new Dictionary<string, object>();
 
             try
