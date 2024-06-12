@@ -26,5 +26,7 @@ namespace Model.Entity.Addons
         public bool? Estandar { get; set; }
         public bool Principales { get; set; }
         public string ModuloRequisito { get; set; }
+        public bool Instalar { get; set; }
+        public bool Ver { get; set; }
     }
 }

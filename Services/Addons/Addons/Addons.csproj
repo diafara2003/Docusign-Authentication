@@ -13,6 +13,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\Model\Model\Model.csproj" />
     <ProjectReference Include="..\..\..\Repository\DocuSignBL\Repository.csproj" />
+    <ProjectReference Include="..\..\HandleError\HandleError.csproj" />
   </ItemGroup>
 
 </Project>

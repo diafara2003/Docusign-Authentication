@@ -1,14 +1,12 @@
 ﻿
 using Repository.DataBase.Conexion;
 using Model.DTO.Addons;
-using Model.DTO;
 using Model.Entity.Addons;
-using Model.Entity.ADP_PNL;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json.Linq;
-using System.Data.SqlClient;
+using Addons.DTO;
+using HandleError;
 
-namespace Addons
+namespace Addons.Services
 {
     public interface IAddonServices
     {
@@ -16,12 +14,14 @@ namespace Addons
         IEnumerable<AddonsDTO> GetAddons(int modulo);
         AddonConfigDTO GetAddon(int id);
         AddonConfigDTO GuardarAddon(AddonConfigDTO data);
-        int calcularNumeroAddon(bool isCritico);
+        int calcularNumeroAddon(bool isCritico, string nombre);
 
         IEnumerable<AutocompleteDTO> GetMenus(string filter = "");
         IEnumerable<AutocompleteDTO> GetConfig(string filter = "");
 
         IEnumerable<AutocompleteDTO> GetInformePanel(string filter = "");
+
+        ResponseActivacionDTO SolicitudHD(RequestHDSolicitudDTO request);
 
     }
 
@@ -29,10 +29,14 @@ namespace Addons
     {
 
         private DB_ADPRO _contexto;
+        private IHandleError _error;
+        private IHelpDesk _hd;
 
-        public AddonsService(DB_ADPRO contexto)
+        public AddonsService(DB_ADPRO contexto, IHandleError error, IHelpDesk hd)
         {
             _contexto = contexto;
+            _error = error;
+            _hd = hd;
         }
 
         public AddonConfigDTO GetAddon(int id)
@@ -62,7 +66,7 @@ namespace Addons
 
 
             //detalles
-            objresultado.detalle = (_contexto.addonsconfig.Where(c => c.IdListado == id)).Select(c => new DetalleAddonDTO()
+            objresultado.detalle = _contexto.addonsconfig.Where(c => c.IdListado == id).Select(c => new DetalleAddonDTO()
             {
                 id = c.IdConfig,
                 addonNo = objresultado.encabezado.addonNo,
@@ -95,13 +99,16 @@ namespace Addons
                 }
             ).ToList();
         }
-        public int calcularNumeroAddon(bool isCritico)
+        public int calcularNumeroAddon(bool isCritico, string nombre)
         {
             int numero = 0;
 
             if (isCritico)
-                numero = _contexto.addonsListado.Min(c => c.AddonNumero) - 1;
+            {
+                var split = nombre.Split("AC");
 
+                numero = int.Parse(split[1]) * -1000;
+            }
             else
                 numero = _contexto.addonsListado.Max(c => c.AddonNumero) + 1;
 
@@ -125,8 +132,8 @@ namespace Addons
                     id = data.encabezado.id;
                     addonno = data.encabezado.addonNo;
 
-                    addon.AddonNumero = data.encabezado.critico ? calcularNumeroAddon(true) : data.encabezado.addonNo;
-                    addon.AddonNombre = data.encabezado.addonNombre;
+                    addon.AddonNumero = data.encabezado.critico ? -1000 + data.encabezado.addonNo * -1 : data.encabezado.addonNo * -1;
+                    addon.AddonNombre = data.encabezado.critico ? $"AC {data.encabezado.addonNo * -1} -  {data.encabezado.addonNombre}" : data.encabezado.addonNombre;
                     addon.HorasBdAdicional = data.encabezado.horasBdAdicional;
                     addon.HorasInstalacion = data.encabezado.horasInstalacion;
                     addon.FechaPublicacion = data.encabezado.fechaPublicacion;
@@ -135,13 +142,13 @@ namespace Addons
                     addon.Obsoleto = data.encabezado.obsoleto;
                     addon.costo = data.encabezado.costo;
                     addon.Requisitos = data.encabezado.requisito;
-                    _contexto.Entry(addon).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+                    _contexto.Entry(addon).State = EntityState.Modified;
 
                 }
                 else
                 {
                     AddonsListado newAddon = new AddonsListado();
-                    newAddon.AddonNumero = data.encabezado.critico ? calcularNumeroAddon(true) : calcularNumeroAddon(false);
+                    newAddon.AddonNumero = data.encabezado.critico ? -1000 + data.encabezado.addonNo * -1 : data.encabezado.addonNo * -1;
                     newAddon.AddonNombre = data.encabezado.addonNombre;
                     newAddon.HorasBdAdicional = data.encabezado.horasBdAdicional;
                     newAddon.HorasInstalacion = data.encabezado.horasInstalacion;
@@ -151,9 +158,11 @@ namespace Addons
                     newAddon.Obsoleto = data.encabezado.obsoleto;
                     newAddon.costo = data.encabezado.costo;
                     newAddon.Requisitos = data.encabezado.requisito;
-
-
                     newAddon.Modulo = data.encabezado.modulo;
+
+
+                    newAddon.Instalar = true;
+                    newAddon.Ver = true;
 
                     _contexto.addonsListado.Add(newAddon);
 
@@ -187,7 +196,7 @@ namespace Addons
 
             _contexto.addonsconfig.Where(c => c.IdListado == idAddon).ToList().ForEach(d =>
             {
-                _contexto.Entry(d).State = Microsoft.EntityFrameworkCore.EntityState.Deleted;
+                _contexto.Entry(d).State = EntityState.Deleted;
             });
 
             foreach (var item in detalle)
@@ -326,5 +335,47 @@ namespace Addons
 
             }
         }
+
+        public ResponseActivacionDTO SolicitudHD(RequestHDSolicitudDTO request)
+        {
+            ResponseActivacionDTO obj = new ResponseActivacionDTO();
+
+            try
+            {
+                var addon = _contexto.addonsListado.FirstOrDefault(c => c.AddonNumero == request.addonno);
+                string entornos = "";
+
+                if (request.entornos != null && request.entornos.Count > 0)
+                    entornos = "<ul style='margin-left:5px'>";
+
+                request.entornos.ForEach(c => entornos += $"<li>{c}</li>");
+
+                if (request.entornos != null && request.entornos.Count > 0)
+                    entornos = "</ul>";
+
+                if (addon != null && addon.Instalar == true)
+                {
+                    //  var emprea = new Empresa().ConsultarEmpresa(empresa);
+
+                    _hd.CrearSoporte($"<h6><strong>Solicitud Instalacion addon {request.addonno}</strong></h6> " +
+                        $"<br /> " +
+                        $"<strong>Addon Número: </strong><span style='margin-left:5px'>{request.addonno} - {addon.AddonNombre}</span><br/>" +
+                        $"<strong>Empresas: </strong>{entornos}<br/>" +
+                        $"<strong>Observaciones de instalación: </strong><span style='margin-left:5px'>{request.obs} </span><br/><br/>", asunto: $"Solicitud instalación Addon {request.addonno}");
+
+                }
+            }
+            catch (Exception e)
+            {
+
+                _error.GuardarError(e, "SolicitudHD", data: new
+                {
+                    request
+                });
+            }
+
+            return obj;
+        }
     }
 }
+

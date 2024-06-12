@@ -1,4 +1,5 @@
-﻿using Addons;
+﻿using Addons.DTO;
+using Addons.Services;
 using Model.DTO;
 using Model.DTO.Addons;
 
@@ -72,6 +73,14 @@ namespace API.Routes.MapAddons
             }).WithTags("Addons")
                     .WithDescription("Consulta los Informes panel de ADPRO para configurar addons")
                     .Produces<IEnumerable<AutocompleteDTO>>().WithOpenApi();
+
+
+            app.MapPost("addons/solicitar", (IAddonServices addon, RequestHDSolicitudDTO request) =>
+            {
+                return Results.Ok(addon.SolicitudHD(request));
+            }).WithTags("Addons")
+                   .WithDescription("Generar un HD para la instalacion del addon")
+                   .Produces<IEnumerable<AutocompleteDTO>>().WithOpenApi();
 
         }
     }

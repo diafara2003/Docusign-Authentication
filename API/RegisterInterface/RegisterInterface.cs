@@ -1,5 +1,7 @@
-﻿using Docusign.Repository.Peticion;
+﻿using Addons.Services;
+using Docusign.Repository.Peticion;
 using Docusign.Services;
+using HandleError;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Repository.DataBase.Model;
 using Services.BIM360Services;
@@ -36,6 +38,9 @@ namespace API.RegisterInterface
 
 
             builder.RegisterAssemblyTypes(Assembly.Load("Addons"));
+            builder.AddScoped<IHelpDesk, HelpDesk>();
+            builder.AddScoped<HandleError.IHandleError, HandleError.HandleExeption>();
+            
         }
 
         public static void RegisterAssemblyTypes(this IServiceCollection services, Assembly assembly)
