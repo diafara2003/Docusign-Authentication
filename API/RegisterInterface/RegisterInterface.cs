@@ -35,7 +35,7 @@ namespace API.RegisterInterface
             builder.AddScoped<IEjemplo, Ejemplo>();
             builder.AddScoped<IBIM360Services, BIM360Services>();
             builder.AddScoped<IDocusignService, DocusignService>();
-
+            builder.AddScoped<IEntradasService, EntradasServices>();
 
             builder.RegisterAssemblyTypes(Assembly.Load("Addons"));
             builder.AddScoped<IHelpDesk, HelpDesk>();

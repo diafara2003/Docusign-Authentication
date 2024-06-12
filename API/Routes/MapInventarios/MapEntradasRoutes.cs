@@ -1,4 +1,5 @@
 ﻿using Inventarios.DTO;
+using Model.DTO;
 using Model.DTO.ComprasD;
 using Model.DTO.Inventarios;
 using Model.Entity.DBO;
@@ -144,6 +145,19 @@ namespace API.Routes.MapInventarios
                 try
                 {
                     DetalllesOCEADTO entrada = _entradasService.ConsultaEntradaAlmacen(idea, suc);
+                    return Results.Ok(entrada);
+                }
+                catch (Exception e)
+                {
+                    return Results.Ok(e.Message);
+                }
+            }).WithTags("Entradas");
+
+            app.MapDelete("/Entradas/EliminaEntradaAlmacen", (IEntradasService _entradasService, int IdEA, string IdUsuario) =>
+            {
+                try
+                {
+                    ResponseEstandarDTO entrada = _entradasService.EliminaEntradaAlmacen(IdEA, IdUsuario);
                     return Results.Ok(entrada);
                 }
                 catch (Exception e)

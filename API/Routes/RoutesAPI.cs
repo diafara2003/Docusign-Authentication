@@ -14,7 +14,7 @@ namespace API.Routes
 
             app.RegisterDocusign();
             app.RegisterDocusignDS();
-            //app.RegisterInventarios();
+            app.RegisterInventarios();
             app.RegisterWeatherForecast();
 
 
