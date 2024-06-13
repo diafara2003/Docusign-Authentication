@@ -54,11 +54,37 @@ namespace API.Routes.MapInventarios
                 }
             }).WithTags("Entradas");
 
+            app.MapGet("/Entradas/ProveedorConEntradas", (IEntradasService _entradasService, string filter, string suc) =>
+            {
+                try
+                {
+                    List<TercerosDTO> _config = _entradasService.TercerosConEntradas(filter, suc);
+                    return Results.Ok(_config);
+                }
+                catch (Exception e)
+                {
+                    return Results.Ok(e.Message);
+                }
+            }).WithTags("Entradas");
+
             app.MapGet("/Entradas/ComprasProveedor", (IEntradasService _entradasService, string proveedor, string suc) =>
             {
                 try
                 {
                     List<CompraDTO> _config = _entradasService.ComprasProveedor(proveedor, suc);
+                    return Results.Ok(_config);
+                }
+                catch (Exception e)
+                {
+                    return Results.Ok(e.Message);
+                }
+            }).WithTags("Entradas");
+
+            app.MapGet("/Entradas/ComprasConEntradas", (IEntradasService _entradasService, string proveedor, string suc) =>
+            {
+                try
+                {
+                    List<CompraDTO> _config = _entradasService.ComprasProveedorConEntradas(proveedor, suc);
                     return Results.Ok(_config);
                 }
                 catch (Exception e)
