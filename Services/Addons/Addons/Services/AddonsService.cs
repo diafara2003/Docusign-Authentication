@@ -136,6 +136,13 @@ namespace Addons.Services
                 }
             ).ToList();
         }
+
+        int calcularCritinoNoPublicado()
+        {
+            int numero = _contexto.addonsListado.Min(c => c.AddonNumero) - 1;
+
+            return numero;
+        }
         public int calcularNumeroAddon(bool isCritico, int id = 0, bool publicar = false)
         {
             int numero = 0;
@@ -156,7 +163,6 @@ namespace Addons.Services
 
             if (isCritico)
             {
-
                 if (id > 0)
                 {
                     numero = (_contexto.addonsListado.Find(id) ?? new AddonsListado() { AddonNumero = 0 }).AddonNumero;
@@ -164,7 +170,8 @@ namespace Addons.Services
                 else
                 {
                     numero = _contexto.addonsListado.Min(c => c.AddonNumero) - 1;
-                }
+                }              
+
                 numero += 1000;
 
                 numero = numero * -1;
@@ -206,13 +213,12 @@ namespace Addons.Services
 
                     if (isCriticoCurrent != data.encabezado.critico)
                     {
-                        numero = calcularNumeroAddon(data.encabezado.critico, id, false);
-
-
+                      
                         if (data.encabezado.critico)
-                        {
-                            numero += -1000;
-                        }
+                            numero = _contexto.addonsListado.Min(c => c.AddonNumero) - 1;
+                        else
+                            numero = _contexto.addonsListado.Where(c => c.AddonNumero > -1000).Min(c => c.AddonNumero) - 1;
+
                     }
 
                     addon.AddonNumero = numero;
@@ -231,7 +237,7 @@ namespace Addons.Services
 
                     _contexto.Entry(addon).State = EntityState.Modified;
 
-                    _contexto.SaveChanges();
+                      _contexto.SaveChanges();
                     addonno = addon.AddonNumero;
                 }
             }
@@ -267,7 +273,7 @@ namespace Addons.Services
 
                 _contexto.addonsListado.Add(newAddon);
 
-             _contexto.SaveChanges();
+                _contexto.SaveChanges();
                 id = newAddon.IdListado;
                 addonno = newAddon.AddonNumero;
 
