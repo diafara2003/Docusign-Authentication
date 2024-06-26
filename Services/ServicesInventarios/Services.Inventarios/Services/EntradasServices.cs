@@ -20,7 +20,9 @@ namespace Services.Inventarios
         List<ADPConfig> ConfigEntradas();
         List<BodegasSucursalDTO> ConsultaBodegas(string suc, string usuario);
         List<TercerosDTO> TercerosEntradas(string filter, string suc);
+        List<TercerosDTO> TercerosConEntradas(string filter, string suc);
         List<CompraDTO> ComprasProveedor(string proveedor, string suc);
+        List<CompraDTO> ComprasProveedorConEntradas(string proveedor, string suc);
         List<PendienteEntradaDTO> ComprasPendientesXSuc(string suc);
         DetalllesOCEADTO ConsultaDetallesOC(string compra, string suc);
         EntradaAlmacenTableDTO GuardarEntrada(EntradaAlmacenDTO data, string XmlEncabezadoEA);
@@ -132,6 +134,35 @@ namespace Services.Inventarios
             return terceros;
         }
 
+        public List<TercerosDTO> TercerosConEntradas(string filter, string suc)
+        {
+            List<TercerosDTO> terceros = new List<TercerosDTO>();
+
+            if (!string.IsNullOrEmpty(suc))
+            {
+
+                if (filter == "_")
+                {
+                    filter = " ";
+                }
+
+                terceros = (from T in _contexto.tercero
+                            join C in _contexto.compras on T.TerID equals C.CompProv
+                            join FP in _contexto.formaPago on C.CompFormaPago equals FP.FrPID
+                            join CD in _contexto.comprasDet on C.CompID equals CD.CompDetCompras
+                            join EA in _contexto.adpEntradasAlmacen on new { comp = C.CompID, suc = C.CompSuc } equals new { comp = EA.EnAOC, suc = Convert.ToInt16(EA.EnASuc) }
+                            where (T.TerNombre.Contains(filter) || T.TerID.ToString().Contains(filter) || (T.TerID.ToString() + " - " + T.TerNombre).Contains(filter))
+                                   && (C.CompEstado.Equals(1) || C.CompEstado.Equals(2)) && C.CompSuc.Equals(Convert.ToInt16(suc))
+                            select new TercerosDTO()
+                            {
+                                id = T.TerID,
+                                nombre = T.TerNombre,
+                            }).ToList().GroupBy(x => x.id).Select(x => x.First()).ToList();
+            }
+
+            return terceros;
+        }
+
         public List<CompraDTO> ComprasProveedor(string proveedor, string suc)
         {
             List<CompraDTO> compras = new List<CompraDTO>();
@@ -146,11 +177,36 @@ namespace Services.Inventarios
 
                            select new CompraDTO()
                            {
-                                CompID = C.CompID,
-                                CompTotalPagar = C.CompTotalPagar,
-                                CompTotalPagarMM = C.CompTotalPagarMM,
-                                MonSimbolo = M.MonSimbolo,
-                                MonAbrev = M.MonAbrev
+                               CompID = C.CompID,
+                               CompTotalPagar = C.CompTotalPagar,
+                               CompTotalPagarMM = C.CompTotalPagarMM,
+                               MonSimbolo = M.MonSimbolo,
+                               MonAbrev = M.MonAbrev
+                           }).ToList() ?? new List<CompraDTO>();
+            }
+            return compras;
+        }
+
+        public List<CompraDTO> ComprasProveedorConEntradas(string proveedor, string suc)
+        {
+            List<CompraDTO> compras = new List<CompraDTO>();
+
+            if (!string.IsNullOrEmpty(proveedor) && !string.IsNullOrEmpty(suc))
+            {
+                compras = (from C in _contexto.compras
+                           join FP in _contexto.formaPago on C.CompFormaPago equals FP.FrPID
+                           join M in _contexto.monedas on C.CompMoneda equals M.MonID
+                           join EA in _contexto.adpEntradasAlmacen on new { comp = C.CompID, suc = C.CompSuc } equals new { comp = EA.EnAOC, suc = Convert.ToInt16(EA.EnASuc) }
+                           where C.CompProv.Equals(int.Parse(proveedor)) && C.CompSuc.Equals(Convert.ToInt16(suc))
+                           && (C.CompEstado.Equals(1) || C.CompEstado.Equals(2))
+
+                           select new CompraDTO()
+                           {
+                               CompID = C.CompID,
+                               CompTotalPagar = C.CompTotalPagar,
+                               CompTotalPagarMM = C.CompTotalPagarMM,
+                               MonSimbolo = M.MonSimbolo,
+                               MonAbrev = M.MonAbrev
                            }).ToList() ?? new List<CompraDTO>();
             }
             return compras;
@@ -559,7 +615,7 @@ namespace Services.Inventarios
                 dataRespuesta.codigo = (int)resultado.Rows[0]["Codigo"];
                 dataRespuesta.mensaje = (string)resultado.Rows[0]["Mensaje"];
                 dataRespuesta.success = true;
-                
+
             }
             catch (Exception e)
             {
