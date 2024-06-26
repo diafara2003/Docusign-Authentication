@@ -28,5 +28,6 @@ namespace Model.Entity.Addons
         public string ModuloRequisito { get; set; }
         public bool Instalar { get; set; }
         public bool Ver { get; set; }
+        
     }
 }

@@ -2,6 +2,19 @@
 
 namespace Addons.DTO
 {
+
+    public class MarcarObsoletoAddonDTO
+    {
+        public int id { get; set; }
+        public string reemplazo { get; set; }
+
+    }
+    public class PublicarAddonDTO
+    {
+        public int id { get; set; }
+        public int numero { get; set; }
+        public bool instalable { get; set; }
+    }
     public class ResponseActivacionDTO
     {
         public string NombreDB { get; set; }

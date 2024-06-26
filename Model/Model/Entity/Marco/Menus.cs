@@ -15,4 +15,13 @@ namespace Model.Entity.Marco
         public string Ruta { get; set; }
         public int Modulo { get; set; }
     }
+
+    [Table("ModulosMenu", Schema = "dbo")]
+    public class ModulosMenu
+    {
+        [Key]
+        public int IdModulo { get; set; }
+        public string DescModulo { get; set; }
+        public string ModIniciales { get; set; }
+    }
 }

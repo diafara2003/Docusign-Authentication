@@ -13,6 +13,8 @@ namespace Model.DTO.Addons
         public bool Obsoleto { get; set; }
         public bool IsEstandar { get; set; }
         public string ModuloRequisito { get; set; }
+        public string addonRequisito { get; set; }
+        public bool publicado { get; set;}
 
     }
 
@@ -29,10 +31,13 @@ namespace Model.DTO.Addons
         public string rutaPDF { get; set; }
         public bool obsoleto { get; set; }
         public string requisito { get; set; }
+        public string requisitoModulo { get; set; }
         public bool critico { get; set; }
         public decimal costo { get; set; }
         public int modulo { get; set; }
         public bool estandar { get; set; }
+        public bool instalable { get; set; }
+        public bool visible { get; set; }
     }
 
     public class DetalleAddonDTO
@@ -46,6 +51,7 @@ namespace Model.DTO.Addons
         public string obs { get; set; }
         public bool anclaValor { get; set; }
         public string menuOld { get; set; }
+        public string MenuOldDesc { get; set; }
         public string tabla { get; set; }
     }
 

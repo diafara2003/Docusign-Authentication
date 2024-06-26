@@ -5,6 +5,9 @@ using Model.Entity.Addons;
 using Microsoft.EntityFrameworkCore;
 using Addons.DTO;
 using HandleError;
+using Model.DTO;
+using System.Linq;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Addons.Services
 {
@@ -14,29 +17,28 @@ namespace Addons.Services
         IEnumerable<AddonsDTO> GetAddons(int modulo);
         AddonConfigDTO GetAddon(int id);
         AddonConfigDTO GuardarAddon(AddonConfigDTO data);
-        int calcularNumeroAddon(bool isCritico, string nombre);
-
-        IEnumerable<AutocompleteDTO> GetMenus(string filter = "");
+        int calcularNumeroAddon(bool isCritico, int id = 0, bool publicar = false);
+        IEnumerable<AutocompleteDTO> GetMenus(int modulo = 0, string filter = "");
         IEnumerable<AutocompleteDTO> GetConfig(string filter = "");
-
         IEnumerable<AutocompleteDTO> GetInformePanel(string filter = "");
-
-        ResponseActivacionDTO SolicitudHD(RequestHDSolicitudDTO request);
-
+        ResponseEstandarDTO PublicarAddon(PublicarAddonDTO request);
+        ResponseAPIDTO EliminarAddon(int id);
+        IEnumerable<AutocompleteDTO> GetModulos(int modulo = 0, string filter = "");
+        IEnumerable<AutocompleteDTO> GetAddonsAC(int modulo = 0, string filter = "");
+        ResponseEstandarDTO MarcarObsoletoAddon(MarcarObsoletoAddonDTO request);
     }
 
     public class AddonsService : IAddonServices
     {
 
         private DB_ADPRO _contexto;
-        private IHandleError _error;
-        private IHelpDesk _hd;
 
-        public AddonsService(DB_ADPRO contexto, IHandleError error, IHelpDesk hd)
+
+
+        public AddonsService(DB_ADPRO contexto)
         {
             _contexto = contexto;
-            _error = error;
-            _hd = hd;
+
         }
 
         public AddonConfigDTO GetAddon(int id)
@@ -59,7 +61,10 @@ namespace Addons.Services
                     critico = c.AddonNumero <= -999,
                     costo = c.costo ?? 0,
                     estandar = c.Estandar ?? true,
-                    modulo = c.Modulo
+                    modulo = c.Modulo,
+                    instalable = c.Instalar,
+                    visible = c.Ver,
+                    requisitoModulo = c.ModuloRequisito ?? ""
 
                 }
             ).FirstOrDefault() ?? new EncabezadoAddonDTO() { };
@@ -76,9 +81,36 @@ namespace Addons.Services
                 valorNombre = c.ColValorNombre,
                 obs = c.Obs,
                 valorValor = c.ColValorValor,
-                tabla = c.Tabla
+                tabla = c.Tabla,
+                menuOld = string.IsNullOrEmpty(c.MenuOld) ? string.Empty : c.MenuOld
 
             }).ToList();
+
+            objresultado.detalle
+                .ForEach(c =>
+                {
+                    if (string.IsNullOrEmpty(c.menuOld))
+                    {
+                        return;
+                    }
+
+                    if (c.menuOld.Contains(","))
+                    {
+                        c.MenuOldDesc = "Multiples menús";
+                    }
+                    else
+                    {
+                        var _menu = _contexto.menus.Find(int.Parse(c.menuOld));
+
+                        if (_menu != null)
+                        {
+                            c.MenuOldDesc = _menu.Ubicacion;
+
+                        }
+                    }
+
+                });
+
 
             return objresultado;
         }
@@ -86,7 +118,9 @@ namespace Addons.Services
         public IEnumerable<AddonsDTO> GetAddons(int modulo)
         {
 
-            return _contexto.addonsListado.Where(c => c.Modulo == modulo).Select(c =>
+            return _contexto.addonsListado.Where(c => c.Modulo == modulo)
+                .OrderBy(c => c.AddonNumero)
+                .Select(c =>
                 new AddonsDTO()
                 {
                     Id = c.IdListado,
@@ -95,23 +129,58 @@ namespace Addons.Services
                     Obsoleto = c.Obsoleto,
                     Critico = c.AddonNumero <= -999,
                     IsEstandar = c.Estandar ?? true,
-                    ModuloRequisito = c.ModuloRequisito ?? ""
+                    ModuloRequisito = c.ModuloRequisito ?? "",
+                    addonRequisito = c.Requisitos ?? "",
+                    publicado = c.AddonNumero > 0 || c.AddonNumero < -999 && c.Ver
+
                 }
             ).ToList();
         }
-        public int calcularNumeroAddon(bool isCritico, string nombre)
+        public int calcularNumeroAddon(bool isCritico, int id = 0, bool publicar = false)
         {
             int numero = 0;
 
+            if (publicar == true)
+            {
+                if (isCritico)
+                {
+                    numero = _contexto.addonsListado.Min(c => c.AddonNumero) - 1;
+
+                    return (numero += 1000) * -1;
+                }
+                else
+                {
+                    return _contexto.addonsListado.Where(c => c.AddonNumero > -1000).Max(c => c.AddonNumero) + 1;
+                }
+            }
+
             if (isCritico)
             {
-                var split = nombre.Split("AC");
 
-                numero = int.Parse(split[1]) * -1000;
+                if (id > 0)
+                {
+                    numero = (_contexto.addonsListado.Find(id) ?? new AddonsListado() { AddonNumero = 0 }).AddonNumero;
+                }
+                else
+                {
+                    numero = _contexto.addonsListado.Min(c => c.AddonNumero) - 1;
+                }
+                numero += 1000;
+
+                numero = numero * -1;
+
             }
             else
-                numero = _contexto.addonsListado.Max(c => c.AddonNumero) + 1;
-
+            {
+                if (id > 0)
+                {
+                    numero = (_contexto.addonsListado.Find(id) ?? new AddonsListado() { AddonNumero = 0 }).AddonNumero;
+                }
+                else
+                {
+                    numero = _contexto.addonsListado.Where(c => c.AddonNumero > -1000).Min(c => c.AddonNumero) - 1;
+                }
+            }
 
             return numero;
         }
@@ -126,14 +195,28 @@ namespace Addons.Services
             {
                 var addon = _contexto.addonsListado.Find(data.encabezado.id);
 
+                int numero = addon.AddonNumero;
+
                 if (addon != null)
                 {
 
                     id = data.encabezado.id;
-                    addonno = data.encabezado.addonNo;
 
-                    addon.AddonNumero = data.encabezado.critico ? -1000 + data.encabezado.addonNo * -1 : data.encabezado.addonNo * -1;
-                    addon.AddonNombre = data.encabezado.critico ? $"AC {data.encabezado.addonNo * -1} -  {data.encabezado.addonNombre}" : data.encabezado.addonNombre;
+                    bool isCriticoCurrent = addon.AddonNumero < -999;
+
+                    if (isCriticoCurrent != data.encabezado.critico)
+                    {
+                        numero = calcularNumeroAddon(data.encabezado.critico, id, false);
+
+
+                        if (data.encabezado.critico)
+                        {
+                            numero += -1000;
+                        }
+                    }
+
+                    addon.AddonNumero = numero;
+                    addon.AddonNombre = data.encabezado.addonNombre;
                     addon.HorasBdAdicional = data.encabezado.horasBdAdicional;
                     addon.HorasInstalacion = data.encabezado.horasInstalacion;
                     addon.FechaPublicacion = data.encabezado.fechaPublicacion;
@@ -142,42 +225,59 @@ namespace Addons.Services
                     addon.Obsoleto = data.encabezado.obsoleto;
                     addon.costo = data.encabezado.costo;
                     addon.Requisitos = data.encabezado.requisito;
+                    addon.ModuloRequisito = data.encabezado.requisitoModulo;
+                    addon.Instalar = data.encabezado.instalable;
+                    addon.Ver = data.encabezado.critico ? false : data.encabezado.visible;
+
                     _contexto.Entry(addon).State = EntityState.Modified;
 
+                    _contexto.SaveChanges();
+                    addonno = addon.AddonNumero;
                 }
-                else
-                {
-                    AddonsListado newAddon = new AddonsListado();
-                    newAddon.AddonNumero = data.encabezado.critico ? -1000 + data.encabezado.addonNo * -1 : data.encabezado.addonNo * -1;
-                    newAddon.AddonNombre = data.encabezado.addonNombre;
-                    newAddon.HorasBdAdicional = data.encabezado.horasBdAdicional;
-                    newAddon.HorasInstalacion = data.encabezado.horasInstalacion;
-                    newAddon.FechaPublicacion = data.encabezado.fechaPublicacion;
-                    newAddon.RutaPDF = data.encabezado.rutaPDF;
-                    newAddon.Obs = data.encabezado.obs;
-                    newAddon.Obsoleto = data.encabezado.obsoleto;
-                    newAddon.costo = data.encabezado.costo;
-                    newAddon.Requisitos = data.encabezado.requisito;
-                    newAddon.Modulo = data.encabezado.modulo;
-
-
-                    newAddon.Instalar = true;
-                    newAddon.Ver = true;
-
-                    _contexto.addonsListado.Add(newAddon);
-
-                    id = newAddon.IdListado;
-                    addonno = newAddon.AddonNumero;
-
-                }
-                _contexto.SaveChanges();
-
-                if (id > 0)
-                    guardarDetalleAddon(data.detalle, id);
-
-                if (id > 0)
-                    objResponse = GetAddon(id);
             }
+            else
+            {
+
+                int numero = calcularNumeroAddon(data.encabezado.critico, 0);
+
+                if (data.encabezado.critico)
+                {
+                    numero += -1000;
+                }
+
+
+                AddonsListado newAddon = new AddonsListado();
+                newAddon.AddonNumero = numero;//; data.encabezado.critico ? -1000 + data.encabezado.addonNo * -1 : data.encabezado.addonNo * -1;
+                newAddon.AddonNombre = data.encabezado.addonNombre;
+                newAddon.HorasBdAdicional = data.encabezado.horasBdAdicional;
+                newAddon.HorasInstalacion = data.encabezado.horasInstalacion;
+                newAddon.FechaPublicacion = data.encabezado.fechaPublicacion;
+                newAddon.RutaPDF = data.encabezado.rutaPDF;
+                newAddon.Obs = data.encabezado.obs;
+                newAddon.Obsoleto = data.encabezado.obsoleto;
+                newAddon.costo = data.encabezado.costo;
+                newAddon.Requisitos = data.encabezado.requisito;
+                newAddon.Modulo = data.encabezado.modulo;
+                newAddon.Estandar = data.encabezado.estandar;
+                newAddon.SubModulo = "Página";
+                newAddon.Instalar = data.encabezado.instalable;
+                newAddon.Ver = data.encabezado.visible;
+                newAddon.ModuloRequisito = data.encabezado.requisitoModulo;
+                //newAddon.Publicado = false;
+
+                _contexto.addonsListado.Add(newAddon);
+
+             _contexto.SaveChanges();
+                id = newAddon.IdListado;
+                addonno = newAddon.AddonNumero;
+
+            }
+
+            if (id > 0)
+                guardarDetalleAddon(data.detalle, id);
+
+            if (id > 0)
+                objResponse = GetAddon(id);
 
             _contexto.ExecuteStoreQuery(new Repository.DataBase.Model.ProcedureDTO()
             {
@@ -211,9 +311,8 @@ namespace Addons.Services
                     IdConfig = 0,
                     IdListado = idAddon,
                     Obs = item.obs,
-                    Tabla = item.tabla
-
-
+                    Tabla = item.tabla,
+                    MenuOld = item.menuOld
                 });
             }
 
@@ -224,7 +323,7 @@ namespace Addons.Services
             }
         }
 
-        public IEnumerable<AutocompleteDTO> GetMenus(string filter = "")
+        public IEnumerable<AutocompleteDTO> GetMenus(int modulo = 0, string filter = "")
         {
             if (filter == "_")
                 filter = "";
@@ -233,7 +332,7 @@ namespace Addons.Services
             if (string.IsNullOrEmpty(filter))
             {
                 return _contexto.menus
-                  .Where(c => c.Modulo == 8 && c.Ubicacion != null && c.Ubicacion.Trim().Length > 0
+                  .Where(c => c.Modulo == modulo && c.Ubicacion != null && c.Ubicacion.Trim().Length > 0
                   && c.ActMenu == 1 && c.Descripcion.Trim() != "--"
                 )
                   .Take(20)
@@ -247,7 +346,7 @@ namespace Addons.Services
             else
             {
                 return _contexto.menus
-                    .Where(c => c.Modulo == 8 && c.Ubicacion != null && c.Ubicacion.Trim().Length > 0
+                    .Where(c => c.Modulo == modulo && c.Ubicacion != null && c.Ubicacion.Trim().Length > 0
                     && c.ActMenu == 1 && c.Descripcion.Trim() != "--"
                     && (c.Descripcion.Trim().ToLower().Contains(filter.ToLower())
                                 || c.Ruta.ToLower().Trim().Contains(filter.ToLower()))
@@ -277,21 +376,21 @@ namespace Addons.Services
                     .Select(c => new AutocompleteDTO()
                     {
                         id = c.CnfCodigo,
-                        valor = "",
-                        descripcion = c.CnfDescripcion
+                        valor = c.CnfDescripcion,
+                        descripcion = c.CnfCodigo
                     });
             }
             else
             {
                 return _contexto.adpconfig
                    .Where(c => c.CnfDescripcion.ToLower().Trim().Contains(filter)
-                           || c.CnfValor.ToLower().Trim().Contains(filter))
+                           || c.CnfCodigo.ToLower().Trim().Contains(filter))
                     .Take(20)
                    .Select(c => new AutocompleteDTO()
                    {
                        id = c.CnfCodigo,
-                       valor = "",
-                       descripcion = c.CnfDescripcion
+                       valor = c.CnfDescripcion,
+                       descripcion = c.CnfCodigo
                    });
 
             }
@@ -314,7 +413,7 @@ namespace Addons.Services
                             descripcion = $"{tipo.TipoInfDescripcion} / {clase.PnlDescripcion} / {inf.InfDesc}",
                             valor = inf.InfId.ToString()
                         })
-                    .Take(20)
+                    .Take(40)
                    .ToList();
             }
             else
@@ -323,58 +422,202 @@ namespace Addons.Services
                         join clase in _contexto.claseInforme on inf.ClaseInf equals clase.PnlId
                         join tipo in _contexto.tipoInforme on clase.TipInfo equals tipo.TipoInfId
                         where inf.InfDesc.ToLower().Trim().Contains(filter.ToLower())
-                                || clase.PnlDescripcion.ToLower().Trim().Contains(filter.ToLower())
+                        || tipo.TipoInfDescripcion.ToLower().Trim().Contains(filter.ToLower())
+                        || clase.PnlDescripcion.ToLower().Trim().Contains(filter.ToLower())
+
                         select new AutocompleteDTO()
                         {
                             id = inf.InfId.ToString(),
-                            descripcion = $"{tipo.TipoInfDescripcion} / ${clase.PnlDescripcion} / {inf.InfDesc}",
+                            descripcion = $"{tipo.TipoInfDescripcion} / {clase.PnlDescripcion} / {inf.InfDesc}",
                             valor = inf.InfId.ToString()
                         })
-                    .Take(20)
+                    .Take(40)
                    .ToList();
 
             }
         }
 
-        public ResponseActivacionDTO SolicitudHD(RequestHDSolicitudDTO request)
+        public ResponseEstandarDTO PublicarAddon(PublicarAddonDTO request)
         {
-            ResponseActivacionDTO obj = new ResponseActivacionDTO();
 
-            try
+            ResponseEstandarDTO objResponse = new ResponseEstandarDTO();
+            objResponse.success = true;
+
+            var addon = _contexto.addonsListado.Find(request.id);
+
+            if (addon != null)
             {
-                var addon = _contexto.addonsListado.FirstOrDefault(c => c.AddonNumero == request.addonno);
-                string entornos = "";
+                addon.Instalar = request.instalable;
 
-                if (request.entornos != null && request.entornos.Count > 0)
-                    entornos = "<ul style='margin-left:5px'>";
-
-                request.entornos.ForEach(c => entornos += $"<li>{c}</li>");
-
-                if (request.entornos != null && request.entornos.Count > 0)
-                    entornos = "</ul>";
-
-                if (addon != null && addon.Instalar == true)
+                if (addon.AddonNumero < -999)
                 {
-                    //  var emprea = new Empresa().ConsultarEmpresa(empresa);
-
-                    _hd.CrearSoporte($"<h6><strong>Solicitud Instalacion addon {request.addonno}</strong></h6> " +
-                        $"<br /> " +
-                        $"<strong>Addon Número: </strong><span style='margin-left:5px'>{request.addonno} - {addon.AddonNombre}</span><br/>" +
-                        $"<strong>Empresas: </strong>{entornos}<br/>" +
-                        $"<strong>Observaciones de instalación: </strong><span style='margin-left:5px'>{request.obs} </span><br/><br/>", asunto: $"Solicitud instalación Addon {request.addonno}");
-
+                    request.numero = (request.numero += 1000) * -1;
                 }
+
+                addon.AddonNumero = request.numero; //_contexto.addonsListado.Max(c => c.AddonNumero) + 1;
+                                                    // addon.Publicado = true;
+
+                objResponse.codigo = addon.AddonNumero;
+
+                _contexto.SaveChanges();
             }
-            catch (Exception e)
+
+            return objResponse;
+        }
+
+        public ResponseEstandarDTO MarcarObsoletoAddon(MarcarObsoletoAddonDTO request)
+        {
+
+            ResponseEstandarDTO objResponse = new ResponseEstandarDTO();
+            objResponse.success = true;
+
+            var addon = _contexto.addonsListado.Find(request.id);
+
+            if (addon != null)
             {
+                addon.Obsoleto = true;
+                // addon.Publicado = true;
+                addon.Reemplazo = request.reemplazo;
 
-                _error.GuardarError(e, "SolicitudHD", data: new
-                {
-                    request
-                });
+                objResponse.codigo = addon.AddonNumero;
+
+                _contexto.SaveChanges();
             }
 
-            return obj;
+            return objResponse;
+        }
+
+        public ResponseAPIDTO EliminarAddon(int id)
+        {
+            ResponseAPIDTO objResponse = new ResponseAPIDTO();
+            var addon = _contexto.addonsListado.Find(id);
+
+            if (addon != null)
+            {
+                _contexto.addonsconfig.Where(c => c.IdListado == id)
+                    .ToList()
+                    .ForEach(c =>
+                    {
+                        _contexto.Entry(c).State = EntityState.Deleted;
+                    });
+
+                _contexto.Entry(addon).State = EntityState.Deleted;
+
+                _contexto.SaveChanges();
+            }
+
+            return objResponse;
+        }
+
+        public IEnumerable<AutocompleteDTO> GetModulos(int modulo = 0, string filter = "")
+        {
+            if (filter == "_")
+                filter = "";
+            List<AutocompleteDTO> objModulos = new List<AutocompleteDTO>();
+
+            objModulos.Add(new AutocompleteDTO()
+            {
+                id = "GTH",
+                valor = "",
+                descripcion = "GTH"
+            });
+            objModulos.Add(new AutocompleteDTO()
+            {
+                id = "A&F",
+                valor = "",
+                descripcion = "A&F"
+            });
+            objModulos.Add(new AutocompleteDTO()
+            {
+                id = "M&E",
+                valor = "",
+                descripcion = "M&E"
+            });
+            objModulos.Add(new AutocompleteDTO()
+            {
+                id = "CBR",
+                valor = "",
+                descripcion = "CBR"
+            });
+            objModulos.Add(new AutocompleteDTO()
+            {
+                id = "F&C",
+                valor = "",
+                descripcion = "F&C"
+            });
+            objModulos.Add(new AutocompleteDTO()
+            {
+                id = "ABR",
+                valor = "",
+                descripcion = "ABR"
+            });
+            objModulos.Add(new AutocompleteDTO()
+            {
+                id = "SGC",
+                valor = "",
+                descripcion = "SGC"
+            });
+            objModulos.Add(new AutocompleteDTO()
+            {
+                id = "SGD",
+                valor = "",
+                descripcion = "SGD"
+            });
+            objModulos.Add(new AutocompleteDTO()
+            {
+                id = "SRM",
+                valor = "",
+                descripcion = "SRM"
+            });
+
+
+
+            if (string.IsNullOrEmpty(filter) == false)
+            {
+                return objModulos
+                  .Where(c => c.descripcion.ToLower().Trim().Contains(filter))
+                   .Take(20)
+                   .ToList();
+
+            }
+            else
+            {
+                return objModulos;
+
+            }
+        }
+
+        public IEnumerable<AutocompleteDTO> GetAddonsAC(int modulo = 0, string filter = "")
+        {
+            if (filter == "_")
+                filter = "";
+
+            if (string.IsNullOrEmpty(filter))
+            {
+                return _contexto.addonsListado
+                    .Where(c => c.Obsoleto == false && c.AddonNumero > 0)
+
+                    .Select(c => new AutocompleteDTO()
+                    {
+                        id = c.IdListado.ToString(),
+                        valor = "",
+                        descripcion = $"{(c.AddonNumero < -1000 ? "" : $"{c.AddonNumero} -")} {c.AddonNombre}"
+                    });
+            }
+            else
+            {
+                return _contexto.addonsListado
+                   .Where(c => c.AddonNumero.ToString().Trim().Contains(filter.ToLower())
+                           || c.AddonNombre.ToLower().Trim().Contains(filter.ToLower()))
+
+                   .Select(c => new AutocompleteDTO()
+                   {
+                       id = c.IdListado.ToString(),
+                       valor = "",
+                       descripcion = $"{(c.AddonNumero < -1000 ? "" : $"{c.AddonNumero} -")} - {c.AddonNombre}"
+                   });
+
+            }
         }
     }
 }

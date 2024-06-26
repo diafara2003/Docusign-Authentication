@@ -48,6 +48,7 @@ namespace Repository.DataBase.Conexion
 
         #region Tablas del Marco
         public DbSet<Menus> menus { get; set; }
+        
         #endregion
 
 

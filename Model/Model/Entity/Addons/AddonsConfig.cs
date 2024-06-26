@@ -16,6 +16,7 @@ namespace Model.Entity.Addons
         public string ColValorNombre { get; set; }
         public string ColValorValor { get; set; }
         public string Obs { get; set; }
+        public string MenuOld { get; set; }
         public bool AnclarVarlor { get; set; }
 
     }
