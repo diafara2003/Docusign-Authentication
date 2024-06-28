@@ -151,7 +151,7 @@ namespace Addons.Services
             {
                 if (isCritico)
                 {
-                    numero = _contexto.addonsListado.Min(c => c.AddonNumero) - 1;
+                    numero = _contexto.addonsListado.Where(c=>c.Ver==true && c.AddonNumero < -999).Min(c => c.AddonNumero) - 1;
 
                     return (numero += 1000) * -1;
                 }
@@ -169,8 +169,8 @@ namespace Addons.Services
                 }
                 else
                 {
-                    numero = _contexto.addonsListado.Min(c => c.AddonNumero) - 1;
-                }              
+                    numero = _contexto.addonsListado.Where(c => c.AddonNumero < -999).Min(c => c.AddonNumero) - 1;
+                }
 
                 numero += 1000;
 
@@ -213,7 +213,7 @@ namespace Addons.Services
 
                     if (isCriticoCurrent != data.encabezado.critico)
                     {
-                      
+
                         if (data.encabezado.critico)
                             numero = _contexto.addonsListado.Min(c => c.AddonNumero) - 1;
                         else
@@ -237,7 +237,7 @@ namespace Addons.Services
 
                     _contexto.Entry(addon).State = EntityState.Modified;
 
-                      _contexto.SaveChanges();
+                    _contexto.SaveChanges();
                     addonno = addon.AddonNumero;
                 }
             }
@@ -248,7 +248,7 @@ namespace Addons.Services
 
                 if (data.encabezado.critico)
                 {
-                    numero += -1000;
+                    numero = (numero * -1) + -1000;
                 }
 
 
@@ -383,7 +383,7 @@ namespace Addons.Services
                     {
                         id = c.CnfCodigo,
                         valor = c.CnfDescripcion,
-                        descripcion = c.CnfCodigo
+                        descripcion = c.CnfDescripcion
                     });
             }
             else
@@ -396,7 +396,7 @@ namespace Addons.Services
                    {
                        id = c.CnfCodigo,
                        valor = c.CnfDescripcion,
-                       descripcion = c.CnfCodigo
+                       descripcion = c.CnfDescripcion
                    });
 
             }
@@ -458,6 +458,8 @@ namespace Addons.Services
                 if (addon.AddonNumero < -999)
                 {
                     request.numero = (request.numero += 1000) * -1;
+
+                    addon.Ver = true;
                 }
 
                 addon.AddonNumero = request.numero; //_contexto.addonsListado.Max(c => c.AddonNumero) + 1;
