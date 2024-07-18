@@ -382,7 +382,7 @@ namespace Addons.Services
                     .Select(c => new AutocompleteDTO()
                     {
                         id = c.CnfCodigo,
-                        valor = c.CnfDescripcion,
+                        valor = c.CnfCodigo,
                         descripcion = c.CnfDescripcion
                     });
             }
@@ -395,7 +395,7 @@ namespace Addons.Services
                    .Select(c => new AutocompleteDTO()
                    {
                        id = c.CnfCodigo,
-                       valor = c.CnfDescripcion,
+                       valor = c.CnfCodigo,
                        descripcion = c.CnfDescripcion
                    });
 
@@ -460,6 +460,7 @@ namespace Addons.Services
                     request.numero = (request.numero += 1000) * -1;
 
                     addon.Ver = true;
+                    addon.Estandar = true;
                 }
 
                 addon.AddonNumero = request.numero; //_contexto.addonsListado.Max(c => c.AddonNumero) + 1;
