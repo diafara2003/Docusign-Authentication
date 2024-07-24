@@ -23,6 +23,14 @@ namespace API.Routes.MapWeatherForecast
               .WithDescription("API de ejemplo para validar el funcionamiento del convertidor de pdf")
               .Produces<Stream>().WithOpenApi();
 
+            app.MapGet("/pruebas/testADPRO", () =>
+            {
+                return Results.Ok(Summaries);
+
+            }).WithTags("WeatherForecast")
+           .WithDescription("API de ejemplo para validar el funcionamiento del convertidor de pdf")
+           .Produces<Stream>().WithOpenApi();
+
             app.MapGet("/WeatherForecast/pdf", async (IPeticionDocusignRepository service, string path) =>
             {
 

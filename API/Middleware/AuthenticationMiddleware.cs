@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Http.Extensions;
 using Repository.DataBase.Model;
 using SincoSoft.Context.Core;
-
+using HandleError;
 
 namespace API.Middleware
 {
@@ -13,36 +13,49 @@ namespace API.Middleware
         //readonly IConfiguration configuration;
         readonly IHttpContextAccessor httpContextAccessor;
         readonly IConstruirSession construirSession;
+        readonly IHandleError error;
 
         public AuthenticationMiddleware(RequestDelegate next
         //, IConfiguration _configuration
         , IHttpContextAccessor _httpContextAccessor
-        , IConstruirSession _construirSession
+        , IConstruirSession _construirSession,
+            IHandleError _error
         )
         {
             this.next = next;
             //configuration = _configuration;
             httpContextAccessor = _httpContextAccessor;
             construirSession = _construirSession;
+            error = _error;
         }
         public async Task Invoke(HttpContext context)
         {
             string urlPeticion = context.Request.GetDisplayUrl().ToLower();
 
-            
-            if (urlPeticion.ToLower().Contains("weatherforecast")
-                || urlPeticion.ToLower().Contains("bim360")
-                || urlPeticion.ToLower().Contains("callback")
-                ) await next(context);
-            else {
-                if (!urlPeticion.Contains("callback"))
-                {
-                    ObtenerSesion(context);
+            try
+            {
+             
 
-                    new DB_ADPRO(construirSession, httpContextAccessor);
+                if (urlPeticion.ToLower().Contains("weatherforecast")
+                    || urlPeticion.ToLower().Contains("bim360")
+                    || urlPeticion.ToLower().Contains("callback")
+                    ) await next(context);
+                else
+                {
+                    if (!urlPeticion.Contains("callback"))
+                    {
+                        ObtenerSesion(context);
+
+                        new DB_ADPRO(construirSession, httpContextAccessor);
+                    }
+                    await next(context);
                 }
-                await next(context);
             }
+            catch (Exception e)
+            {
+                error.GuardarError(e, urlPeticion);
+            }
+          
 
             
         }

@@ -290,7 +290,7 @@ namespace Addons.Services
                 commandText = "addons.Dtsxml",
                 parametros = new Dictionary<string, object>()
             {
-                {"@addon",addonno },{"@Ctrz",0 },{"@modulo",data.encabezado.modulo }
+                {"@addon",addonno.ToString() },{"@Ctrz",0 },{"@modulo",data.encabezado.modulo }
             }
             });
 
