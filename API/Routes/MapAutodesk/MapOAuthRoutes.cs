@@ -1,6 +1,7 @@
 ﻿using Autodesk.Forge.Client;
 using Autodesk.Forge;
 using Repository.AutoDesk.forgeAPI;
+using HandleError;
 
 namespace API.Routes.MapAutodesk
 {
@@ -11,10 +12,11 @@ namespace API.Routes.MapAutodesk
             Scope.BucketCreate, Scope.BucketRead, Scope.BucketUpdate, Scope.BucketDelete
         };
         private static Credentials Credentials { get; set; }
+
         public static void RegisterOAuth(this IEndpointRouteBuilder app)
         {
 
-            app.MapGet("/EDT/BIM360/OAuth/token", async (HttpContext _httpContext,IConfiguration _configuration) =>
+            app.MapGet("/EDT/BIM360/OAuth/token", async (HttpContext _httpContext,IConfiguration _configuration, IHandleError error) =>
             {
                 string FORGE_CLIENT_ID = _configuration["FORGE_CLIENT_ID"];// Credentials.GetAppSetting("FORGE_CLIENT_ID");
                 string FORGE_CLIENT_SECRET = _configuration["FORGE_CLIENT_SECRET"];//Credentials.GetAppSetting("FORGE_CLIENT_SECRET");
@@ -37,7 +39,7 @@ namespace API.Routes.MapAutodesk
                 }
                 catch (Exception ex)
                 {
-
+                    error.GuardarError(ex, "/EDT/BIM360/OAuth/token");
                     return Results.Ok(new AccessToken());
                 }
             }).WithTags("BIM360");
